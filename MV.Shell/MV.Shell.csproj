@@ -1,0 +1,76 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MV.Shell</AssemblyName>
+    <ApplicationIcon />
+    <Win32Resource />
+    <StartupObject>Mv.Shell.App</StartupObject>
+    <RootNamespace>Mv.Shell</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Modules\**" />
+    <EmbeddedResource Remove="Modules\**" />
+    <None Remove="Modules\**" />
+    <Page Remove="Modules\**" />
+    <Compile Remove="ServerInteraction\Responses.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="logo-icon.ico" />
+    <None Remove="MockData\background.jpg" />
+    <None Remove="MockData\background1.jpg" />
+    <None Remove="MockData\cc.jpg" />
+    <None Remove="MockData\dota2.jpg" />
+    <None Remove="MockData\fate.jpg" />
+    <None Remove="MockData\group.png" />
+    <None Remove="MockData\luluxiu.jpg" />
+    <None Remove="MockData\netdisk.png" />
+    <None Remove="MockData\qiegewala.png" />
+    <None Remove="MockData\scrapylogo.png" />
+    <None Remove="MockData\unknown.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="4.1.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
+    <PackageReference Include="Prism.Logging.Serilog" Version="7.2.0.1422" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
+    <PackageReference Include="Refit" Version="5.0.23" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MV.Authentication\MV.Authentication.csproj" />
+    <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
+    <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
+    <ProjectReference Include="..\MV.Modules.RD402\MV.Modules.RD402.csproj" />
+    <ProjectReference Include="..\MV.Resources\MV.Resources.csproj" />
+    <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="logo-icon.ico" />
+    <Resource Include="MockData\background.jpg" />
+    <Resource Include="MockData\background1.jpg" />
+    <Resource Include="MockData\dota2.jpg" />
+    <Resource Include="MockData\fate.jpg" />
+    <Resource Include="MockData\group.png" />
+    <Resource Include="MockData\netdisk.png" />
+    <Resource Include="MockData\scrapylogo.png" />
+    <Resource Include="MockData\unknown.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+</Project>

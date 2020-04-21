@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MV.Core.TransferService</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Polly" Version="7.2.0" />
+    <PackageReference Include="System.Reactive.Core" Version="4.3.2" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
+  </ItemGroup>
+</Project>
