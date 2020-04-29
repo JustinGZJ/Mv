@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.IO.Packaging;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,8 +73,14 @@ namespace Mv.Modules.RD402.ViewModels
                                 for (var i = 0; i < 16; i++) Outs[i] = device.GetSetBit(0, i);
 
                                 IsConnected = device.IsConnected;
-
-                                Spindle = ToStringBase36(device.GetWord(1));
+                                if (_config.Factory == "ICT")
+                                {
+                                    Spindle = ToSpindle(device.GetWord(1));
+                                }
+                                else
+                                {
+                                    Spindle = ToStringBase36(device.GetWord(1));
+                                }
                             });
 
                         Thread.Sleep(100);
@@ -117,7 +124,6 @@ namespace Mv.Modules.RD402.ViewModels
                                     _device.SetBit(0, 2, true);
                                 }
                                 AddMsg($"耗时 {Environment.TickCount - tick} ms");
-
                                 AddMsg("二维码设置完成...");
                                 _device.SetBit(0, 0, true);
                             }
@@ -140,8 +146,12 @@ namespace Mv.Modules.RD402.ViewModels
                             }
                             else
                             {
-                                _device.SetString(23, Barcode);
-                                if (await _device.WritePrinterTextAsync(Barcode))
+                                if (_config.Factory == "ICT")
+                                {
+                                    barcode = $"{LineCode}{MachineCode}{ToSpindle(device.GetWord(1))}{DayOfWeek}{Vendor}{WireConfig}";
+                                }
+                                _device.SetString(23, barcode);
+                                if (await _device.WritePrinterTextAsync(barcode))
                                 {
                                     _device.SetBit(0, 3, true);
                                     AddMsg("Success!");
@@ -171,14 +181,14 @@ namespace Mv.Modules.RD402.ViewModels
                                 var station = "STC Winding";
                                 var result = _device.GetBit(0, 5) ? "PASS" : "FAIL";
                                 var hashtable = new Dictionary<string, string>();
-                                hashtable["SN"] = MachineCode;
+                                hashtable["SN"] = MatrixCode;
                                 hashtable["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                                 hashtable["Machine_number"] = _config.MachineNumber;
                                 hashtable["Mandrel_number"] = axis;
                                 hashtable["Station"] = station;
                                 hashtable["Result"] = result;
                                 AddMsg(string.Join(',', hashtable.Values));
-                                var saveResult = SaveFile(Path.Combine(_config.FileDir, MachineCode + ".csv"), hashtable);
+                                var saveResult = SaveFile(Path.Combine(_config.FileDir, MatrixCode + ".csv"), hashtable);
                                 _device.SetBit(0, 5, saveResult);
                             }
                             else if (_config.Factory == "信维")
@@ -399,7 +409,7 @@ namespace Mv.Modules.RD402.ViewModels
             dispatcher.Invoke(() =>
             {
                 if (Msg.Count > 100) Msg.RemoveAt(0);
-                  Msg.Add(msg);
+                Msg.Add(msg);
             });
             Logger.Log(msg, Category.Info, Priority.None);
         }
@@ -412,12 +422,17 @@ namespace Mv.Modules.RD402.ViewModels
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 if (!File.Exists(fileName))
                 {
-                    var header = string.Join(',', hashtable.Keys).Trim(',');
-                    File.AppendAllText(fileName, header + Environment.NewLine);
+                    var header = string.Join(',', hashtable.Keys).Trim(',')+Environment.NewLine;
+                    var content = string.Join(',', hashtable.Values).Trim(',')+Environment.NewLine; 
+                    File.AppendAllText(fileName, header +content);
+                }
+                else
+                {
+                    var content = string.Join(',', hashtable.Values).Trim(',');
+                    File.AppendAllText(fileName, content + Environment.NewLine);
                 }
 
-                var content = string.Join(',', hashtable.Values).Trim(',');
-                File.AppendAllText(fileName, content + Environment.NewLine);
+   
                 return true;
             }
             catch (Exception ex)
@@ -447,7 +462,14 @@ namespace Mv.Modules.RD402.ViewModels
                 return value.ToString();
             return Chr(Encoding.ASCII.GetBytes("A")[0] + (value - 10));
         }
-
+        public string ToSpindle(int value)
+        {
+           
+            string content1 = "ABCD";
+            if (value > 16 || value < 1)
+                return value.ToString();
+            return content1.Substring((value-1) / 4, 1) + ((value-1) % 4 + 1).ToString();
+        }
 
         #region 设置条码命令
 
@@ -507,7 +529,10 @@ namespace Mv.Modules.RD402.ViewModels
             hashtable["softwareVER"] = _config.SoftwareVER;
             hashtable["moName"] = Mo;
             hashtable["coilWinding"] = CoilWinding;
-            hashtable["axis"] = ToStringBase36(_device.GetWord(1)); ;
+            if (_config.Factory == "ICT")
+                hashtable["axis"] = ToSpindle(_device.GetWord(1));
+            else
+                hashtable["axis"] = ToStringBase36(_device.GetWord(1)); ;
 
             var result = await _device.GetMatrixCodeAsync(hashtable);
             AddMsg($"{MvUser.Username}:获取二维码{result.Item2}.");
