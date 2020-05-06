@@ -13,6 +13,8 @@ namespace Mv.Modules.RD402.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+                throw new ArgumentNullException($"{nameof(FactoryVisiableConverter)} value can not be null");
             return value.ToString() == TargetFactory ? Visibility.Visible : Visibility.Collapsed;
         }
 

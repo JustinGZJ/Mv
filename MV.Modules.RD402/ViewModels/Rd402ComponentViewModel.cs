@@ -24,7 +24,10 @@ using ZXing.Presentation;
 
 namespace Mv.Modules.RD402.ViewModels
 {
-    public class Rd402ComponentViewModel : ViewModelBase, IViewLoadedAndUnloadedAware<Rd402Component>
+
+
+
+    public class Rd402ComponentViewModel : ViewModelBase
     {
         private readonly IConfigureFile _configure;
         private readonly DeviceReadWriter _device;
@@ -60,8 +63,9 @@ namespace Mv.Modules.RD402.ViewModels
             _configure.ValueChanged += _configure_ValueChanged;
             _config = configure.GetValue<RD402Config>(nameof(RD402Config)) ?? new RD402Config();
 
-
-            Task.Run(() =>
+            CancellationTokenSource cancellationToken = new CancellationTokenSource();
+            
+            Task.Factory.StartNew(() =>
                 {
                     while (true)
                     {
@@ -85,11 +89,10 @@ namespace Mv.Modules.RD402.ViewModels
 
                         Thread.Sleep(100);
                     }
-                }
-            );
+                },
+          cancellationToken.Token, TaskCreationOptions.LongRunning,TaskScheduler.Default);
             short tick = 0;
-
-            Task.Run(
+            Task.Factory.StartNew(
                 async () =>
                 {
                     while (true)
@@ -99,7 +102,6 @@ namespace Mv.Modules.RD402.ViewModels
                             AddMsg("获取二维码...");
                             var tick = Environment.TickCount;
                             var result = await GetMatrixCode();
-
                             AddMsg($"耗时:{Environment.TickCount - tick} ms");
                             if (!result)
                             {
@@ -109,7 +111,6 @@ namespace Mv.Modules.RD402.ViewModels
                             else
                             {
                                 AddMsg("Success");
-                                tick = Environment.TickCount;
                                 AddMsg($"开始写入二维码: {MatrixCode}");
                                 tick = Environment.TickCount;
                                 if (!await WritePrinterCode())
@@ -131,7 +132,6 @@ namespace Mv.Modules.RD402.ViewModels
                             _device.SetBit(0, 0, false);
                             _device.SetBit(0, 2, false);
                         }
-
                         if (_device.GetBit(0, 1))
                         {
                             AddMsg($"start set bar code {Barcode}...");
@@ -151,7 +151,7 @@ namespace Mv.Modules.RD402.ViewModels
                                     barcode = $"{LineCode}{MachineCode}{ToSpindle(device.GetWord(1))}{DayOfWeek}{Vendor}{WireConfig}";
                                 }
                                 _device.SetString(23, barcode);
-                                if (await _device.WritePrinterTextAsync(barcode))
+                                if (await _device.WritePrinterTextAsync(barcode).ConfigureAwait(false))
                                 {
                                     _device.SetBit(0, 3, true);
                                     AddMsg("Success!");
@@ -224,7 +224,7 @@ namespace Mv.Modules.RD402.ViewModels
                         _device.SetShort(10, tick++);
                         Thread.Sleep(1);
                     }
-                });
+                },cancellationToken.Token, TaskCreationOptions.LongRunning,TaskScheduler.Default);
         }
 
         public ObservableCollection<string> Msg { get; } = new ObservableCollection<string>();
@@ -422,17 +422,15 @@ namespace Mv.Modules.RD402.ViewModels
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
                 if (!File.Exists(fileName))
                 {
-                    var header = string.Join(',', hashtable.Keys).Trim(',')+Environment.NewLine;
-                    var content = string.Join(',', hashtable.Values).Trim(',')+Environment.NewLine; 
-                    File.AppendAllText(fileName, header +content);
+                    var header = string.Join(',', hashtable.Keys).Trim(',') + Environment.NewLine;
+                    var content = string.Join(',', hashtable.Values).Trim(',') + Environment.NewLine;
+                    File.AppendAllText(fileName, header + content);
                 }
                 else
                 {
                     var content = string.Join(',', hashtable.Values).Trim(',');
                     File.AppendAllText(fileName, content + Environment.NewLine);
                 }
-
-   
                 return true;
             }
             catch (Exception ex)
@@ -444,31 +442,30 @@ namespace Mv.Modules.RD402.ViewModels
 
         private void _configure_ValueChanged(object sender, ValueChangedEventArgs e)
         {
-            if (e.KeyName == nameof(RD402Config))
-            {
-                _config = _configure.GetValue<RD402Config>(nameof(RD402Config));
-                RaisePropertyChanged(nameof(LineNumber));
-                RaisePropertyChanged(nameof(Mo));
-                RaisePropertyChanged(nameof(MachineCode));
-                RaisePropertyChanged(nameof(Factory));
-                if (_config.Factory == "ICT")
-                    Barcode = $"{LineCode}{MachineCode}{Spindle}{DayOfWeek}{Vendor}{WireConfig}";
-            }
+            if (e.KeyName != nameof(RD402Config)) return;
+            _config = _configure.GetValue<RD402Config>(nameof(RD402Config));
+            RaisePropertyChanged(nameof(LineNumber));
+            RaisePropertyChanged(nameof(Mo));
+            RaisePropertyChanged(nameof(MachineCode));
+            RaisePropertyChanged(nameof(Factory));
+            if (_config.Factory == "ICT")
+                Barcode = $"{LineCode}{MachineCode}{Spindle}{DayOfWeek}{Vendor}{WireConfig}";
         }
 
-        public static string ToStringBase36(int value)
+        private static string ToStringBase36(int value)
         {
             if (value >= 0 && value < 10)
                 return value.ToString();
             return Chr(Encoding.ASCII.GetBytes("A")[0] + (value - 10));
         }
-        public string ToSpindle(int value)
+
+        private string ToSpindle(int value)
         {
-           
+
             string content1 = "ABCD";
             if (value > 16 || value < 1)
                 return value.ToString();
-            return content1.Substring((value-1) / 4, 1) + ((value-1) % 4 + 1).ToString();
+            return content1.Substring((value - 1) / 4, 1) + ((value - 1) % 4 + 1).ToString();
         }
 
         #region 设置条码命令
@@ -477,11 +474,11 @@ namespace Mv.Modules.RD402.ViewModels
 
         public DelegateCommand SetBarcodeCommand =>
             _setbarcodeCommand ??= new DelegateCommand(async () =>
-                await SetBarcode());
+                await SetBarcode().ConfigureAwait(false));
 
         private async Task SetBarcode()
         {
-            if (await _device.WritePrinterTextAsync(Barcode))
+            if (await _device.WritePrinterTextAsync(Barcode).ConfigureAwait(false))
             {
                 AddMsg($"{MvUser.Username}:设置条码成功.");
             }
@@ -516,7 +513,7 @@ namespace Mv.Modules.RD402.ViewModels
                 return strCharacter;
             }
 
-            throw new Exception("ASCII Code is not valid.");
+            throw new Exception("ASCII code is not valid.");
         }
 
 
@@ -534,7 +531,7 @@ namespace Mv.Modules.RD402.ViewModels
             else
                 hashtable["axis"] = ToStringBase36(_device.GetWord(1)); ;
 
-            var result = await _device.GetMatrixCodeAsync(hashtable);
+            var result = await _device.GetMatrixCodeAsync(hashtable).ConfigureAwait(false);
             AddMsg($"{MvUser.Username}:获取二维码{result.Item2}.");
             if (!result.Item1) return false;
 
@@ -565,16 +562,16 @@ namespace Mv.Modules.RD402.ViewModels
         private DelegateCommand _set2dcodeCommand;
 
         public DelegateCommand Set2DodeCommand =>
-            _set2dcodeCommand ??= new DelegateCommand(async () => await ExecuteSet2DodeCommand());
+            _set2dcodeCommand ??= new DelegateCommand(async () => await ExecuteSet2DodeCommand().ConfigureAwait(false));
 
         private async Task ExecuteSet2DodeCommand()
         {
-            await WritePrinterCode();
+            await WritePrinterCode().ConfigureAwait(false);
         }
 
         private async Task<bool> WritePrinterCode()
         {
-            if (await _device.WritePrinterCodeAsync(MatrixCode))
+            if (await _device.WritePrinterCodeAsync(MatrixCode).ConfigureAwait(false))
             {
                 AddMsg($"{MvUser.Username}: set matrix code {MatrixCode},ok");
                 return true;
@@ -586,16 +583,5 @@ namespace Mv.Modules.RD402.ViewModels
 
         #endregion
 
-        private Rd402Component _view;
-        public void OnLoaded(Rd402Component view)
-        {
-            view = _view;
-            // throw new NotImplementedException();
-        }
-
-        public void OnUnloaded(Rd402Component view)
-        {
-            //  throw new NotImplementedException();
-        }
     }
 }

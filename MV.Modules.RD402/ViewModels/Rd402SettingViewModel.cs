@@ -127,7 +127,7 @@ namespace Mv.Modules.RD402.ViewModels
             }
         }
 
-        public string[] Factories => new[] { "ICT", "信维","调试" };
+        public static string[] Factories => new[] { "ICT", "信维", "调试" };
 
         public string coilWinding
         {

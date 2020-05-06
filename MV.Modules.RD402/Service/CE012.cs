@@ -50,6 +50,8 @@ namespace Mv.Modules.RD402.Service
         {
             try
             {
+                if (hashtable == null)
+                    throw new ArgumentNullException($"{nameof(getsn)}:hashtable cannot be  null");
                 string postData = ParsToString(hashtable);
                 string ret = Post("http://172.19.144.1:8011/ce012.asmx/GetSTCCoilSN", postData);             
                 var document = new XmlDocument();

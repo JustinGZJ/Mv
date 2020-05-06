@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Mv.Modules.Group.MockData;
 
@@ -88,12 +90,15 @@ namespace Mv.Modules.Group.Controls
 
         private async void LoadPreviousMessages()
         {
-            Debug.WriteLine("Gets previous 10 messages.");
+            await Task.Run(() => { });
+            throw new NotImplementedException(nameof(LoadPreviousMessages));
         }
 
         private async void LoadSubsequentMessages()
         {
+            await Task.Run(() => { });
             Debug.WriteLine("Gets subsequent 10 messages.");
+            throw new NotImplementedException(nameof(LoadSubsequentMessages));
         }
 
         #region Implements INotifyPropertyChanged

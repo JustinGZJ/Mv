@@ -56,7 +56,7 @@ namespace Mv.Modules.RD402.Service
             _cts = new CancellationTokenSource();
             try
             {
-                Task.Run(() =>
+                Task.Factory.StartNew(() =>
                 {
                     OperateResult con = _melsec.ConnectServer();
                     if (!con.IsSuccess)
@@ -65,7 +65,6 @@ namespace Mv.Modules.RD402.Service
                         return;
                     while (!_cts.IsCancellationRequested)
                     {
-
                         int istart = Environment.TickCount;
                         var rbs = PlcRead();
                         if (rbs != null)
@@ -73,8 +72,9 @@ namespace Mv.Modules.RD402.Service
                             Buffer.BlockCopy(rbs, 0, _rbs, 0, rbs.Length);
                         }
                         PlcWrite(_wbs);
+                        Thread.Sleep(1);
                     }
-                }, _cts.Token);
+                }, _cts.Token,TaskCreationOptions.LongRunning,TaskScheduler.Default);
             }
             catch (AggregateException exs)
             {
@@ -82,10 +82,6 @@ namespace Mv.Modules.RD402.Service
                 {
                     _messageQueue.Enqueue(e.Message);
                 }
-            }
-            catch (Exception ex)
-            {
-                _messageQueue.Enqueue(ex.Message);
             }
 
         }

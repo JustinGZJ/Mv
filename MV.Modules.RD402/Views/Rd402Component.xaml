@@ -311,7 +311,7 @@
                 </TabControl>
             </GroupBox>
             <GroupBox Header="Messages" Grid.Row="6">
-                <ListBox x:Name="Msgs" ItemsSource="{Binding Msg}"></ListBox>
+                <ListBox controls:ListScrollToEnd.IsScrollToEnd="True" x:Name="Msgs" ItemsSource="{Binding Msg}"></ListBox>
             </GroupBox>
         </Grid>
 
