@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Packaging;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,50 +19,75 @@ using Unity;
 using ZXing;
 using ZXing.Common;
 using ZXing.Presentation;
+using System.Linq;
 
 namespace Mv.Modules.RD402.ViewModels
 {
 
+    public static class RD402Helper
+    {
+        public static bool SaveFile(string fileName, Dictionary<string, string> hashtable)
+        {
+            try
+            {
+                var dir = Path.GetDirectoryName(fileName);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                if (!File.Exists(fileName))
+                {
+                    var header = string.Join(',', hashtable.Keys).Trim(',') + Environment.NewLine;
+                    var content = string.Join(',', hashtable.Values).Trim(',') + Environment.NewLine;
+                    File.AppendAllText(fileName, header + content);
+                }
+                else
+                {
+                    var content = string.Join(',', hashtable.Values).Trim(',');
+                    File.AppendAllText(fileName, content + Environment.NewLine);
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                //    AddMsg(ex.Message);
+                return false;
+            }
+        }
+    }
 
 
     public class Rd402ComponentViewModel : ViewModelBase
     {
         private readonly IConfigureFile _configure;
-        private readonly DeviceReadWriter _device;
-
+        private IFactoryInfo factoryInfo;
+        private readonly IDeviceReadWriter _device;
+        private readonly IInkPrinter inkPrinter;
         private string _2dcode;
 
         private RD402Config _config;
         private string _dayOfWeek;
-
-
         private bool _isConnected;
-
         private string _linecode;
-
         private string _machineCode;
-
         private string _spindle;
-
         private string _vendor;
-
         private string _wireConfig;
         private string barcode;
         private string coilWinding;
         private readonly Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
-
         private string station;
 
-        public Rd402ComponentViewModel(IUnityContainer container, DeviceReadWriter device, IConfigureFile configure
+        public Rd402ComponentViewModel(IUnityContainer container, IDeviceReadWriter device, IInkPrinter inkPrinter, IConfigureFile configure
         ) : base(container)
         {
             _device = device;
+            this.inkPrinter = inkPrinter;
             _configure = configure;
             _configure.ValueChanged += _configure_ValueChanged;
             _config = configure.GetValue<RD402Config>(nameof(RD402Config)) ?? new RD402Config();
 
+            this.factoryInfo = Container.Resolve<IFactoryInfo>(_config.Factory);
+
             CancellationTokenSource cancellationToken = new CancellationTokenSource();
-            
+
             Task.Factory.StartNew(() =>
                 {
                     while (true)
@@ -75,22 +98,14 @@ namespace Mv.Modules.RD402.ViewModels
                                 for (var i = 0; i < 16; i++) Obs[i] = device.GetBit(0, i);
 
                                 for (var i = 0; i < 16; i++) Outs[i] = device.GetSetBit(0, i);
-
                                 IsConnected = device.IsConnected;
-                                if (_config.Factory == "ICT")
-                                {
-                                    Spindle = ToSpindle(device.GetWord(1));
-                                }
-                                else
-                                {
-                                    Spindle = ToStringBase36(device.GetWord(1));
-                                }
+                                Spindle = factoryInfo.GetSpindle(device.GetWord(1));
                             });
 
                         Thread.Sleep(100);
                     }
                 },
-          cancellationToken.Token, TaskCreationOptions.LongRunning,TaskScheduler.Default);
+          cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             short tick = 0;
             Task.Factory.StartNew(
                 async () =>
@@ -101,7 +116,7 @@ namespace Mv.Modules.RD402.ViewModels
                         {
                             AddMsg("获取二维码...");
                             var tick = Environment.TickCount;
-                            var result = await GetMatrixCode();
+                            var result = await GetMatrixCode().ConfigureAwait(false);
                             AddMsg($"耗时:{Environment.TickCount - tick} ms");
                             if (!result)
                             {
@@ -113,7 +128,7 @@ namespace Mv.Modules.RD402.ViewModels
                                 AddMsg("Success");
                                 AddMsg($"开始写入二维码: {MatrixCode}");
                                 tick = Environment.TickCount;
-                                if (!await WritePrinterCode())
+                                if (!await WritePrinterCode().ConfigureAwait(false))
                                 {
                                     AddMsg("Fail");
                                     _device.SetBit(0, 2, false);
@@ -135,113 +150,52 @@ namespace Mv.Modules.RD402.ViewModels
                         if (_device.GetBit(0, 1))
                         {
                             AddMsg($"start set bar code {Barcode}...");
-                            if (Barcode.Length < 7 && _config.Factory == "ICT")
+
+                            barcode = factoryInfo.GetBarcode(MatrixCode);
+                            _device.SetString(23, barcode);
+                            if (await inkPrinter.WritePrinterTextAsync(barcode).ConfigureAwait(false))
                             {
-                                AddMsg("barcode lenth <7.");
-                                _device.SetBit(0, 3, false);
-                                _device.SetBit(0, 1, true);
-                                SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 2000);
-                                _device.SetBit(0, 1, false);
-                                _device.SetBit(0, 3, false);
+                                _device.SetBit(0, 3, true);
+                                AddMsg("Success!");
                             }
                             else
                             {
-                                if (_config.Factory == "ICT")
-                                {
-                                    barcode = $"{LineCode}{MachineCode}{ToSpindle(device.GetWord(1))}{DayOfWeek}{Vendor}{WireConfig}";
-                                }
-                                _device.SetString(23, barcode);
-                                if (await _device.WritePrinterTextAsync(barcode).ConfigureAwait(false))
-                                {
-                                    _device.SetBit(0, 3, true);
-                                    AddMsg("Success!");
-                                }
-                                else
-                                {
-                                    _device.SetBit(0, 3, false);
-                                    AddMsg("Fail!");
-                                }
-
-                                AddMsg("条码设置完毕...");
-                                _device.SetBit(0, 1, true);
-                                SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 2000);
-                                _device.SetBit(0, 1, false);
                                 _device.SetBit(0, 3, false);
+                                AddMsg("Fail!");
                             }
-                        }
+                            AddMsg("条码设置完毕...");
+                            _device.SetBit(0, 1, true);
+                            SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 2000);
+                            _device.SetBit(0, 1, false);
+                            _device.SetBit(0, 3, false);
 
+                        }
                         if (_device.GetBit(0, 4))
                         {
                             AddMsg("开始保存文件...");
-
-                            if (_config.Factory == "ICT")
-                            {
-                                var machineCode = MachineCode;
-                                var axis = Spindle;
-                                var station = "STC Winding";
-                                var result = _device.GetBit(0, 5) ? "PASS" : "FAIL";
-                                var hashtable = new Dictionary<string, string>();
-                                hashtable["SN"] = MatrixCode;
-                                hashtable["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                                hashtable["Machine_number"] = _config.MachineNumber;
-                                hashtable["Mandrel_number"] = axis;
-                                hashtable["Station"] = station;
-                                hashtable["Result"] = result;
-                                AddMsg(string.Join(',', hashtable.Values));
-                                var saveResult = SaveFile(Path.Combine(_config.FileDir, MatrixCode + ".csv"), hashtable);
-                                _device.SetBit(0, 5, saveResult);
-                            }
-                            else if (_config.Factory == "信维")
-                            {
-                                var hashtable = new Dictionary<string, string>();
-                                hashtable["MI"] = "Sunway";
-                                hashtable["Station"] = _config.Station;
-                                hashtable["Project"] = _config.Project;
-                                hashtable["Stage"] = _config.Stage;
-                                hashtable["Model"] = _config.Model;
-                                hashtable["Config"] = _config.Config;
-                                hashtable["Test Time"] = DateTime.Now.ToString();
-                                hashtable["Fail Item"] = _device.GetBit(0, 5) ? "" : "Barcode NG"; ;
-                                hashtable["Fixture"] = "";
-                                hashtable["Cavity"] = "";
-                                hashtable["Mandrel number"] = _config.MachineNumber;
-                                hashtable["Winding spindle"] = Spindle;
-                                hashtable["STC SN"] = MatrixCode.Split('+')[0];
-                                hashtable["Coil SN"] = "";
-                                hashtable["FG SN"] = "";
-                                AddMsg(string.Join(',', hashtable.Values));
-                                var saveResult = SaveFile(Path.Combine(_config.FileDir, DateTime.Today.ToString("yyyy-MM-dd") + ".csv"), hashtable);
-                                _device.SetBit(0, 5, saveResult);
-                            }
+                            var result = factoryInfo.UploadFile(_device.GetBit(0, 5), factoryInfo.GetSpindle(_device.GetWord(1)), MatrixCode);
+                            _device.SetBit(0, 5, result);
                             AddMsg("文件保存完毕");
                             _device.SetBit(0, 4, true);
                             SpinWait.SpinUntil(() => !_device.GetBit(0, 4), 2000);
                             _device.SetBit(0, 4, false);
                             _device.SetBit(0, 5, false);
                         }
-
                         if (tick >= 15) tick = 0;
                         _device.SetShort(10, tick++);
                         Thread.Sleep(1);
+                        //    AddMsg(tick.ToString());
                     }
-                },cancellationToken.Token, TaskCreationOptions.LongRunning,TaskScheduler.Default);
+                }, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         public ObservableCollection<string> Msg { get; } = new ObservableCollection<string>();
 
         public ObservableCollection<BindableWrapper<bool>> Obs { get; } =
-            new ObservableCollection<BindableWrapper<bool>>
-            {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                false
-            };
+            new ObservableCollection<BindableWrapper<bool>>(Enumerable.Repeat(new BindableWrapper<bool>() { Value = false }, 16));
 
         public ObservableCollection<BindableWrapper<bool>> Outs { get; } =
-            new ObservableCollection<BindableWrapper<bool>>
-            {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-                false
-            };
+            new ObservableCollection<BindableWrapper<bool>>(Enumerable.Repeat(new BindableWrapper<bool>() { Value = false }, 16));
 
         public string LineCode
         {
@@ -292,18 +246,7 @@ namespace Mv.Modules.RD402.ViewModels
             set
             {
                 if (!SetProperty(ref _2dcode, value)) return;
-                if (_config.Factory == "ICT")
-                {
-                    LineCode = "0" + value.Substring(18, 1);
-                    Vendor = value.Substring(19, 1);
-                    DayOfWeek = value.Substring(6, 1);
-                    WireConfig = value.Substring(21, 1);
-                }
-                else
-                {
-                    Barcode = _2dcode.Substring(_2dcode.Length - 4);
-                }
-
+                Barcode = factoryInfo.GetBarcode(_2dcode, _config, _device.GetWord(1));
                 dispatcher.BeginInvoke(() =>
                 {
                     var writer = new BarcodeWriterGeometry
@@ -336,33 +279,16 @@ namespace Mv.Modules.RD402.ViewModels
         public string Mo
         {
             get => _config.Mo;
-            set
-            {
-                _config.Mo = value;
-                RaisePropertyChanged(nameof(Mo));
-            }
         }
 
         public string CoilWinding
         {
-            get => string.IsNullOrEmpty(coilWinding) ? _config.CoilWinding : coilWinding;
-            set
-            {
-                SetProperty(ref coilWinding, value);
-                _config.CoilWinding = value;
-                _configure.SetValue(nameof(RD402Config), _config);
-            }
+            get =>  _config.CoilWinding;
         }
 
         public string Station
         {
-            get => string.IsNullOrEmpty(station) ? _config.Station : station;
-            set
-            {
-                SetProperty(ref station, value);
-                _config.Station = value;
-                _configure.SetValue(nameof(RD402Config), _config);
-            }
+            get =>  _config.Station;
         }
 
 
@@ -371,19 +297,13 @@ namespace Mv.Modules.RD402.ViewModels
             get => string.IsNullOrEmpty(_spindle) ? "0" : _spindle;
             set
             {
-                if (SetProperty(ref _spindle, value) && _config.Factory == "ICT")
-                    Barcode = $"{LineCode}{MachineCode}{Spindle}{DayOfWeek}{Vendor}{WireConfig}";
+                SetProperty(ref _spindle, value);
             }
         }
 
         public string DayOfWeek
         {
             get => _dayOfWeek;
-            set
-            {
-                if (SetProperty(ref _dayOfWeek, value) && _config.Factory == "ICT")
-                    Barcode = $"{LineCode}{MachineCode}{Spindle}{DayOfWeek}{Vendor}{WireConfig}";
-            }
         }
 
         public string Barcode
@@ -395,11 +315,6 @@ namespace Mv.Modules.RD402.ViewModels
         public string LineNumber
         {
             get => _config.LineNumber;
-            set
-            {
-                _config.LineNumber = value;
-                RaisePropertyChanged(nameof(LineNumber));
-            }
         }
 
 
@@ -414,59 +329,26 @@ namespace Mv.Modules.RD402.ViewModels
             Logger.Log(msg, Category.Info, Priority.None);
         }
 
-        public bool SaveFile(string fileName, Dictionary<string, string> hashtable)
-        {
-            try
-            {
-                var dir = Path.GetDirectoryName(fileName);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                if (!File.Exists(fileName))
-                {
-                    var header = string.Join(',', hashtable.Keys).Trim(',') + Environment.NewLine;
-                    var content = string.Join(',', hashtable.Values).Trim(',') + Environment.NewLine;
-                    File.AppendAllText(fileName, header + content);
-                }
-                else
-                {
-                    var content = string.Join(',', hashtable.Values).Trim(',');
-                    File.AppendAllText(fileName, content + Environment.NewLine);
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                AddMsg(ex.Message);
-                return false;
-            }
-        }
+
 
         private void _configure_ValueChanged(object sender, ValueChangedEventArgs e)
         {
             if (e.KeyName != nameof(RD402Config)) return;
-            _config = _configure.GetValue<RD402Config>(nameof(RD402Config));
+            var config = _configure.GetValue<RD402Config>(nameof(RD402Config));
+            if (_config.Factory != config.Factory)
+            {
+                factoryInfo = Container.Resolve<IFactoryInfo>(config.Factory);        
+            }
             RaisePropertyChanged(nameof(LineNumber));
             RaisePropertyChanged(nameof(Mo));
             RaisePropertyChanged(nameof(MachineCode));
             RaisePropertyChanged(nameof(Factory));
-            if (_config.Factory == "ICT")
-                Barcode = $"{LineCode}{MachineCode}{Spindle}{DayOfWeek}{Vendor}{WireConfig}";
+            Barcode = factoryInfo.GetBarcode(MatrixCode, config, _device.GetWord(1));
+            _config = config;
+            RaisePropertyChanged(nameof(Factory));
         }
 
-        private static string ToStringBase36(int value)
-        {
-            if (value >= 0 && value < 10)
-                return value.ToString();
-            return Chr(Encoding.ASCII.GetBytes("A")[0] + (value - 10));
-        }
 
-        private string ToSpindle(int value)
-        {
-
-            string content1 = "ABCD";
-            if (value > 16 || value < 1)
-                return value.ToString();
-            return content1.Substring((value - 1) / 4, 1) + ((value - 1) % 4 + 1).ToString();
-        }
 
         #region 设置条码命令
 
@@ -478,7 +360,7 @@ namespace Mv.Modules.RD402.ViewModels
 
         private async Task SetBarcode()
         {
-            if (await _device.WritePrinterTextAsync(Barcode).ConfigureAwait(false))
+            if (await inkPrinter.WritePrinterTextAsync(Barcode).ConfigureAwait(false))
             {
                 AddMsg($"{MvUser.Username}:设置条码成功.");
             }
@@ -503,38 +385,14 @@ namespace Mv.Modules.RD402.ViewModels
             var result = await GetMatrixCode();
         }
 
-        public static string Chr(int asciiCode)
-        {
-            if (asciiCode >= 0 && asciiCode <= 255)
-            {
-                var asciiEncoding = new ASCIIEncoding();
-                byte[] byteArray = { (byte)asciiCode };
-                var strCharacter = asciiEncoding.GetString(byteArray);
-                return strCharacter;
-            }
 
-            throw new Exception("ASCII code is not valid.");
-        }
 
 
         private async Task<bool> GetMatrixCode()
         {
-            var hashtable = new Hashtable();
-            hashtable["lineNumber"] = LineNumber;
-            hashtable["station"] = Station;
-            hashtable["machineNO"] = _config.MachineNumber;
-            hashtable["softwareVER"] = _config.SoftwareVER;
-            hashtable["moName"] = Mo;
-            hashtable["coilWinding"] = CoilWinding;
-            if (_config.Factory == "ICT")
-                hashtable["axis"] = ToSpindle(_device.GetWord(1));
-            else
-                hashtable["axis"] = ToStringBase36(_device.GetWord(1)); ;
-
-            var result = await _device.GetMatrixCodeAsync(hashtable).ConfigureAwait(false);
+            var result = await Task.Run(factoryInfo.GetSn).ConfigureAwait(false);
             AddMsg($"{MvUser.Username}:获取二维码{result.Item2}.");
             if (!result.Item1) return false;
-
             dispatcher.Invoke(() => { MatrixCode = result.Item2; });
             AddMsg($"{MvUser.Username}:二维码:{MatrixCode}.");
             return true;
@@ -571,7 +429,7 @@ namespace Mv.Modules.RD402.ViewModels
 
         private async Task<bool> WritePrinterCode()
         {
-            if (await _device.WritePrinterCodeAsync(MatrixCode).ConfigureAwait(false))
+            if (await inkPrinter.WritePrinterCodeAsync(MatrixCode).ConfigureAwait(false))
             {
                 AddMsg($"{MvUser.Username}: set matrix code {MatrixCode},ok");
                 return true;
@@ -584,4 +442,6 @@ namespace Mv.Modules.RD402.ViewModels
         #endregion
 
     }
+
+
 }

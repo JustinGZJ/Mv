@@ -26,10 +26,6 @@ namespace Mv.Ui.Core
                     await task;
                     onSuccessCallback?.Invoke();
                 }
-              //  catch (ApiException e)
-                //{
-                //   // _snackbarMessageQueue.Enqueue(JObject.Parse(e.Content).Value<string>("status"));
-                //}
                 catch (HttpRequestException httpRequestException)
                 {
                     _snackbarMessageQueue.Enqueue(httpRequestException.InnerException?.Message);
@@ -42,11 +38,6 @@ namespace Mv.Ui.Core
                 {
                     return await task;
                 }
-          //      catch (ApiException apiException)
-                //{
-                //    var message = JObject.Parse(apiException.Content)["status"].ToString();
-                //    _snackbarMessageQueue.Enqueue(message);
-                //}
                 catch (HttpRequestException httpRequestException)
                 {
                     _snackbarMessageQueue.Enqueue(httpRequestException.InnerException?.Message);

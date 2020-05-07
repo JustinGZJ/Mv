@@ -19,10 +19,94 @@ using System.Collections.Concurrent;
 
 namespace Mv.Modules.RD402.Service
 {
-
-    public class DeviceReadWriter
+    public class InkPrinter : IInkPrinter
     {
-        IGetSn _snGeter;
+        private readonly IConfigureFile configureFile;
+        private readonly RD402Config _config;
+        private readonly ISnackbarMessageQueue _messageQueue;
+
+        public InkPrinter(IConfigureFile configureFile, ISnackbarMessageQueue messageQueue)
+        {
+            this.configureFile = configureFile;
+            _config = configureFile.Load().GetValue<RD402Config>(nameof(RD402Config));
+            this._messageQueue = messageQueue;
+        }
+
+        public async Task<bool> WritePrinterTextAsync(string text)
+        {
+            try
+            {
+                using (TcpClient client = new TcpClient())
+                {
+                    string cmd = $"STM:0:2::1{text}:";
+                    byte[] bs = new byte[cmd.Length + 2];
+                    byte[] br = new byte[10];
+                    await client.ConnectAsync(_config.PrinterIpAddress, _config.PrinterPort).ConfigureAwait(false);
+                    var sour = Encoding.ASCII.GetBytes(cmd);
+                    Buffer.BlockCopy(sour, 0, bs, 1, sour.Length);
+                    bs[0] = 0x02;
+                    bs[bs.Length - 1] = 0x03;
+                    client.Client.Send(bs);
+                    client.Client.Receive(br);
+                    if (br[0] == 0x06)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _messageQueue.Enqueue(ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> WritePrinterCodeAsync(string text)
+        {
+            try
+            {
+                using (TcpClient client = new TcpClient
+                {
+                    ReceiveTimeout = 1000,
+
+                    SendTimeout = 1000
+                })
+                {
+                    await client.ConnectAsync(_config.PrinterIpAddress, _config.PrinterPort).ConfigureAwait(false);
+                    string cmd = $"S2M:2:1:::::1:0:1{text}:";
+                    byte[] bs = new byte[cmd.Length + 2];
+                    byte[] br = new byte[10];
+                    var sour = Encoding.ASCII.GetBytes(cmd);
+                    Buffer.BlockCopy(sour, 0, bs, 1, sour.Length);
+                    bs[0] = 0x02;
+                    bs[bs.Length - 1] = 0x03;
+                    client.Client.Send(bs);
+                    client.Client.Receive(br);
+                    if (br[0] == 0x06)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _messageQueue.Enqueue(ex.Message);
+                return false;
+                // throw;
+            }
+        }
+    }
+
+    public class DeviceReadWriter : IDisposable, IDeviceReadWriter
+    {
         public DeviceReadWriter(IConfigureFile configureFile, ISnackbarMessageQueue messageQueue)
         {
 
@@ -38,14 +122,12 @@ namespace Mv.Modules.RD402.Service
                 _config = new RD402Config();
                 _configureFile.SetValue(nameof(RD402Config), _config);
             }
-            UpdateSnGetter(_config);
             PlcConnect();
         }
         public bool IsConnected { get; set; }
         public void PlcConnect()
         {
             _config = _configureFile.Load().GetValue<RD402Config>(nameof(RD402Config));
-            _configureFile.ValueChanged += _configureFile_ValueChanged;
             _melsec = new MelsecMcNet { IpAddress = _config.PLCIpAddress, Port = _config.PLCPort };
             if (_rbs == null || _rbs.Length != _config.ReadLens * 2)
                 _rbs = new byte[_config.ReadLens * 2];
@@ -74,7 +156,7 @@ namespace Mv.Modules.RD402.Service
                         PlcWrite(_wbs);
                         Thread.Sleep(1);
                     }
-                }, _cts.Token,TaskCreationOptions.LongRunning,TaskScheduler.Default);
+                }, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
             catch (AggregateException exs)
             {
@@ -84,31 +166,6 @@ namespace Mv.Modules.RD402.Service
                 }
             }
 
-        }
-
-        private void _configureFile_ValueChanged(object sender, ValueChangedEventArgs e)
-        {
-            var config = _configureFile.GetValue<RD402Config>(nameof(RD402Config));
-            if (_config.Factory != config.Factory)
-                UpdateSnGetter(config);
-            _config = config;
-        }
-
-        private void UpdateSnGetter(RD402Config config)
-        {
-
-            if (config.Factory == "ICT")
-            {
-                _snGeter = new checkmes();
-            }
-            else if (config.Factory == "信维")
-            {
-                _snGeter = new CE012();
-            }
-            else
-            {
-                _snGeter=new DebugGetSn();
-            }
         }
 
         byte[] PlcRead()
@@ -190,89 +247,6 @@ namespace Mv.Modules.RD402.Service
             return (BitConverter.ToUInt16(_wbs, index * 2) & (1 << bit)) > 0;
         }
 
-        public async Task<bool> WritePrinterTextAsync(string text)
-        {
-            try
-            {
-                using (TcpClient client = new TcpClient())
-                {
-                    string cmd = $"STM:0:2::1{text}:";
-                    byte[] bs = new byte[cmd.Length + 2];
-                    byte[] br = new byte[10];
-                    await client.ConnectAsync(_config.PrinterIpAddress, _config.PrinterPort);
-                    var sour = Encoding.ASCII.GetBytes(cmd);
-                    Buffer.BlockCopy(sour, 0, bs, 1, sour.Length);
-                    bs[0] = 0x02;
-                    bs[bs.Length - 1] = 0x03;
-                    client.Client.Send(bs);
-                    client.Client.Receive(br);
-                    if (br[0] == 0x06)
-                    {
-
-                        return true;
-                    }
-                    else
-                    {
-
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _messageQueue.Enqueue(ex.Message);
-                return false;
-            }
-        }
-
-        public async Task<bool> WritePrinterCodeAsync(string text)
-        {
-            try
-            {
-                using (TcpClient client = new TcpClient
-                {
-                    ReceiveTimeout = 1000,
-
-                    SendTimeout = 1000
-                })
-                {
-                    await client.ConnectAsync(_config.PrinterIpAddress, _config.PrinterPort);
-                    string cmd = $"S2M:2:1:::::1:0:1{text}:";
-                    byte[] bs = new byte[cmd.Length + 2];
-                    byte[] br = new byte[10];
-                    var sour = Encoding.ASCII.GetBytes(cmd);
-                    Buffer.BlockCopy(sour, 0, bs, 1, sour.Length);
-                    bs[0] = 0x02;
-                    bs[bs.Length - 1] = 0x03;
-                    client.Client.Send(bs);
-                    client.Client.Receive(br);
-                    if (br[0] == 0x06)
-                    {
-
-                        return true;
-                    }
-                    else
-                    {
-
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _messageQueue.Enqueue(ex.Message);
-                return false;
-                // throw;
-            }
-        }
-
-        public async Task<(bool, string)> GetMatrixCodeAsync(Hashtable hashtable)
-        {
-            return await Task.Run(() => _snGeter.getsn(hashtable));
-        }
-
-
-
         MelsecMcNet _melsec;
         IConfigureFile _configureFile;
         RD402Config _config;
@@ -281,6 +255,23 @@ namespace Mv.Modules.RD402.Service
         byte[] _rbs;
         byte[] _wbs;
 
+
+        bool disposed = false;
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+            if (disposing)
+            {
+                _cts.Dispose();
+            }
+            disposed = true;
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 
 }

@@ -124,10 +124,10 @@
     <value>出力</value>
   </data>
   <data name="SetMatrixCodeToMachine" xml:space="preserve">
-    <value>行列コードをマシンに設定してください！</value>
+    <value>行列コードをマシンに設定してください</value>
   </data>
   <data name="GetMatrixCodeFromServer" xml:space="preserve">
-    <value>サーバーからマトリックスコードを取得！</value>
+    <value>サーバーからマトリックスコードを取得</value>
   </data>
   <data name="Exchange" xml:space="preserve">
     <value>Exchange</value>

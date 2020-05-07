@@ -79,7 +79,7 @@
                         <TextBox Margin="5" IsReadOnly="True" Width="100" materialDesign:HintAssist.Hint="Line No."
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="LineCode" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="LineCode" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="2" Max="2" />
@@ -87,10 +87,10 @@
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
-                        <TextBox Margin="5" Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Machine No."
+                        <TextBox Margin="5"  Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Machine No." 
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="MachineCode" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="MachineCode" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="1" />
@@ -101,7 +101,7 @@
                         <TextBox Margin="5" Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Spindle"
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="Spindle" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
+                                <Binding Path="Spindle"  UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="1" />
@@ -120,10 +120,10 @@
                                 </Binding>
                             </TextBox.Text>
                         </TextBox>
-                        <TextBox Margin="5" Width="100" materialDesign:HintAssist.Hint="Wire Vendor Code"
+                        <TextBox Margin="5" Width="100"  materialDesign:HintAssist.Hint="Wire Vendor Code"
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="Vendor" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="Vendor" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="1" />
@@ -134,7 +134,7 @@
                         <TextBox IsReadOnly="True" Margin="5" Width="100" materialDesign:HintAssist.Hint="Wire Config Code"
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="WireConfig" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="WireConfig" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="1" />
@@ -147,7 +147,7 @@
                         <TextBox IsReadOnly="True" Margin="5" Width="100" materialDesign:HintAssist.Hint="MO"
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="Mo" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="Mo" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="20" />
@@ -158,7 +158,7 @@
                         <TextBox IsReadOnly="True" Margin="5" Width="100" materialDesign:HintAssist.Hint="LineNumber"
                                  materialDesign:HintAssist.IsFloating="True">
                             <TextBox.Text>
-                                <Binding Path="LineNumber" UpdateSourceTrigger="PropertyChanged"
+                                <Binding Path="LineNumber" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
                                          ValidatesOnDataErrors="True">
                                     <Binding.ValidationRules>
                                         <validaterule:LengthRule Min="1" Max="20" />
@@ -208,7 +208,6 @@
                                 <materialDesign:PopupBox.ToggleCheckedContent>
                                     <materialDesign:PackIcon Kind="Pencil" Width="24" Height="24" />
                                 </materialDesign:PopupBox.ToggleCheckedContent>
-
                                 <StackPanel>
                                     <Button Command="{Binding SetBarcodeCommand }">
                                         <materialDesign:PackIcon Kind="Barcode" Height="20" Width="20"
