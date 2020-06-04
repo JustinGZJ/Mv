@@ -11,7 +11,7 @@ using Mv.Shell.Views.Authentication;
 using Mv.Core.Interfaces;
 using Serilog;
 using System.IO;
-using Mv.Modules.RD402;
+using Mv.Modules.P99;
 
 namespace Mv.Shell
 {
@@ -48,12 +48,18 @@ namespace Mv.Shell
             ViewModelLocationProvider.SetDefaultViewModelFactory(new ViewModelResolver(() => Container).UseDefaultConfigure().ResolveViewModelForView);
         }
 
-
+        protected override IModuleCatalog CreateModuleCatalog()
+        {
+            return new DirectoryModuleCatalog() { ModulePath = "./Modules" };
+            //return base.CreateModuleCatalog();
+        }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
+
+            moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
-            moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
+        //    moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }
 
         public override void Initialize()
@@ -61,7 +67,7 @@ namespace Mv.Shell
             base.Initialize();
             Settings.Default.PropertyChanged += (sender, eventArgs) => Settings.Default.Save();
         }
-
+        
         private void ConfigureApplicationEventHandlers()
         {
             var handler = Container.Resolve<ExceptionHandler>();

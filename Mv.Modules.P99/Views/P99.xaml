@@ -1,0 +1,69 @@
+﻿<TabItem x:Class="Mv.Modules.P99.Views.P99Component"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Mv.Modules.P99.Views"
+             xmlns:controls="clr-namespace:Mv.Controls;assembly=MV.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+            xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             d:DesignHeight="300" d:DesignWidth="300"
+             xmlns:prism="http://prismlibrary.com/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+         prism:ViewModelLocator.AutoWireViewModel="True" >
+    <TabItem.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MV.Controls;component/Styles/Mv.Animations.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MV.Controls;component/Styles/Mv.Brushes.Navy.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </TabItem.Resources>
+    <TabItem.Header>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+                <RowDefinition Height="2" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <materialDesign:PackIcon Kind="StackExchange" Foreground="{StaticResource LightGreyBackgroundBrush}"
+                                     HorizontalAlignment="Center" Height="22" Width="22" />
+            <TextBlock Grid.Row="2" Text="数据交互" HorizontalAlignment="Center"
+                       Foreground="{StaticResource LightGreyBackgroundBrush}" FontSize="10" />
+        </Grid>
+    </TabItem.Header>
+    <Grid Style="{StaticResource FloatInRightToLeftStyle}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition  Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid  Grid.Row="0">
+            <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}">数据转发</TextBlock>
+            <Border BorderThickness="0 0 0 1" BorderBrush="{StaticResource LightGreyBackgroundBrush}"/>
+        </Grid>
+        <GroupBox Margin="10" Header="Support Ring SN" Grid.Column="0" Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding SupportRingSNs}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Value}"></TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+        <GroupBox Margin="10" Header="Mandrel No." Grid.Row="1" Grid.Column="1">
+            <ItemsControl ItemsSource="{Binding MandrelNO}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Value}"></TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+    </Grid>
+</TabItem>
