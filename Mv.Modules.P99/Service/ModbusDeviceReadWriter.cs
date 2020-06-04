@@ -4,6 +4,8 @@ using HslCommunication.ModBus;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Prism;
+using Prism.Logging;
 
 namespace Mv.Modules.P99.Service
 {
@@ -13,12 +15,15 @@ namespace Mv.Modules.P99.Service
         byte[] _wbs = new byte[40*2];
         public bool IsConnected { get ; set; }
         ModbusTcpNet modbus;
-        public ModbusDeviceReadWriter()
+        private readonly ILoggerFacade logger;
+
+        public ModbusDeviceReadWriter(ILoggerFacade logger)
         {
             modbus = new ModbusTcpNet("192.168.1.1", 8000) {
                 IsStringReverse = true
               //  ByteTransform = new ReverseWordTransform(DataFormat.ABCD)
             };
+            modbus.ConnectServer();
             modbus.AddressStartWithZero = true;
 
             Task.Factory.StartNew(() =>
@@ -30,10 +35,15 @@ namespace Mv.Modules.P99.Service
                     {                    
                         Buffer.BlockCopy(rr.Content,0,_rbs, 0, rr.Content.Length);
                     }
+                    else
+                    {
+                        logger.Log(rr.Message, Category.Warn, Priority.None);
+                    }
                     IsConnected = rr.IsSuccess;
                     var wt=modbus.Write("400",_wbs);
                 }
             }, TaskCreationOptions.LongRunning);
+            this.logger = logger;
         }
         public ushort GetWord(int index)
         {
