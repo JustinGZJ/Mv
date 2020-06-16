@@ -23,7 +23,7 @@ namespace Mv.Modules.P99.ViewModels
 
         public void Save()
         {
-            configureFile.SetValue<P99Config>(nameof(P99Config), Config);
+            configureFile.SetValue(nameof(P99Config), Config);
         }
     }
 }
