@@ -52,12 +52,12 @@ namespace Mv.Modules.P99.Service
         private int addressOffset = 3700;
         private int localOffset = 200;
         Subject<AlarmItem> subjectAlarmItem = new Subject<AlarmItem>();
-
+        Subject<AlarmInfo> subjectNewAlarm = new Subject<AlarmInfo>();
         private IEnumerable<AlarmInfoRecord> GetAlarmInfos(FileInfo file)
         {
             try
             {
-                using var reader = new StreamReader(file.FullName,encoding:Encoding.UTF8);
+                using var reader = new StreamReader(file.FullName, encoding: Encoding.UTF8);
                 using var csv = new CsvReader(reader, CultureInfo.CurrentCulture);
                 var records = csv.GetRecords<AlarmInfoRecord>()
                 .Where(x => !string.IsNullOrEmpty(x.Message))
@@ -80,7 +80,18 @@ namespace Mv.Modules.P99.Service
             this.device = device;
             LoadAlarmInfos();
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
-
+            subjectNewAlarm.Subscribe(m =>
+            {
+                var dictionary = new Dictionary<string, string>();
+                dictionary["地址"] = m.Address;
+                dictionary["开始时间"] = DateTime.Now.ToString();     
+                dictionary["信息"] = m.Message;
+                if (m.Message.Contains("按钮"))
+                    dictionary["类型"] = "U";
+                else
+                    dictionary["类型"] = "A";
+                Helper.SaveFile($"./SFC/{DateTime.Today:yyyyMMdd}.csv", dictionary);
+            });
             subjectAlarmItem.Buffer(TimeSpan.FromSeconds(1)).Subscribe((n) =>
             {
                 n.ForEach(m =>
@@ -98,18 +109,21 @@ namespace Mv.Modules.P99.Service
         Dictionary<string, AlarmItem> currentAlarmItems = new Dictionary<string, AlarmItem>();
         private void ObserveAlarms(long m)
         {
-         //   device.GetBit(200, 1);
+            //   device.GetBit(200, 1);
             var inalarms = alarms.Where(x => device.GetBit(x.AddressOffset - addressOffset + localOffset, x.BitIndex));
             var noalarms = alarms.Except(inalarms);
             //添加新的报警信息
-            inalarms.Where(x => !currentAlarmItems.ContainsKey(x.Address)).ToList()
-            .ForEach((newAlarm) => currentAlarmItems[newAlarm.Address] = new AlarmItem
+            var newalarms = inalarms.Where(x => !currentAlarmItems.ContainsKey(x.Address)).ToList();
+            newalarms.ForEach((newAlarm) => currentAlarmItems[newAlarm.Address] = new AlarmItem
             {
                 Address = newAlarm.Address,
                 Message = newAlarm.Message,
                 StartTime = DateTime.Now,
                 TimeSpan = TimeSpan.FromSeconds(0)
             });
+            newalarms.ForEach(x => subjectNewAlarm.OnNext(x));
+
+
             //删除旧的报警信息
             noalarms.Where(x => currentAlarmItems.ContainsKey(x.Address)).ToList()
             .ForEach((solvedAlarm) =>

@@ -22,7 +22,7 @@ namespace Mv.Modules.P99.Service
         {
             try
             {
-                if (tcpClient.TcpClient!=null&&!tcpClient.TcpClient.Connected)
+                if (tcpClient.TcpClient==null||!tcpClient.TcpClient.Connected)
                 {
                     await Task.Run(() =>
                      tcpClient.Connect("127.0.0.1", 6000));
