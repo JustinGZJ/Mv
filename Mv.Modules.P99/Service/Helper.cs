@@ -6,14 +6,14 @@ namespace Mv.Modules.P99.Service
 {
     public static class Helper
     {
-
         public static long GetTimeStamp()
         {
             DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1, 0, 0, 0, 0));
             DateTime nowTime = DateTime.Now;
-            long unixTime = (long)System.Math.Round((nowTime - startTime).TotalMilliseconds, MidpointRounding.AwayFromZero);
+            long unixTime = (long)Math.Round((nowTime - startTime).TotalMilliseconds, MidpointRounding.AwayFromZero);
             return unixTime;
         }
+
         public static bool SaveFile(string fileName, Dictionary<string, string> hashtable)
         {
             try

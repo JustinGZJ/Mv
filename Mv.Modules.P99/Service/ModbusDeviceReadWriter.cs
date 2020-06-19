@@ -11,8 +11,8 @@ namespace Mv.Modules.P99.Service
 {
     public class ModbusDeviceReadWriter : IDeviceReadWriter
     {
-        byte[] _rbs = new byte[100 * 2];
-        byte[] _wbs = new byte[40*2];
+        byte[] rbs = new byte[400 * 2];
+        byte[] wbs = new byte[40*2];
         public bool IsConnected { get ; set; }
         ModbusTcpNet modbus;
         private readonly ILoggerFacade logger;
@@ -20,8 +20,8 @@ namespace Mv.Modules.P99.Service
         public ModbusDeviceReadWriter(ILoggerFacade logger)
         {
             modbus = new ModbusTcpNet("192.168.1.1", 8000) {
-                IsStringReverse = true
-              //  ByteTransform = new ReverseWordTransform(DataFormat.ABCD)
+                IsStringReverse = true,
+                DataFormat = DataFormat.CDAB
             };
             modbus.ConnectServer();
             modbus.AddressStartWithZero = true;
@@ -30,25 +30,24 @@ namespace Mv.Modules.P99.Service
             {
                 while (true)
                 {
-                    var rr = modbus.Read("0", 100);
+                    var rr = modbus.Read("0", (ushort)(rbs.Length/2));
                     if (rr.IsSuccess)
                     {                    
-                        Buffer.BlockCopy(rr.Content,0,_rbs, 0, rr.Content.Length);
+                        Buffer.BlockCopy(rr.Content,0,rbs, 0, rr.Content.Length);
                     }
                     else
                     {
                         logger.Log(rr.Message, Category.Warn, Priority.None);
                     }
                     IsConnected = rr.IsSuccess;
-                    var wt=modbus.Write("400",_wbs);
+                    var wt=modbus.Write("400",wbs);
                 }
             }, TaskCreationOptions.LongRunning);
             this.logger = logger;
         }
         public ushort GetWord(int index)
-        {
-           
-            return modbus.ByteTransform.TransUInt16(_rbs, index * 2);
+        {         
+            return modbus.ByteTransform.TransUInt16(rbs, index * 2);
         }
         public bool GetBit(int index, int bit)
         {
@@ -59,12 +58,22 @@ namespace Mv.Modules.P99.Service
 
         public short GetShort(int index)
         {
-            return modbus.ByteTransform.TransInt16(_rbs, index * 2);
+            return modbus.ByteTransform.TransInt16(rbs, index * 2);
+        }
+
+        public int GetInt( int index)
+        {
+            return modbus.ByteTransform.TransInt32(rbs, index * 2);
+        }
+
+        public void SetInt( int index, int value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 4);
         }
 
         public void SetShort(int index, short value)
         {
-            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, _wbs, index * 2, 2);
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 2);
     
         }
 
@@ -72,12 +81,12 @@ namespace Mv.Modules.P99.Service
         {
             if (value)
             {
-                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(_wbs, index * 2) | (1 << bit));
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(wbs, index * 2) | (1 << bit));
                 SetShort(index, (short)mInt16);
             }
             else
             {
-                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(_wbs, index * 2) & (~(1 << bit)));
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(wbs, index * 2) & (~(1 << bit)));
                 SetShort(index, (short)mInt16);
             }
         }
@@ -85,7 +94,7 @@ namespace Mv.Modules.P99.Service
         public void SetString(int index, string value)
         {
             var bs = modbus.ByteTransform.TransByte(value,Encoding.ASCII);
-            Buffer.BlockCopy(bs, 0, _wbs, index * 2, bs.Length);
+            Buffer.BlockCopy(bs, 0, wbs, index * 2, bs.Length);
         }
 
         /// <summary>
@@ -96,13 +105,13 @@ namespace Mv.Modules.P99.Service
         /// <returns></returns>
         public string GetString(int index, int len)
         {
-           return modbus.ByteTransform.TransString(_rbs, index, len, Encoding.ASCII);
+           return modbus.ByteTransform.TransString(rbs, index, len, Encoding.ASCII);
           
         }
 
         public bool GetSetBit(int index, int bit)
         {
-            return (modbus.ByteTransform.TransUInt16(_wbs, index * 2) & (1 << bit)) > 0;
+            return (modbus.ByteTransform.TransUInt16(wbs, index * 2) & (1 << bit)) > 0;
         }
 
         public void PlcConnect()

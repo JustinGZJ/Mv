@@ -13,5 +13,7 @@
         void SetBit(int index, int bit, bool value);
         void SetShort(int index, short value);
         void SetString(int index, string value);
+        int GetInt(int index);
+        void SetInt(int index, int value);
     }
 }

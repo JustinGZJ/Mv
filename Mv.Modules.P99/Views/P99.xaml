@@ -9,8 +9,10 @@
           xmlns:ctls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DesignHeight="300" d:DesignWidth="300"
-             xmlns:prism="http://prismlibrary.com/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:controls1="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
-         prism:ViewModelLocator.AutoWireViewModel="True" >
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True" 
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:controls1="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
+     >
     <TabItem.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -31,7 +33,7 @@
             </Grid.RowDefinitions>
             <materialDesign:PackIcon Kind="StackExchange" Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="数据交互" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="扫码数据" HorizontalAlignment="Center"
                        Foreground="{StaticResource LightGreyBackgroundBrush}" FontSize="10" />
         </Grid>
     </TabItem.Header>

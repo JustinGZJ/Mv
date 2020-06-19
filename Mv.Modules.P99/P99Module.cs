@@ -2,6 +2,7 @@
 using Mv.Modules.P99.Views;
 using Mv.Ui.Core;
 using Mv.Ui.Core.Modularity;
+using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
@@ -15,15 +16,20 @@ namespace Mv.Modules.P99
 
         public P99Module(IUnityContainer container, IRegionManager regionManager) : base(container)
         {
-            _regionManager = regionManager;
-        
+            _regionManager = regionManager;       
         }
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
-        {
+        {       
+            containerRegistry.RegisterSingleton<IDeviceReadWriter, ModbusDeviceReadWriter>();
+            containerRegistry.RegisterSingleton<IPlcCognexComm, PlcCognexComm>();
+            containerRegistry.RegisterSingleton<ICognexCommunication, CognexCommunication>();
+            containerRegistry.RegisterSingleton<IAlarmService, AlarmService>();
+            containerRegistry.RegisterSingleton<IRunTimeService, RunTimeService>();
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(P99Component));
             _regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(P99Settings));
-            containerRegistry.RegisterSingleton<IDeviceReadWriter, ModbusDeviceReadWriter>();
+            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Cognex));
+            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Alarms));
         }
     }
 }

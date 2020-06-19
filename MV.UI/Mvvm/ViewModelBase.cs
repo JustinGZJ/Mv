@@ -23,8 +23,9 @@ namespace Mv.Ui.Mvvm
         protected ViewModelBase(IUnityContainer container)
         {
             Container = container;
-            EventAggregator = container.Resolve<IEventAggregator>();
+   
             Logger = container.Resolve<ILoggerFacade>();
+            EventAggregator = container.Resolve<IEventAggregator>();
             SnackbarMessageQueue = container.Resolve<ISnackbarMessageQueue>();
         }
 
