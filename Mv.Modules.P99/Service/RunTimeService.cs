@@ -41,17 +41,19 @@ namespace Mv.Modules.P99.Service
                 Looptime = device.GetInt(288) * 1.0 / 100;
                 Idletime =Math.Round(device.GetInt(292) * 1.0 / 60,2);
 
-                var dic = new Dictionary<string, string>();
-                dic["时间"] = DateTime.Now.ToString();
-                dic["上料数量"] = LoadCount.ToString();
-                dic["下料数量"] = UnloadCount.ToString();
-                dic["上料相机NG"] = GlueCameraNg.ToString();
-                dic["点胶相机NG"] = GlueCameraNg.ToString();
-                dic["扫码NG"] = ScanCodeNg.ToString();
-                dic["运行信息"] = Runtime.ToString();
-                dic["停机时间"] = Downtime.ToString();
-                dic["周期时间"] = Looptime.ToString();
-                dic["待机时间"] = Idletime.ToString();
+                var dic = new Dictionary<string, string>
+                {
+                    ["时间"] = DateTime.Now.ToString(),
+                    ["上料数量"] = LoadCount.ToString(),
+                    ["下料数量"] = UnloadCount.ToString(),
+                    ["上料相机NG"] = GlueCameraNg.ToString(),
+                    ["点胶相机NG"] = GlueCameraNg.ToString(),
+                    ["扫码NG"] = ScanCodeNg.ToString(),
+                    ["运行信息"] = Runtime.ToString(),
+                    ["停机时间"] = Downtime.ToString(),
+                    ["周期时间"] = Looptime.ToString(),
+                    ["待机时间"] = Idletime.ToString()
+                };
                 Helper.SaveFile($"./生产信息/{DateTime.Now:yyyyMMdd}.csv",dic);
             });
 
