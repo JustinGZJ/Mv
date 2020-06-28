@@ -5,6 +5,7 @@
     <AssemblyName>MV.Resources</AssemblyName>
     <RootNamespace>Mv.Resources</RootNamespace>
     <LangVersion>8.0</LangVersion>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\avatar-default.png" />

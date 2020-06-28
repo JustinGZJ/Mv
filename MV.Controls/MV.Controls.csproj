@@ -3,6 +3,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MV.Controls</AssemblyName>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />

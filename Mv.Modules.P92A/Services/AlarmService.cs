@@ -3,6 +3,7 @@ using CsvHelper.Configuration.Attributes;
 using Prism.Events;
 using Prism.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -13,15 +14,15 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Mv.Modules.P99.Service
+namespace Mv.Modules.P92A.Service
 {
-
 
     public class AlarmItem
     {
         public int Id { get; set; }
         public string Address { get; set; }
         public string Message { get; set; }
+        public string EnglishMessage { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime StopTime { get; set; }
         public TimeSpan TimeSpan { get; set; }
@@ -31,9 +32,11 @@ namespace Mv.Modules.P99.Service
     {
         internal class AlarmInfoRecord
         {
-            [Index(2)]
+            [Index(0)]
             public string Address { get; set; }
-            [Index(4)]
+            [Index(1)]
+            public string EnglishMessage { get; set; }
+            [Index(2)]
             public string Message { get; set; }
         }
         internal class AlarmInfo
@@ -42,6 +45,8 @@ namespace Mv.Modules.P99.Service
 
             public string Message { get; set; }
 
+            public string EnglishMessage { get; set; }
+
             public int AddressOffset { get; set; }
 
             public int BitIndex { get; set; }
@@ -49,8 +54,9 @@ namespace Mv.Modules.P99.Service
         private readonly ILoggerFacade logger;
         private readonly IEventAggregator eventAggregator;
         private readonly IDeviceReadWriter device;
-        private int addressOffset = 3700;
-        private int localOffset = 200;
+        private readonly ICE012 ce012;
+        private int addressOffset = 0;  //文件中的地址和实际地址的偏移
+        private int localOffset = 0;     //软件内部的偏移
         Subject<AlarmItem> subjectAlarmItem = new Subject<AlarmItem>();
         Subject<AlarmInfo> subjectNewAlarm = new Subject<AlarmInfo>();
         private IEnumerable<AlarmInfoRecord> GetAlarmInfos(FileInfo file)
@@ -72,47 +78,48 @@ namespace Mv.Modules.P99.Service
             }
         }
 
-        Regex regex = new Regex(@"^MB\d{4}[A-D0-9]{1}");
-        public AlarmService(ILoggerFacade logger, IEventAggregator eventAggregator, IDeviceReadWriter device)
+        Regex regex = new Regex(@"^M\d+$");
+        public AlarmService(ILoggerFacade logger, IEventAggregator eventAggregator, IDeviceReadWriter device,ICE012 ce012)
         {
             this.logger = logger;
             this.eventAggregator = eventAggregator;
             this.device = device;
+            this.ce012 = ce012;
             LoadAlarmInfos();
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
             subjectNewAlarm.Subscribe(m =>
             {
-                var dictionary = new Dictionary<string, string>();
-                dictionary["地址"] = m.Address;
-                dictionary["开始时间"] = DateTime.Now.ToString();     
-                dictionary["信息"] = m.Message;
-                if (m.Message.Contains("按钮"))
-                    dictionary["类型"] = "U";
-                else
-                    dictionary["类型"] = "A";
-                Helper.SaveFile($"./SFC/{DateTime.Today:yyyyMMdd}.csv", dictionary);
+                logger.Log(m.Message, Category.Warn, Priority.None);
             });
             subjectAlarmItem.Buffer(TimeSpan.FromSeconds(1)).Subscribe((n) =>
             {
                 n.ForEach(m =>
                 {
-                    var dictionary = new Dictionary<string, string>();
-                    dictionary["开始时间"] = m.StartTime.ToString();
-                    dictionary["结束时间"] = m.StopTime.ToString();
-                    dictionary["报警地址"] = m.Address;
-                    dictionary["报警信息"] = m.Message;
-                    dictionary["持续时间"] = m.TimeSpan.ToString();
-                    Helper.SaveFile($"./报警信息/{DateTime.Today:yyyyMMdd}.csv", dictionary);
+                    logger.Log(m.Message, Category.Warn, Priority.None);
+                    int v = 0;
+                    if(m.Message.Contains("待机")||m.Message.Contains("运行"))
+                    {
+                        v = 0;
+                    }
+                    else
+                    {
+                        v = -1;
+                    }
+                   var hashtable = new Hashtable();
+                    hashtable["status"] = v.ToString();
+                    hashtable["code"] = $"Winding,L3002,SW-CE012-Tanac-Main coil Winding-005,{m.Address.Substring(1)},{m.EnglishMessage},{m.Message}";
+                    var result= ce012.PostData(hashtable);
+                    logger.Log($"POST:{result.Item1},{result.Item2}", Category.Debug, Priority.None);
                 });
             });
         }
         Dictionary<string, AlarmItem> currentAlarmItems = new Dictionary<string, AlarmItem>();
-        bool localvalue;
+        bool mActive;
         private void ObserveAlarms(long m)
         {
-            localvalue = !localvalue;
-            device.SetBit(0, 1, localvalue);
-            //   device.GetBit(200, 1);
+            mActive = !mActive;
+            device.SetBit(0, 0, mActive);
+            //   device.GetBit(200, 1); LINQ
             var inalarms = alarms.Where(x => device.GetBit(x.AddressOffset - addressOffset + localOffset, x.BitIndex));
             var noalarms = alarms.Except(inalarms);
             //添加新的报警信息
@@ -121,6 +128,7 @@ namespace Mv.Modules.P99.Service
             {
                 Address = newAlarm.Address,
                 Message = newAlarm.Message,
+                EnglishMessage = newAlarm.EnglishMessage,
                 StartTime = DateTime.Now,
                 TimeSpan = TimeSpan.FromSeconds(0)
             });
@@ -161,8 +169,9 @@ namespace Mv.Modules.P99.Service
                 {
                     Address = x.Address,
                     Message = x.Message,
-                    AddressOffset = int.Parse(x.Address.Substring(2, 4)),
-                    BitIndex = Convert.ToInt32(x.Address.Substring(6, 1), 16)
+                    EnglishMessage = x.EnglishMessage,
+                    AddressOffset = (int.Parse(x.Address.Substring(1)) - 1) / 16,
+                    BitIndex = (int.Parse(x.Address.Substring(1)) - 1) % 16
                 }).ToList();
         }
     }

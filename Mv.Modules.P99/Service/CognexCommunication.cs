@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace Mv.Modules.P99.Service
 {
     public class CognexCommunication : ICognexCommunication
-    {
+    {       
         SimpleTcpClient tcpClient = new SimpleTcpClient();
         private readonly ILoggerFacade logger;
 
-        public CognexCommunication(ILoggerFacade logger )
+        public CognexCommunication(ILoggerFacade logger)
         {
             tcpClient.TimeOut = TimeSpan.FromSeconds(5);
             var task = CheckConnectionAsync();
@@ -22,7 +22,7 @@ namespace Mv.Modules.P99.Service
         {
             try
             {
-                if (tcpClient.TcpClient==null||!tcpClient.TcpClient.Connected)
+                if (tcpClient.TcpClient == null || !tcpClient.TcpClient.Connected)
                 {
                     await Task.Run(() =>
                      tcpClient.Connect("127.0.0.1", 6000));
@@ -78,19 +78,22 @@ namespace Mv.Modules.P99.Service
             }
         }
 
-        public async Task<(bool, string, int, int, int, int,int,int,int,int)> TakePhotoAsync(int id, double x, double y)
+        public async Task<(bool, string, int, int, int, int, int, int, int, int)> TakePhotoAsync(int id, double x, double y)
         {
             var response = await RequestAsync($"T{2 + id},{x},{y}" + Environment.NewLine).ConfigureAwait(false);
             var splits = response.Split(',');
-            if (splits.Length >= 8 && splits.Skip(2).All(x => double.TryParse(x, out var value)))
+            if (splits.Length >= 10 && splits.Skip(1).All(x => double.TryParse(x, out var value)))
             {
-                var vs = splits.Skip(2).Select(m => (int)(double.Parse(m) * 1000)).ToArray();
-                return (true, response, vs[0], vs[1], vs[2], vs[3],vs[4],vs[5],vs[6],vs[7]);
+                if (double.TryParse(splits[1], out var result))
+                {
+                    if (result == 1)
+                    {
+                        var vs = splits.Skip(2).Select(m => (int)(double.Parse(m) * 1000)).ToArray();
+                        return (true, response, vs[0], vs[1], vs[2], vs[3], vs[4], vs[5], vs[6], vs[7]);
+                    }
+                }
             }
-            else
-            {
-                return (false, response, 0, 0, 0, 0,0,0,0,0);
-            }
+            return (false, response, 0, 0, 0, 0, 0, 0, 0, 0);
         }
 
         private async Task<string> RequestAsync(string cmd)
@@ -111,9 +114,9 @@ namespace Mv.Modules.P99.Service
             catch (Exception EX)
             {
                 responseData = "CONNECT ERROR";
-              //  throw;
+                //  throw;
             }
-       
+
             return responseData;
         }
     }

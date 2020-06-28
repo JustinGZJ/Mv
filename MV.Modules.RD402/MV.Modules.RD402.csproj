@@ -5,6 +5,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MV.Modules.RD402</AssemblyName>
     <RootNamespace>Mv.Modules.RD402</RootNamespace>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">

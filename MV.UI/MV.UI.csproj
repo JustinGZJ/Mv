@@ -4,6 +4,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MV.UI</AssemblyName>
     <LangVersion>8</LangVersion>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />

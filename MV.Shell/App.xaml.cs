@@ -11,7 +11,8 @@ using Mv.Shell.Views.Authentication;
 using Mv.Core.Interfaces;
 using Serilog;
 using System.IO;
-using Mv.Modules.P99;
+
+using Mv.Modules.P92A;
 
 namespace Mv.Shell
 {
@@ -56,8 +57,8 @@ namespace Mv.Shell
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-
-            moduleCatalog.AddModule<P99Module>();
+          //  moduleCatalog.AddModule<>
+            moduleCatalog.AddModule<P92AModule>();
             base.ConfigureModuleCatalog(moduleCatalog);
         //    moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }
