@@ -6,6 +6,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:lvc="clr-namespace:LiveCharts;assembly=LiveCharts"
              prism:ViewModelLocator.AutoWireViewModel="True"
+            xmlns:ctls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
              xmlns:local="clr-namespace:Mv.Modules.P92A.Views" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:controls1="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls" xmlns:lvc1="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
          mc:Ignorable="d" 
 
@@ -27,6 +28,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -44,7 +46,7 @@
         </Border>
 
         <Grid  Grid.Row="1" Grid.ColumnSpan="2">
-            <GroupBox Header="实时状态" Height="auto">
+            <Border  Margin="10" Height="auto">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -88,7 +90,7 @@
                         </lvc1:PieChart>
                     </Grid>
                 </Grid>
-            </GroupBox>
+            </Border>
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="10" >
             <TabControl>
@@ -124,6 +126,9 @@
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                     </ItemsControl>
+                </TabItem>
+                <TabItem Header="Messages">
+                    <ListBox  ctls:ListScrollToEnd.IsScrollToEnd="True"  x:Name="Msgs" ItemsSource="{Binding Messages}"></ListBox>
                 </TabItem>
             </TabControl>
         </Grid>

@@ -24,6 +24,7 @@ namespace Mv.Modules.P92A
             containerRegistry.RegisterSingleton<IAlarmService, AlarmService>();
             containerRegistry.RegisterSingleton<ICE012, CE012>();
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Alarms));
+            regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(P92ASettings));
 
         }
     }

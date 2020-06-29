@@ -110,6 +110,13 @@ namespace Mv.Modules.P92A.ViewModels
         public AlarmsViewModel(IUnityContainer container, IAlarmService alarmService,IDeviceReadWriter device) : base(container)
         {
             this.alarmService = alarmService;
+            EventAggregator.GetEvent<MessageEvent>().Subscribe((m) =>
+            {
+                this.Invoke(() =>
+                {
+                    Messages.Add(m);
+                });            
+            });
             Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x =>
             {
                 var alarmItems = alarmService.GetAlarmItems();
@@ -117,12 +124,12 @@ namespace Mv.Modules.P92A.ViewModels
                 Invoke(() =>
                 {
                     AlarmCode= device.GetUInt(625).ToString();//925
-                    DownTime1[0]=device.GetUInt(627)/1000d;//927
-                    DownTime2[0]=device.GetUInt(629)/1000d;//929
-                    IdelTime1[0]=device.GetUInt(631)/1000d;//931
-                    IdelTime2[0]=device.GetUInt(633)/1000d;//933
-                    Runtime1[0] = device.GetUInt(635)/1000d;//935
-                    Runtime2[0] = device.GetUInt(637)/1000d;//937
+                    DownTime1[0]=device.GetUInt(627)*1d;//927
+                    DownTime2[0]=device.GetUInt(629)*1d;//929
+                    IdelTime1[0]=device.GetUInt(631)*1d;//931
+                    IdelTime2[0]=device.GetUInt(633)*1d;//933
+                    Runtime1[0] = device.GetUInt(635)*1d;//935
+                    Runtime2[0] = device.GetUInt(637)*1d;//937
                     AlarmItems.Clear();
                     alarmItems.ForEach(x => AlarmItems.Add(new AlarmItemVm
                     {
@@ -137,5 +144,6 @@ namespace Mv.Modules.P92A.ViewModels
         }
 
         public ObservableCollection<AlarmItemVm> AlarmItems { get; set; } = new ObservableCollection<AlarmItemVm>();
+        public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration.Attributes;
+using Mv.Core.Interfaces;
+using Mv.Modules.P92A.ViewModels;
 using Prism.Events;
 using Prism.Logging;
 using System;
@@ -53,6 +55,7 @@ namespace Mv.Modules.P92A.Service
         }
         private readonly ILoggerFacade logger;
         private readonly IEventAggregator eventAggregator;
+        private readonly IConfigureFile configure;
         private readonly IDeviceReadWriter device;
         private readonly ICE012 ce012;
         private int addressOffset = 0;  //文件中的地址和实际地址的偏移
@@ -79,43 +82,39 @@ namespace Mv.Modules.P92A.Service
         }
 
         Regex regex = new Regex(@"^M\d+$");
-        public AlarmService(ILoggerFacade logger, IEventAggregator eventAggregator, IDeviceReadWriter device,ICE012 ce012)
+        public AlarmService(ILoggerFacade logger, IEventAggregator eventAggregator,IConfigureFile configure, IDeviceReadWriter device, ICE012 ce012)
         {
             this.logger = logger;
             this.eventAggregator = eventAggregator;
+            this.configure = configure;
             this.device = device;
             this.ce012 = ce012;
-
-         
             LoadAlarmInfos();
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
+
             subjectNewAlarm.Subscribe(m =>
             {
                 logger.Log(m.Message, Category.Warn, Priority.None);
+                int v = m.Message.Contains("待机") || m.Message.Contains("运行") ? 0 : -1;
+                Hashtable hashtable = new Hashtable
+                {
+                    ["status"] = v.ToString()
+                };
+                MessageEvent messageEvent = eventAggregator.GetEvent<MessageEvent>();
+                messageEvent.Publish(v.ToString());
+               var p92ASetting =configure.GetValue<P92ASetting>(nameof(P92ASetting))??new P92ASetting();
+                var code = $"{p92ASetting.Station},{p92ASetting.LineNo},{p92ASetting.MachineCode},{m.Address.Substring(1)},{m.EnglishMessage},{m.Message}";
+                hashtable["code"] = code;
+                messageEvent.Publish(code);
+                var result = ce012.PostData(hashtable);
+                messageEvent.Publish($"POST:{result.Item1},{result.Item2}");
+                logger.Log($"POST:{result.Item1},{result.Item2}", Category.Debug, Priority.None);
             });
             subjectAlarmItem.Buffer(TimeSpan.FromSeconds(1)).Subscribe((n) =>
             {
-
-
                 n.ForEach(m =>
                 {
                     logger.Log(m.Message, Category.Warn, Priority.None);
-                    int v = 0;
-                    if(m.Message.Contains("待机")||m.Message.Contains("运行"))
-                    {
-                        v = 0;
-                    }
-                    else
-                    {
-                        v = -1;
-                    }
-                   var hashtable = new Hashtable();
-                    hashtable["status"] = v.ToString();
-                   // eventAggregator.GetEvent<string>()
-                    hashtable["code"] = $"Winding,L3002,SW-CE012-Tanac-Main coil Winding-005,{m.Address.Substring(1)},{m.EnglishMessage},{m.Message}";
-                    var result= ce012.PostData(hashtable);
-                   // var msgposter =eventAggregator.GetEvent<string>
-                    logger.Log($"POST:{result.Item1},{result.Item2}", Category.Debug, Priority.None);
                 });
             });
         }
