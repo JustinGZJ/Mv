@@ -36,7 +36,7 @@
         <Border x:Name="Header" BorderThickness="0 0 0 1" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource LightGreyBackgroundBrush}">
             <Grid  >
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock }" Margin="10" Foreground="{StaticResource PrimaryHueMidBrush}">报警信息</TextBlock>
-                <controls1:SimpleLed HorizontalAlignment="Right" State="{Binding IsConnected.Value}" Margin="10"
+                <controls1:SimpleLed HorizontalAlignment="Right" State="{Binding IsConnected}" Margin="10"
                                                         OnColor="{DynamicResource PrimaryHueMidBrush}"
                                                         OffColor="LightGray" />
             </Grid>
@@ -63,7 +63,7 @@
                     </DockPanel>
 
                     <Grid x:Name="xc01" Grid.Row="1" Height="200">
-                        <lvc1:PieChart LegendLocation="Bottom"  Hoverable="False" DataTooltip="{x:Null}">
+                        <lvc1:PieChart LegendLocation="Bottom"  Hoverable="False" DataTooltip="{x:Null}" >
                             <lvc1:PieChart.Series>
                                 <lvc1:PieSeries Title="运行时间" Values="{Binding Runtime1}" DataLabels="True"
                               />

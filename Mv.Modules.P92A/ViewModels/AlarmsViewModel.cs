@@ -98,8 +98,13 @@ namespace Mv.Modules.P92A.ViewModels
             get { return 运行时间2; }
             set { SetProperty(ref 运行时间2, value); }
         }
-       
 
+        bool _isConnected;
+        public bool IsConnected
+        {
+            get => _isConnected;
+            set => SetProperty(ref _isConnected, value);
+        }
 
         private readonly IAlarmService alarmService;
         public AlarmsViewModel(IUnityContainer container, IAlarmService alarmService,IDeviceReadWriter device) : base(container)
@@ -108,6 +113,7 @@ namespace Mv.Modules.P92A.ViewModels
             Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x =>
             {
                 var alarmItems = alarmService.GetAlarmItems();
+                IsConnected = device.IsConnected;
                 Invoke(() =>
                 {
                     AlarmCode= device.GetUInt(625).ToString();//925

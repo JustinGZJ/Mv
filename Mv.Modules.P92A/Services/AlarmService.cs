@@ -27,7 +27,7 @@ namespace Mv.Modules.P92A.Service
         public DateTime StopTime { get; set; }
         public TimeSpan TimeSpan { get; set; }
     }
-
+    public class MessageEvent : PubSubEvent<string> { }
     public class AlarmService : IAlarmService
     {
         internal class AlarmInfoRecord
@@ -85,6 +85,8 @@ namespace Mv.Modules.P92A.Service
             this.eventAggregator = eventAggregator;
             this.device = device;
             this.ce012 = ce012;
+
+         
             LoadAlarmInfos();
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
             subjectNewAlarm.Subscribe(m =>
@@ -93,6 +95,8 @@ namespace Mv.Modules.P92A.Service
             });
             subjectAlarmItem.Buffer(TimeSpan.FromSeconds(1)).Subscribe((n) =>
             {
+
+
                 n.ForEach(m =>
                 {
                     logger.Log(m.Message, Category.Warn, Priority.None);
@@ -107,8 +111,10 @@ namespace Mv.Modules.P92A.Service
                     }
                    var hashtable = new Hashtable();
                     hashtable["status"] = v.ToString();
+                   // eventAggregator.GetEvent<string>()
                     hashtable["code"] = $"Winding,L3002,SW-CE012-Tanac-Main coil Winding-005,{m.Address.Substring(1)},{m.EnglishMessage},{m.Message}";
                     var result= ce012.PostData(hashtable);
+                   // var msgposter =eventAggregator.GetEvent<string>
                     logger.Log($"POST:{result.Item1},{result.Item2}", Category.Debug, Priority.None);
                 });
             });
