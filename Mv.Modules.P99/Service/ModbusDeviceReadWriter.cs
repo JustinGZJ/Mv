@@ -23,11 +23,11 @@ namespace Mv.Modules.P99.Service
                 IsStringReverse = true,
                 DataFormat = DataFormat.CDAB
             };
-            modbus.ConnectServer();
+      
             modbus.AddressStartWithZero = true;
-
             Task.Factory.StartNew(() =>
             {
+                modbus.ConnectServer();
                 while (true)
                 {
                     var rr = modbus.Read("0", (ushort)(rbs.Length/2));

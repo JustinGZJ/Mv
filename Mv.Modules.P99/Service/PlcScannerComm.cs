@@ -8,25 +8,27 @@ using System.Threading.Tasks;
 
 namespace Mv.Modules.P99.Service
 {
-    public class PlcCognexComm : IPlcCognexComm
+    public class PlcScannerComm : IPlcScannerComm
     {
 
-        List<(byte[], byte[])> localbs = new List<(byte[], byte[])>(2) {
-             (new byte[10*2],new byte[30*2]),
-            (new byte[10*2],new byte[30*2])
+        List<(byte[], byte[])> localbs = new List<(byte[], byte[])>(4) {
+             (new byte[1*2],new byte[19*2]),
+            (new byte[1*2],new byte[19*2]),
+            (new byte[1*2],new byte[19*2]),
+            (new byte[1*2],new byte[19*2])
         };
         public bool IsConnected { get; set; }
         ModbusTcpNet modbus;
         private readonly ILoggerFacade logger;
 
-        public PlcCognexComm(ILoggerFacade logger)
+        public PlcScannerComm(ILoggerFacade logger)
         {
-            modbus = new ModbusTcpNet("192.168.1.1", 5000)
+            modbus = new ModbusTcpNet("192.168.1.1", 6000)
             {
                 DataFormat = DataFormat.CDAB,
                 IsStringReverse = true
             };
-        
+         
             modbus.AddressStartWithZero = true;
 
             Task.Factory.StartNew(() =>
@@ -35,9 +37,9 @@ namespace Mv.Modules.P99.Service
                 while (true)
                 {
 
-                    for (int i = 0; i < 2; i++)
+                    for (int i = 0; i < 4; i++)
                     {
-                        var rr = modbus.Read((0 + 40 * i).ToString(), 10);
+                        var rr = modbus.Read((0 + 20 * i).ToString(), 1);
                         if (rr.IsSuccess)
                         {
                             Buffer.BlockCopy(rr.Content, 0, localbs[i].Item1, 0, rr.Content.Length);
@@ -47,7 +49,7 @@ namespace Mv.Modules.P99.Service
                             logger.Log(rr.Message, Category.Warn, Priority.None);
                         }
                         IsConnected = rr.IsSuccess;
-                        var wt = modbus.Write((10 + 40 * i).ToString(), localbs[i].Item2);
+                        var wt = modbus.Write((1 + 20 * i).ToString(), localbs[i].Item2);
                     }
                 }
             }, TaskCreationOptions.LongRunning);
@@ -136,5 +138,4 @@ namespace Mv.Modules.P99.Service
         }
 
     }
-    public interface IPlcScannerComm : IPlcCognexComm { }
 }

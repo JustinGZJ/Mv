@@ -1,7 +1,9 @@
-﻿using Prism.Logging;
+﻿using Polly.Caching;
+using Prism.Logging;
 using SimpleTCP;
 using System;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace Mv.Modules.P99.Service
@@ -14,7 +16,7 @@ namespace Mv.Modules.P99.Service
         public CognexCommunication(ILoggerFacade logger)
         {
             tcpClient.TimeOut = TimeSpan.FromSeconds(5);
-            var task = CheckConnectionAsync();
+           // var task = CheckConnectionAsync();
             this.logger = logger;
         }
 
@@ -22,11 +24,24 @@ namespace Mv.Modules.P99.Service
         {
             try
             {
-                if (tcpClient.TcpClient == null || !tcpClient.TcpClient.Connected)
+                if (tcpClient.TcpClient != null && tcpClient.TcpClient.Connected)
                 {
-                    await Task.Run(() =>
-                     tcpClient.Connect("127.0.0.1", 6000));
+                    return;
                 }
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        tcpClient.Connect("127.0.0.1", 6000);
+                    }
+                    catch (Exception e)
+                    {
+
+                        logger.Log(e.Message, Category.Exception, Priority.None);
+                        ;
+                    }
+                }
+               );
             }
             catch (Exception ex)
             {

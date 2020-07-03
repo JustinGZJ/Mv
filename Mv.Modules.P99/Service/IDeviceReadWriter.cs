@@ -1,5 +1,6 @@
 ﻿namespace Mv.Modules.P99.Service
-{
+{ 
+    public interface IScannerReadWriter : IDeviceReadWriter { }
     public interface IDeviceReadWriter
     {
         bool IsConnected { get; set; }

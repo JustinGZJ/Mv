@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Unity;
@@ -18,7 +19,9 @@ namespace Mv.Modules.P99.ViewModels
 {
     public class P99ComponentViewModel : ViewModelBase
     {
+        private readonly IPlcScannerComm plcScanner;
         private readonly IConfigureFile configureFile;
+        private readonly IScannerComm scannerComm;
 
         public ObservableCollection<BindableWrapper<string>> SupportRingSNs { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
         public ObservableCollection<BindableWrapper<string>> MandrelNO { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
@@ -57,14 +60,22 @@ namespace Mv.Modules.P99.ViewModels
                 return true;
             }
         }
-        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device, IConfigureFile configureFile) : base(container)
+        
+
+        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm) : base(container)
         {
+            this.plcScanner = plcScanner;
             this.configureFile = configureFile;
+            this.scannerComm = scannerComm;
+            EventAggregator.GetEvent<MessageEvent>().Subscribe((x) => Invoke(() => {
+                AddMessage(x);
+            }));
             var m = configureFile.GetValue<P99Config>(nameof(P99Config));
             if (m == null)
             {
                 configureFile.SetValue(nameof(P99Config), new P99Config());
             }
+          
             Task.Factory.StartNew(() =>
             {
                 short itick = 0;
