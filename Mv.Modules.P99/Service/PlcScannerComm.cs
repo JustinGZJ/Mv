@@ -12,10 +12,10 @@ namespace Mv.Modules.P99.Service
     {
 
         List<(byte[], byte[])> localbs = new List<(byte[], byte[])>(4) {
-             (new byte[1*2],new byte[19*2]),
-            (new byte[1*2],new byte[19*2]),
-            (new byte[1*2],new byte[19*2]),
-            (new byte[1*2],new byte[19*2])
+             (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2])
         };
         public bool IsConnected { get; set; }
         ModbusTcpNet modbus;
@@ -27,8 +27,7 @@ namespace Mv.Modules.P99.Service
             {
                 DataFormat = DataFormat.CDAB,
                 IsStringReverse = true
-            };
-         
+            };       
             modbus.AddressStartWithZero = true;
 
             Task.Factory.StartNew(() =>
@@ -39,7 +38,7 @@ namespace Mv.Modules.P99.Service
 
                     for (int i = 0; i < 4; i++)
                     {
-                        var rr = modbus.Read((0 + 20 * i).ToString(), 1);
+                        var rr = modbus.Read((0 + 20 * i).ToString(), 20);
                         if (rr.IsSuccess)
                         {
                             Buffer.BlockCopy(rr.Content, 0, localbs[i].Item1, 0, rr.Content.Length);

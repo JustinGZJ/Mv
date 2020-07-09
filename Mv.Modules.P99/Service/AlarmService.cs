@@ -82,9 +82,10 @@ namespace Mv.Modules.P99.Service
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
             subjectNewAlarm.Subscribe(m =>
             {
+                logger.Log($"{m.Address}:{m.Message}", Category.Debug, Priority.None);
                 var dictionary = new Dictionary<string, string>();
                 dictionary["地址"] = m.Address;
-                dictionary["开始时间"] = DateTime.Now.ToString();     
+                dictionary["开始时间"] = DateTime.Now.ToString();
                 dictionary["信息"] = m.Message;
                 if (m.Message.Contains("按钮"))
                     dictionary["类型"] = "U";

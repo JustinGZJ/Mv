@@ -4,6 +4,6 @@ namespace Mv.Modules.P99.Service
 {
     public interface IScannerComm
     {
-        Task<(bool, string)> GetCodeAsync(int id, int timeout = 1000);
+        (bool, string) GetCodeAsync(int id, int timeout = 1000);
     }
 }

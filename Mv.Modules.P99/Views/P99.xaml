@@ -50,9 +50,15 @@
         <Border BorderThickness="0 0 0 1" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource LightGreyBackgroundBrush}">
             <Grid  >
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock }" Margin="10" Foreground="{StaticResource PrimaryHueMidBrush}">数据交互</TextBlock>
-                <controls1:SimpleLed HorizontalAlignment="Right" State="{Binding IsConnected.Value}" Margin="10"
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <controls1:SimpleLed  State="{Binding IsConnected.Value}" Margin="10"
                                                         OnColor="{DynamicResource PrimaryHueMidBrush}"
                                                         OffColor="LightGray" />
+                    <controls1:SimpleLed  State="{Binding IsConnected2.Value}" Margin="10"
+                                                        OnColor="{DynamicResource PrimaryHueMidBrush}"
+                                                        OffColor="LightGray" />
+                </StackPanel>
+
             </Grid>
         </Border>
         <GroupBox Margin="10" Header="Support Ring SN" Grid.Column="0" Grid.Row="1">

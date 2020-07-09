@@ -3,7 +3,6 @@ using Prism.Logging;
 using System;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace Mv.Modules.P92A.Service
 {
     public class MCDeviceReadWriter : IDeviceReadWriter
@@ -13,8 +12,6 @@ namespace Mv.Modules.P92A.Service
         byte[] _rbs = new byte[675 * 2];
 
         byte[] _wbs = new byte[10 * 2];
-
-
 
         MelsecMcNet melsec = new MelsecMcNet("192.168.0.10", 6000);
         private readonly ILoggerFacade logger;

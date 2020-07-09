@@ -13,6 +13,7 @@ using Serilog;
 using System.IO;
 
 using Mv.Modules.P99;
+using Prism.Logging;
 
 namespace Mv.Shell
 {
@@ -30,9 +31,11 @@ namespace Mv.Shell
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSerilog();
+            
             containerRegistry.RegisterSingleton<INonAuthenticationApi, NonAuthenticationApi>();
             containerRegistry.RegisterInstance<ISnackbarMessageQueue>(new SnackbarMessageQueue(TimeSpan.FromMilliseconds(2000)));
             containerRegistry.RegisterInstance(new ConfigureFile().Load());
+            ConfigureApplicationEventHandlers();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -42,6 +45,7 @@ namespace Mv.Shell
                      .MinimumLevel.Debug()
                      .WriteTo.RollingFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs","log.txt"), retainedFileCountLimit: 7)
                      .CreateLogger();
+      
             base.OnStartup(e);
         }
         protected override void ConfigureViewModelLocator()
@@ -52,7 +56,6 @@ namespace Mv.Shell
         protected override IModuleCatalog CreateModuleCatalog()
         {
             return new DirectoryModuleCatalog() { ModulePath = "./Modules" };
-            //return base.CreateModuleCatalog();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -65,7 +68,7 @@ namespace Mv.Shell
 
         public override void Initialize()
         {
-            base.Initialize();
+            base.Initialize();    
             Settings.Default.PropertyChanged += (sender, eventArgs) => Settings.Default.Save();
         }
         
@@ -77,6 +80,7 @@ namespace Mv.Shell
         }
         protected override void OnExit(ExitEventArgs e)
         {
+            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件退出:{e.ApplicationExitCode}", Category.Debug, Priority.None); 
             Log.CloseAndFlush();
             base.OnExit(e);
         }

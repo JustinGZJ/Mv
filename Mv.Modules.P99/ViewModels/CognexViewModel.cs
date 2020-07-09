@@ -60,20 +60,32 @@ namespace Mv.Modules.P99.ViewModels
         private const int ADDR_DONE = 0;
         private readonly IPlcCognexComm device;
         private readonly ICognexCommunication cognex;
+        private readonly IOPTLight light;
 
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
         public ObservableCollection<CognexValue> CognexValues { get; set; } = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
 
-        public CognexViewModel(IUnityContainer container, IPlcCognexComm plcCognex, ICognexCommunication cognex) : base(container)
+        public CognexViewModel(IUnityContainer container, IPlcCognexComm plcCognex, ICognexCommunication cognex,IOPTLight light) : base(container)
         {
             this.device = plcCognex;
             this.cognex = cognex;
-            Observable.Interval(TimeSpan.FromMilliseconds(500)).Subscribe(x =>
+            this.light = light;
+            Observable.Interval(TimeSpan.FromMilliseconds(1000)).Subscribe(x =>
             {
                 device.SetInt(0, 20, (x % 2 == 0) ? 0 : 1);
                 device.SetInt(1, 20, (x % 2 == 0) ? 0 : 1);
-            });
+            }); //心跳
+
+            Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(x =>
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var m = (i + 1);
+                    short current = light.GetCurrent(m);
+                    device.SetShort(0, 22 + i, current);
+                }
+            });  //uv灯
             Task.Factory.StartNew(async () =>
             {
                 while (true)

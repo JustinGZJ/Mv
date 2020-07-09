@@ -28,6 +28,8 @@ namespace Mv.Modules.P99
             containerRegistry.RegisterSingleton<IAlarmService, AlarmService>();
             containerRegistry.RegisterSingleton<IRunTimeService, RunTimeService>();
             containerRegistry.RegisterSingleton<IScannerComm, ScannerComm>();
+            containerRegistry.RegisterSingleton<IEpson2Cognex, Epson2Cognex>();
+            containerRegistry.RegisterSingleton<IOPTLight, OPTLight>();
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(P99Component));
             _regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(P99Settings));
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Cognex));

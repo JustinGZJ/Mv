@@ -4,49 +4,52 @@ using SimpleTCP;
 using System;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mv.Modules.P99.Service
 {
     public class CognexCommunication : ICognexCommunication
-    {       
+    {
         SimpleTcpClient tcpClient = new SimpleTcpClient();
         private readonly ILoggerFacade logger;
 
         public CognexCommunication(ILoggerFacade logger)
         {
             tcpClient.TimeOut = TimeSpan.FromSeconds(5);
-           // var task = CheckConnectionAsync();
+            var task = CheckConnectionAsync();
             this.logger = logger;
         }
 
-        private async Task CheckConnectionAsync()
+        private async Task<bool> CheckConnectionAsync()
         {
             try
             {
                 if (tcpClient.TcpClient != null && tcpClient.TcpClient.Connected)
                 {
-                    return;
+                    return true;
                 }
-                await Task.Run(() =>
-                {
-                    try
-                    {
-                        tcpClient.Connect("127.0.0.1", 6000);
-                    }
-                    catch (Exception e)
-                    {
+                return await Task<bool>.Run(() =>
+                 {
+                     try
+                     {
+                         tcpClient.Connect("127.0.0.1", 6000);
+                         return true;
+                     }
+                     catch (Exception e)
+                     {
 
-                        logger.Log(e.Message, Category.Exception, Priority.None);
-                        ;
-                    }
-                }
-               );
+                         logger.Log(e.Message, Category.Exception, Priority.None);
+                         return false;
+                     }
+                 }
+                 );
             }
             catch (Exception ex)
             {
                 logger.Log(ex.Message, Category.Exception, Priority.None);
-                ;
+                return false;
             }
         }
 
@@ -117,10 +120,17 @@ namespace Mv.Modules.P99.Service
             logger.Log($"发送至康耐视:{cmd}", Category.Debug, Priority.None);
             try
             {
-                await CheckConnectionAsync();
+                for (int i = 0; i < 3; i++)
+                {
+                    var connected = await CheckConnectionAsync();
+                    if (connected)
+                        break;
+                    await Task.Delay(200);
+                    logger.Log($"重新连接康耐视", Category.Debug, Priority.None);
+                }
                 var message = await Task.Run(() =>
                   {
-                      return tcpClient.WriteAndGetReply(cmd);
+                          return tcpClient.WriteAndGetReply(cmd);
                   });
 
                 if (message != null)
@@ -128,8 +138,7 @@ namespace Mv.Modules.P99.Service
             }
             catch (Exception EX)
             {
-                responseData = "CONNECT ERROR";
-                //  throw;
+                responseData = $"CONNECT ERROR:{EX.Message},{EX.StackTrace}";
             }
 
             return responseData;

@@ -22,11 +22,12 @@ namespace Mv.Modules.P99.ViewModels
         private readonly IPlcScannerComm plcScanner;
         private readonly IConfigureFile configureFile;
         private readonly IScannerComm scannerComm;
+        private readonly IEpson2Cognex epson2Cognex;
 
         public ObservableCollection<BindableWrapper<string>> SupportRingSNs { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
         public ObservableCollection<BindableWrapper<string>> MandrelNO { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
-
+        public BindableWrapper<bool> IsConnected2 { get; set; } = new BindableWrapper<bool>();
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> Trigger { get; set; } = new BindableWrapper<bool>();
 
@@ -62,11 +63,12 @@ namespace Mv.Modules.P99.ViewModels
         }
         
 
-        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm) : base(container)
+        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm, IEpson2Cognex epson2Cognex) : base(container)
         {
             this.plcScanner = plcScanner;
             this.configureFile = configureFile;
             this.scannerComm = scannerComm;
+            this.epson2Cognex = epson2Cognex;
             EventAggregator.GetEvent<MessageEvent>().Subscribe((x) => Invoke(() => {
                 AddMessage(x);
             }));
@@ -91,6 +93,7 @@ namespace Mv.Modules.P99.ViewModels
                         }
                         Trigger = (device.GetWord(0) > 0);
                         IsConnected.Value = device.IsConnected;
+                        IsConnected2.Value = plcScanner.IsConnected;
                         device.SetShort(1, itick++);
                         if (itick >= 100)
                             itick = 0;
