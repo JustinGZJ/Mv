@@ -61,7 +61,7 @@
 
             </Grid>
         </Border>
-        <GroupBox Margin="10" Header="Support Ring SN" Grid.Column="0" Grid.Row="1">
+        <GroupBox Margin="10" Header="Support Ring SN" Grid.Column="0" Grid.Row="1" >
             <ItemsControl ItemsSource="{Binding SupportRingSNs}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

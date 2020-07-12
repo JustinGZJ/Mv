@@ -4,7 +4,6 @@ using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
-using System.Windows.Documents;
 using Unity;
 
 namespace Mv.Modules.P99.ViewModels

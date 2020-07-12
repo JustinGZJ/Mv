@@ -12,7 +12,7 @@ using Mv.Core.Interfaces;
 using Serilog;
 using System.IO;
 
-using Mv.Modules.P99;
+
 using Prism.Logging;
 
 namespace Mv.Shell
@@ -55,13 +55,21 @@ namespace Mv.Shell
 
         protected override IModuleCatalog CreateModuleCatalog()
         {
-            return new DirectoryModuleCatalog() { ModulePath = "./Modules" };
+           var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = "./Modules" };
+            directoryCatalog.Initialize();
+            return directoryCatalog;
+            //foreach (IModuleCatalogItem module in directoryCatalog.Items)
+            //{
+            //    ModuleInfo mi = (ModuleInfo)module;
+            //    directoryCatalog.AddModule(mi);
+            //}
+          //  return 
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
           //  moduleCatalog.AddModule<>
-            moduleCatalog.AddModule<P99Module>();
+          //  moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         //    moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }

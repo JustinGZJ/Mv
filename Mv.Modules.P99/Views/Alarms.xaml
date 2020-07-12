@@ -24,6 +24,7 @@
         </Grid>
     </TabItem.Header>
     <Grid Style="{StaticResource FloatInRightToLeftStyle}">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>

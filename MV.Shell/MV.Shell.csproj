@@ -37,8 +37,8 @@
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.1.0" />
     <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
-    <PackageReference Include="Prism.Logging.Serilog" Version="7.2.0.1422" />
-    <PackageReference Include="Prism.Unity" Version="7.2.0.1367" />
+    <PackageReference Include="Prism.Logging.Serilog" Version="7.2.0.1423" />
+    <PackageReference Include="Prism.Unity" Version="7.2.0.1422" />
     <PackageReference Include="Refit" Version="5.0.23" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
   </ItemGroup>
@@ -46,7 +46,6 @@
     <ProjectReference Include="..\MV.Authentication\MV.Authentication.csproj" />
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
-    <ProjectReference Include="..\Mv.Modules.P99\Mv.Modules.P99.csproj" />
     <ProjectReference Include="..\MV.Resources\MV.Resources.csproj" />
     <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
   </ItemGroup>
