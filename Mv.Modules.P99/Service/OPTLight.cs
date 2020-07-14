@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Linq;
 using System.Net;
+using Prism.Logging;
 
 namespace Mv.Modules.P99
 {
@@ -34,11 +35,13 @@ namespace Mv.Modules.P99
     }
     public class OPTLight : IOPTLight
     {
+        private readonly ILoggerFacade logger;
         TcpClient client = new TcpClient();
-        public OPTLight()
+        public OPTLight(ILoggerFacade logger)
         {
             client.ReceiveTimeout = 1000;
             client.SendTimeout = 1000;
+            this.logger = logger;
         }
         public short GetCurrent(int index)
         {
@@ -69,6 +72,7 @@ namespace Mv.Modules.P99
             }
             catch (Exception ex)
             {
+                logger.Log(ex.Message, Category.Debug, Priority.High);
                 return -1;
             }
         }

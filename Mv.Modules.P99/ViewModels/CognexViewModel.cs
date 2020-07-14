@@ -62,6 +62,8 @@ namespace Mv.Modules.P99.ViewModels
         private readonly ICognexCommunication cognex;
         private readonly IOPTLight light;
 
+
+       
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
         public ObservableCollection<CognexValue> CognexValues { get; set; } = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
@@ -77,7 +79,7 @@ namespace Mv.Modules.P99.ViewModels
                 device.SetInt(1, 20, (x % 2 == 0) ? 0 : 1);
             }); //心跳
 
-            Observable.Interval(TimeSpan.FromMilliseconds(200)).Subscribe(x =>
+            Observable.Interval(TimeSpan.FromMilliseconds(800)).Subscribe(x =>
             {
                 for (int i = 0; i < 4; i++)
                 {
