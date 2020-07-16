@@ -1,4 +1,5 @@
 ﻿using Mv.Modules.TagManager.Views;
+using Mv.Ui.Core;
 using Mv.Ui.Core.Modularity;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -18,8 +19,9 @@ namespace Mv.Modules.TagManager
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //containerregistry.registersingleton<idevicereadwriter, modbusdevicereadwriter>();
-            //_regionmanager.registerviewwithregion(regionnames.maintabregion, typeof(p99component));
+     //       containerregistry.registersingleton<idevicereadwriter, modbusdevicereadwriter>();
+            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagEditor));
+
         }
     }
 }

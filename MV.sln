@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mv.Modules.TagManager", "Mv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GateWay", "GateWay\GateWay.csproj", "{18F1A8C4-0BE5-4528-9B8E-2EBC157DB31B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModbusDriver", "ModbusDriver\ModbusDriver.csproj", "{B1A266FB-B143-4D60-B77B-CAFF37372DEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,14 @@ Global
 		{18F1A8C4-0BE5-4528-9B8E-2EBC157DB31B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18F1A8C4-0BE5-4528-9B8E-2EBC157DB31B}.Release|x86.ActiveCfg = Release|Any CPU
 		{18F1A8C4-0BE5-4528-9B8E-2EBC157DB31B}.Release|x86.Build.0 = Release|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

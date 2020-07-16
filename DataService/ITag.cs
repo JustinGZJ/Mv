@@ -140,9 +140,9 @@ namespace DataService
             return 0;
         }
 
-        public ValueChangingEventHandler<Storage> ValueChanging;
+        public  ValueChangingEventHandler<Storage> ValueChanging;
 
-        public ValueChangedEventHandler ValueChanged;
+        public  ValueChangedEventHandler ValueChanged;
 
         #region IComparable<PLCAddress> Members
 
@@ -176,10 +176,7 @@ namespace DataService
                 Storage value = Storage.Empty;
                 value.Boolean = _newvalue.Value;
                 DateTime time = _newvalue.TimeStamp.ToDateTime();
-                if (ValueChanging != null)
-                {
-                    ValueChanging(this, new ValueChangingEventArgs<Storage>(_newvalue.Quality, _value, value, _timeStamp, time));
-                }
+                ValueChanging?.Invoke(this, new ValueChangingEventArgs<Storage>(_newvalue.Quality, _value, value, _timeStamp, time));
                 _timeStamp = time;
                 _quality = _newvalue.Quality;
                 if (_quality == QUALITIES.QUALITY_GOOD)

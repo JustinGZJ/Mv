@@ -9,11 +9,13 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataService\DataService.csproj" />
+    <ProjectReference Include="..\GateWay\GateWay.csproj" />
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
+    <ProjectReference Include="..\MV.Resources\MV.Resources.csproj" />
     <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy &quot;$(TargetDir)*$(TargetExt)&quot; &quot;$(SolutionDir)$(SolutionName).Shell\bin\Debug\netcoreapp3.1\Modules&quot; /Y /S" />
+  </Target>
 </Project>

@@ -1,62 +1,14 @@
 ﻿using DataService;
 using Microsoft.Extensions.Logging;
-using Mv.Core.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Timers;
 namespace BatchCoreService
 {
-
-    public class DriverDataContext : IDriverDataContext
-    {
-
-        public const string DRIVERS = "DRIVERS";
-        private readonly IConfigureFile configure;
-        public DriverDataContext(IConfigureFile configure)
-        {
-            this.configure = configure;
-        }
-
-        public IEnumerable<Driver> GetDrivers()
-        {
-            var drivers = configure.GetValue<IEnumerable<Driver>>(DRIVERS) ?? new List<Driver>();
-            return drivers;
-        }
-
-        public void SetDrivers(IEnumerable<Driver> drivers)
-        {
-            configure.SetValue(DRIVERS, drivers);
-        }
-    }
-    public class Driver
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Assembly { get; set; }
-        public string ClassName { get; set; }
-        public ICollection<Group> Groups { get; set; } = new List<Group>();
-        public ICollection<DriverArgument> Arguments { get; set; } = new List<DriverArgument>();
-        public bool Active { get; set; }
-    }
-    public class Group
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int UpdateRate { get; set; }
-        public int DeadBand { get; set; }
-        public bool Active { get; set; }
-        public int DriverId { get; set; }
-        public ICollection<TagMetaData> TagMetas { get; set; } = new List<TagMetaData>();
-    }
-    public class DriverArgument
-    {
-        public int Id { get; set; }
-        public int DriverID { get; set; }
-        public string PropertyName { get; set; }
-        public string PropertyValue { get; set; }
-    }
     public class DAService : IDataServer
     {
 
@@ -122,7 +74,7 @@ namespace BatchCoreService
         }
 
 
-        Dictionary<string, ITag> _mapping;
+        Dictionary<string, ITag> _mapping=new Dictionary<string, ITag>();
 
         List<Scaling> _scales;
 
@@ -144,15 +96,8 @@ namespace BatchCoreService
         }
 
         private object _myLock = new object();
-        Dictionary<short, string> _archiveList = null; //是否需要lock
 
-        public Dictionary<short, string> ArchiveList
-        {
-            get
-            {
-                return _archiveList;
-            }
-        }
+        public Dictionary<short, string> ArchiveList { get; private set; } = null;
 
         public DAService(ILogger logger, IDriverDataContext dataContext)
         {
@@ -161,10 +106,8 @@ namespace BatchCoreService
             _scales = new List<Scaling>();
             _drivers = new SortedList<short, IDriver>();
             reval = new ExpressionEval(this);
-
-            InitServerByDatabase();
+            InitServer();
             InitConnection();
-
             timer1.Elapsed += timer1_Elapsed;
             timer1.Interval = CYCLE;
             timer1.Enabled = true;
@@ -235,13 +178,41 @@ namespace BatchCoreService
                     grp.IsActive = grp.IsActive;
                 }
             }
-
-            //此处需改进,与Condition采用相同的处理方式，可配置
         }
 
-        void InitServerByDatabase()
+        void InitServer()
         {
+            var drivers = dataContext.GetDrivers();
+            _list = drivers.SelectMany(x => x.Groups.SelectMany(m => m.TagMetas)).ToList();
+            ArchiveList = _list.Where(x => x.Archive).ToDictionary(x => x.ID, x => x.Name);
+            foreach (var driver in drivers)
+            {
+                var dv = AddDriver(
+                    driver.Id, 
+                    driver.Name,
+                    driver.Server, 
+                    driver.Timeout,
+                    driver.Assembly,
+                    driver.ClassName,
+                    driver.Arguments.ToImmutableDictionary(x => x.PropertyName, x => x.PropertyValue));
+                foreach (var group in driver.Groups)
+                {
+                    var gp = dv.AddGroup(group.Name, group.Id, group.UpdateRate, group.DeadBand, group.Active);
+                    gp.AddItems(group.TagMetas.ToList());
+                    gp.DataChange += Gp_DataChange; ;
+                }
+                foreach (var item in _mapping)
+                {
+                    item.Value.ValueChanged += OnValueChanged;
+                }
 
+             
+            }
+        }
+
+        private void Gp_DataChange(object sender, DataChangeEventArgs e)
+        {
+          //  throw new NotImplementedException();
         }
         #endregion
 
@@ -251,10 +222,6 @@ namespace BatchCoreService
         void OnValueChanged(object sender, DataService.ValueChangedEventArgs e)
         {
             var tag = sender as ITag;
-            //DataHelper.Instance.ExecuteStoredProcedure("AddEventLog",
-            //    DataHelper.CreateParam("@StartTime", SqlDbType.DateTime, tag.TimeStamp),
-            //    DataHelper.CreateParam("@Source", SqlDbType.NVarChar, tag.ID.ToString(), 50),
-            //    DataHelper.CreateParam("@StartTime", SqlDbType.NVarChar, tag.ToString(), 50));
         }
 
         public HistoryData[] BatchRead(DataSource source, bool sync, params ITag[] itemArray)
@@ -335,7 +302,7 @@ namespace BatchCoreService
         }
 
         public IDriver AddDriver(short id, string name, string server, int timeOut,
-            string assembly, string className, string spare1, string spare2)
+            string assembly, string className, IDictionary<string, string> dictionary)
         {
             if (_drivers.ContainsKey(id))
                 return _drivers[id];
@@ -348,7 +315,7 @@ namespace BatchCoreService
                 {
                     //dv = new ModbusDriver.ModbusTCPReader(this, id, name, server, timeOut);
                     dv = Activator.CreateInstance(dvType,
-                        new object[] { this, id, name, server, timeOut, spare1, spare2 }) as IDriver;
+                        new object[] { this, id, name, server, timeOut, dictionary }) as IDriver;
                     if (dv != null)
                         _drivers.Add(id, dv);
                 }

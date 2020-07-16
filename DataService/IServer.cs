@@ -37,7 +37,7 @@ namespace DataService
         IEnumerable<IDriver> Drivers { get; }
         IEnumerable<string> BrowseItems(BrowseType browseType, string tagName, DataType dataType);
         IDriver AddDriver(short id, string name, string server, int timeOut,
-            string assembly, string className, string spare1, string spare2);
+            string assembly, string className, IDictionary<string,string> dictionary);
         IGroup GetGroupByName(string name);
         int GetScaleByID(short id);
         int GetItemProperties(short id);//返回的是元数据在元数据列表的索引

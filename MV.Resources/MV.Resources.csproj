@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Images\avatar-default.png" />
+    <None Remove="Images\background1.jpg" />
     <None Remove="Images\FileTypes\ApkType.png" />
     <None Remove="Images\FileTypes\DocType.png" />
     <None Remove="Images\FileTypes\ExeType.png" />
@@ -32,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\avatar-default.png" />
+    <Resource Include="Images\background1.jpg" />
     <Resource Include="Images\FileTypes\ApkType.png" />
     <Resource Include="Images\FileTypes\DocType.png" />
     <Resource Include="Images\FileTypes\ExeType.png" />
