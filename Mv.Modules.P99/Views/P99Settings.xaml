@@ -23,6 +23,14 @@
                 <TextBlock Margin="10">保存路径</TextBlock>
                 <TextBox Margin="10"  Text="{Binding Config.SaveDir}"></TextBox>
             </DockPanel>
+            <DockPanel LastChildFill="True"  Margin="10">
+                <TextBlock Margin="10">工控机IP</TextBlock>
+                <TextBox Margin="10" Text="{Binding Config.MachineNo}"></TextBox>
+            </DockPanel>
+            <DockPanel LastChildFill="True" Margin="10">
+                <TextBlock Margin="10">保存路径</TextBlock>
+                <TextBox Margin="10"  Text="{Binding Config.SaveDir}"></TextBox>
+            </DockPanel>
         </StackPanel>
         <Button Grid.Row="1" Margin="20" Content="保存" Command="{Binding SaveCommand}" Style="{StaticResource MaterialDesignFlatMidBgButton}"/>
     </Grid>

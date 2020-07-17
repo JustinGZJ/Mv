@@ -32,6 +32,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Border x:Name="Header" BorderThickness="0 0 0 1" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource LightGreyBackgroundBrush}">
             <Grid  >
@@ -93,7 +94,16 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <Grid Grid.Row="2" Grid.ColumnSpan="2">
+        <GroupBox Margin="10" Grid.Row="1" Grid.Column="2" Header="UV灯电流值">
+            <ItemsControl ItemsSource="{Binding UVCurrents}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Value}"></TextBlock>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+        <Grid Grid.Row="2" Grid.ColumnSpan="3">
             <GroupBox Header="Messages" Margin="10">
                 <ListBox  ctls:ListScrollToEnd.IsScrollToEnd="True"  x:Name="Msgs" ItemsSource="{Binding Messages}"></ListBox>
             </GroupBox>

@@ -4,9 +4,12 @@ using Mv.Ui.Mvvm;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Unity;
 
 namespace Mv.Modules.P99.ViewModels
@@ -63,7 +66,7 @@ namespace Mv.Modules.P99.ViewModels
         private readonly IOPTLight light;
 
 
-       
+        public ObservableCollection<BindableWrapper<short>> UVCurrents { get; set; } = new ObservableCollection<BindableWrapper<short>>(Enumerable.Repeat(new BindableWrapper<short>(), 4));
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
         public ObservableCollection<CognexValue> CognexValues { get; set; } = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
@@ -79,15 +82,21 @@ namespace Mv.Modules.P99.ViewModels
                 device.SetInt(1, 20, (x % 2 == 0) ? 0 : 1);
             }); //心跳
 
-            Observable.Interval(TimeSpan.FromMilliseconds(800)).Subscribe(x =>
-            {
-                for (int i = 0; i < 4; i++)
+
+            Task.Factory.StartNew(() =>{
+                while (true)
                 {
-                    var m = (i + 1);
-                    short current = light.GetCurrent(m);
-                    device.SetShort(0, 22 + i, current);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        var m = (i + 1);
+                        short current = light.GetCurrent(m);
+                        device.SetShort(0, 22 + i, current);
+                        UVCurrents[i].Value = current;
+                    }
+                    Thread.Sleep(100);
                 }
-            });  //uv灯
+            },TaskCreationOptions.LongRunning);
+
             Task.Factory.StartNew(async () =>
             {
                 while (true)
@@ -193,7 +202,7 @@ namespace Mv.Modules.P99.ViewModels
                     }
                     Thread.Sleep(1);
                 }
-            });
+            },TaskCreationOptions.LongRunning);
         }
 
         private void AddMessage(string Msg)
