@@ -57,7 +57,8 @@
                     </Grid>
                 </ToggleButton>
                 <ToggleButton x:Name="SettingsToggleButton"
-                              Height="56" Style="{StaticResource LeftBarAndUnderlineToggleButtonStyle}">
+                              Height="56" 
+                              Style="{StaticResource LeftBarAndUnderlineToggleButtonStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="25" />

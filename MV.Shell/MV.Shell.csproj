@@ -23,13 +23,11 @@
     <None Remove="MockData\background1.jpg" />
     <None Remove="MockData\cc.jpg" />
     <None Remove="MockData\dota2.jpg" />
-    <None Remove="MockData\fate.jpg" />
     <None Remove="MockData\group.png" />
     <None Remove="MockData\luluxiu.jpg" />
     <None Remove="MockData\netdisk.png" />
     <None Remove="MockData\qiegewala.png" />
     <None Remove="MockData\scrapylogo.png" />
-    <None Remove="MockData\unknown.jpeg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -58,11 +56,9 @@
     <Resource Include="MockData\background.jpg" />
     <Resource Include="MockData\background1.jpg" />
     <Resource Include="MockData\dota2.jpg" />
-    <Resource Include="MockData\fate.jpg" />
     <Resource Include="MockData\group.png" />
     <Resource Include="MockData\netdisk.png" />
     <Resource Include="MockData\scrapylogo.png" />
-    <Resource Include="MockData\unknown.jpeg" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Settings.Designer.cs">

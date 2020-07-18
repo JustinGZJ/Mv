@@ -58,12 +58,6 @@ namespace Mv.Shell
            var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = "./Modules" };
             directoryCatalog.Initialize();
             return directoryCatalog;
-            //foreach (IModuleCatalogItem module in directoryCatalog.Items)
-            //{
-            //    ModuleInfo mi = (ModuleInfo)module;
-            //    directoryCatalog.AddModule(mi);
-            //}
-          //  return 
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

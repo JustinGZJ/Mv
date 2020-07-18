@@ -17,7 +17,7 @@ namespace Mv.Modules.P99.Service
 
         public CognexCommunication(ILoggerFacade logger)
         {
-            tcpClient.TimeOut = TimeSpan.FromSeconds(5);
+            tcpClient.TimeOut = TimeSpan.FromSeconds(2);
             var task = CheckConnectionAsync();
             this.logger = logger;
         }

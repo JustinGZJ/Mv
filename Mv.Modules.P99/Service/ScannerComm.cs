@@ -22,6 +22,7 @@ namespace Mv.Modules.P99.Service
         public ScannerComm(ILoggerFacade logger, IPlcScannerComm plcScannerComm, IEventAggregator aggregator)
         {
             this.logger = logger;
+            logger.Log("hello", Category.Debug, Priority.None);
             this.plcScannerComm = plcScannerComm;
             this.aggregator = aggregator;
             try

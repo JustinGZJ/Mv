@@ -1,4 +1,6 @@
-﻿using Mv.Modules.TagManager.Views;
+﻿using BatchCoreService;
+using Mv.Modules.TagManager.Services;
+using Mv.Modules.TagManager.Views;
 using Mv.Ui.Core;
 using Mv.Ui.Core.Modularity;
 using Prism.Ioc;
@@ -19,7 +21,9 @@ namespace Mv.Modules.TagManager
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-     //       containerregistry.registersingleton<idevicereadwriter, modbusdevicereadwriter>();
+            this.Container.RegisterType<IDriverDataContext, DriverDataContext>();
+
+
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagEditor));
 
         }

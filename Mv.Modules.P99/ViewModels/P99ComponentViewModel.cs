@@ -103,6 +103,7 @@ namespace Mv.Modules.P99.ViewModels
             }, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(() =>
             {
+              
                 while (true)
                 {
                     if (Trigger)
