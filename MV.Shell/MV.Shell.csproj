@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>MV.Shell</AssemblyName>
-    <ApplicationIcon />
+    <ApplicationIcon>logo-icon.ico</ApplicationIcon>
     <Win32Resource />
     <StartupObject>Mv.Shell.App</StartupObject>
     <RootNamespace>Mv.Shell</RootNamespace>
@@ -22,12 +22,10 @@
     <None Remove="MockData\background.jpg" />
     <None Remove="MockData\background1.jpg" />
     <None Remove="MockData\cc.jpg" />
-    <None Remove="MockData\dota2.jpg" />
     <None Remove="MockData\group.png" />
     <None Remove="MockData\luluxiu.jpg" />
     <None Remove="MockData\netdisk.png" />
     <None Remove="MockData\qiegewala.png" />
-    <None Remove="MockData\scrapylogo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
@@ -55,10 +53,8 @@
     <Resource Include="logo-icon.ico" />
     <Resource Include="MockData\background.jpg" />
     <Resource Include="MockData\background1.jpg" />
-    <Resource Include="MockData\dota2.jpg" />
     <Resource Include="MockData\group.png" />
     <Resource Include="MockData\netdisk.png" />
-    <Resource Include="MockData\scrapylogo.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Settings.Designer.cs">

@@ -36,6 +36,6 @@
     <Grid>
         <Image Source="/MV.Resources;component/Images/background1.jpg" Stretch="UniformToFill" Style="{StaticResource FadeInStyle}"/>
         <Rectangle Grid.Row="0" Grid.RowSpan="4" Fill="#AAAAAAAA" Style="{StaticResource FadeInStyle}"/>
-        <local:DirverEditer></local:DirverEditer>
+        <local:DriverEditer prism:ViewModelLocator.AutoWireViewModel="True"></local:DriverEditer>
     </Grid>
 </TabItem>

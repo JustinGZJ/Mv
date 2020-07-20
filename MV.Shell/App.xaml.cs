@@ -55,6 +55,8 @@ namespace Mv.Shell
 
         protected override IModuleCatalog CreateModuleCatalog()
         {
+           
+           
            var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = "./Modules" };
             directoryCatalog.Initialize();
             return directoryCatalog;
@@ -62,10 +64,7 @@ namespace Mv.Shell
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-          //  moduleCatalog.AddModule<>
-          //  moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
-        //    moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }
 
         public override void Initialize()

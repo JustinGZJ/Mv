@@ -10,6 +10,7 @@ namespace Mv.Core
             Directory.CreateDirectory(Apps);
             Directory.CreateDirectory(Logs);
             Directory.CreateDirectory(Users);
+            Directory.CreateDirectory(Drivers);
         }
 
         /// <summary>
@@ -36,5 +37,8 @@ namespace Mv.Core
         /// %AppData%\MV\Users
         /// </summary>
         public static readonly string Users = Path.Combine(AppData, nameof(Users));
+
+
+        public static readonly string Drivers = Path.Combine(MainProgram, nameof(Drivers));
     }
 }

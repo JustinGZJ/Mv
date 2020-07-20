@@ -23,26 +23,6 @@
                 </Ellipse.Fill>
             </Ellipse>
 
-            <StackPanel Grid.Column="2">
-                <TextBlock Text="{Binding Path=AuthorName, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                           FontWeight="Bold" VerticalAlignment="Center" Margin="0 2"/>
-                <TextBlock Text="{Binding Path=Description, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                           Foreground="Gray" VerticalAlignment="Center" Margin="0 2"/>
-                <StackPanel Orientation="Horizontal" Margin="0 2">
-                    <materialDesign:PackIcon Kind="GithubCircle" VerticalAlignment="Center" Margin="0 0 8 0"/>
-                    <Button Content="Github"
-                            ToolTip="{Binding Path=GithubHome, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                            Command="{Binding Path=OpenGithubHomeCommand, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                            Foreground="#5458AF" Style="{StaticResource LinkButtonStyle}" VerticalAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0 2">
-                    <materialDesign:PackIcon Kind="Email" VerticalAlignment="Center" Margin="0 0 8 0"/>
-                    <Button Content="Email" 
-                            ToolTip="{Binding Path=Email, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                            Command="{Binding Path=OpenEmailCommand, RelativeSource={RelativeSource AncestorType=dialogs:AuthorCard}}" 
-                            Foreground="#5458AF" Style="{StaticResource LinkButtonStyle}" VerticalAlignment="Center"/>
-                </StackPanel>
-            </StackPanel>
         </Grid>
     </Border>
 

@@ -11,14 +11,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Mv.Modules.TagManager.Views
+namespace Mv.Modules.TagManager.Views.Dialogs
 {
     /// <summary>
-    /// DirverEditer.xaml 的交互逻辑
+    /// AddDriverDlg.xaml 的交互逻辑
     /// </summary>
-    public partial class DriverEditer : UserControl
+    public partial class AddDriverDlg : UserControl
     {
-        public DriverEditer()
+        public AddDriverDlg()
         {
             InitializeComponent();
         }
