@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using Mv.Modules.TagManager.Views.Dialogs;
 using Mv.Modules.TagManager.ViewModels.Dialogs;
 using Mv.Modules.TagManager.Views;
+using DataService;
+using System.Reflection;
+using System.Linq;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
@@ -56,7 +59,22 @@ namespace Mv.Modules.TagManager.ViewModels
 
         private void ShowDriver(Driver driver)
         {
-            
+            IDriver dv = null;
+            try
+            {
+                Assembly ass = Assembly.LoadFrom(driver.Assembly);
+                var dvType = ass.GetType(driver.ClassName);
+               // IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary< string, string> paras = null
+                if (dvType != null)
+                {
+                    dv = Activator.CreateInstance(dvType,
+                        new object[] { null,driver.Id ,driver.Name, driver.ClassName,string.IsNullOrEmpty(driver.Server)?"127.0.0.1":driver.Server, driver.Timeout==0?500:driver.Timeout, driver.Arguments.ToDictionary(x=>x.PropertyName,x=>x.PropertyValue) }) as IDriver;
+                }
+            }
+            catch (Exception e)
+            {
+            //    AddErrorLog(e);
+            }
         }
 
         void IViewLoadedAndUnloadedAware<DriverEditer>.OnLoaded(DriverEditer view)

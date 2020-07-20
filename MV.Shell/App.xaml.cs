@@ -54,10 +54,8 @@ namespace Mv.Shell
         }
 
         protected override IModuleCatalog CreateModuleCatalog()
-        {
-           
-           
-           var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = "./Modules" };
+        {          
+           var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
             directoryCatalog.Initialize();
             return directoryCatalog;
         }
