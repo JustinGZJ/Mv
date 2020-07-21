@@ -5,8 +5,34 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mv.Modules.TagManager.Views.Dialogs"
              mc:Ignorable="d" 
+             xmlns:pg="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">Groups</TextBlock>
+            <ListBox Grid.Row="1" x:Name="lst"></ListBox>
+            <Grid Grid.Row="2" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button>添加</Button>
+                <Button Grid.Column="1">删除</Button>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1" >
+            <pg:PropertyGrid SelectedObject="{Binding ElementName=lst,Path=SelectedItem}"></pg:PropertyGrid>
+        </Grid>
+
     </Grid>
 </UserControl>

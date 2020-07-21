@@ -66,7 +66,7 @@ namespace Mv.Modules.TagManager.ViewModels
             get { return selectPropery; }
             set { SetProperty(ref selectPropery, value); }
         }
-
+  
         private void ShowDriver(Driver driver)
         {
             IDriver dv = null;
@@ -99,7 +99,18 @@ namespace Mv.Modules.TagManager.ViewModels
                         DataContext = SelectPropery,
                         Title = "设置驱动"
                     };
-                    dialog.ShowDialog();
+                    if (dialog.ShowDialog()==true)
+                    {
+                        var arguments = dv.GetType().GetProperties().Where(x => x.CanWrite).Select(x => new DriverArgument
+                        {
+                            DriverID = dv.ID,
+                            PropertyName = x.Name,
+                            PropertyValue = x.GetValue(dv).ToString()
+                        });
+
+                        driver.Arguments.Clear();
+                        arguments.ForEach(x => driver.Arguments.Add(x));
+                    }
                 }
             }
             catch (Exception e)
