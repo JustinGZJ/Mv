@@ -47,8 +47,8 @@ namespace DataService
         string ServerName { get; set; }//可以考虑增加一个附加参数，Sever只定义本机名
         bool IsClosed { get; }
         int TimeOut { get; set; }
-        IEnumerable<IGroup> Groups { get; }
-        IDataServer Parent { get; }
+        IEnumerable<IGroup> Groups { get;  }
+        IDataServer Parent { get;  }
         bool Connect();
         IGroup AddGroup(string name, short id, int updateRate, float deadBand = 0f, bool active = false);
         bool RemoveGroup(IGroup group);

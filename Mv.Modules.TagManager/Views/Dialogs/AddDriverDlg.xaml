@@ -8,7 +8,6 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DataContext="{d:DesignInstance  localvm:AddDriverDlgViewModel,IsDesignTimeCreatable=True}"
              mc:Ignorable="d" 
              Width="400" 
              Padding="20"

@@ -9,7 +9,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:localvm="clr-namespace:Mv.Modules.TagManager.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             d:DataContext="{d:DesignInstance localvm:DriverEditerViewModel}"
+             xmlns:tk="http://schemas.xceed.com/wpf/xaml/toolkit"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -19,7 +19,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -46,8 +45,8 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding Name}" Style="{StaticResource MaterialDesignBody2TextBlock}"/>
-                                <TextBlock Text="{Binding Description}" Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                                <TextBlock Text="{Binding Name}" FontSize="16" Style="{StaticResource MaterialDesignTextBlock}"/>
+                                <TextBlock Text="{Binding Description}" FontSize="14" Style="{StaticResource MaterialDesignTextBlock}" />
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -56,13 +55,13 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddDriverCommand}">添加</Button>
                     <Button Grid.Column="1" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding RemoveDriverCommand}" CommandParameter="{Binding ElementName=lst, Path=SelectedItem}">删除</Button>
+                    <Button Grid.Column="2" Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding ShowDriverCommand}" CommandParameter="{Binding ElementName=lst,Path=SelectedItem}">编辑</Button>
                 </Grid>
             </Grid>
-       
         </Border>
-
     </Grid>
 </UserControl>

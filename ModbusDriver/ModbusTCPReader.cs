@@ -104,6 +104,10 @@ namespace ModbusDriver
             }
        
         }
+        public ModbusTCPReader()
+        {
+
+        }
 
         public bool Connect()
         {
@@ -540,6 +544,8 @@ namespace ModbusDriver
         {
             get { return 60; }
         }
+
+   
 
         public ItemData<Storage>[] ReadMultiple(DeviceAddress[] addrsArr)
         {

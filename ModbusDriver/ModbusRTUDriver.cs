@@ -23,7 +23,7 @@ namespace ModbusDriver
             }
         }
 
-        private SerialPortStream _serialPort; 
+        private SerialPortStream _serialPort;
         public int PDU
         {
             get { return 0x100; }
@@ -113,7 +113,7 @@ namespace ModbusDriver
         {
             get
             {
-                return _serialPort.IsOpen == false;
+                return (_serialPort ==null)|| (_serialPort.IsOpen == false);
             }
         }
 
@@ -136,14 +136,15 @@ namespace ModbusDriver
             get { return _server; }
         }
 
-        public string port { get; private set; }
-        public string baudRate { get; private set; }
+        public string port { get;  set; }
+        public string baudRate { get;  set; }
 
         public ModbusRTUReader(IDataServer server, short id, string name, string remote = null, int timeOut = 10000, IDictionary<string,string> paras=null)
         {
             _id = id;
             _name = name;
             _server = server;
+            _serialPort = new SerialPortStream();
             if (paras != null)
             {
                 var properties = GetType().GetProperties().Where(x => x.CanWrite).Where(x => paras.Keys.Contains(x.Name));
@@ -159,21 +160,24 @@ namespace ModbusDriver
                     }
                 }
             }
-            _serialPort = new SerialPortStream(port); 
+
              _timeOut = timeOut;
-            _serialPort.ReadTimeout = _timeOut;
-            _serialPort.WriteTimeout = _timeOut;
-            _serialPort.BaudRate = int.Parse(baudRate);
-            _serialPort.DataBits = 8;
-            _serialPort.Parity = Parity.Even;
-            _serialPort.StopBits = StopBits.One;
+        }
+        public ModbusRTUReader()
+        {
 
         }
-
         public bool Connect()
         {
             try
             {
+                _serialPort.PortName = port;
+                _serialPort.ReadTimeout = _timeOut;
+                _serialPort.WriteTimeout = _timeOut;
+                _serialPort.BaudRate = int.Parse(baudRate);
+                _serialPort.DataBits = 8;
+                _serialPort.Parity = Parity.Even;
+                _serialPort.StopBits = StopBits.One;
                 _serialPort.Open();
                 return true;
             }

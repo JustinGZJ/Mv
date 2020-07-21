@@ -58,15 +58,16 @@ namespace ModbusDriver
         }
 
         List<IGroup> _grps = new List<IGroup>(20);
-        public IEnumerable<IGroup> Groups
-        {
-            get { return _grps; }
-        }
+        public IEnumerable<IGroup> Groups => _grps;
 
         IDataServer _server;
         public IDataServer Parent
         {
             get { return _server; }
+        }
+        public ModbusRTU_TCPReader()
+        {
+
         }
 
         public ModbusRTU_TCPReader(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null)
@@ -462,6 +463,7 @@ namespace ModbusDriver
         {
             get { return 60; }
         }
+
 
         public ItemData<Storage>[] ReadMultiple(DeviceAddress[] addrsArr)
         {
