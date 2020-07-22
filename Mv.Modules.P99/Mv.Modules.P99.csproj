@@ -23,6 +23,14 @@
     <Reference Include="HslCommunication">
       <HintPath>HslCommunication.dll</HintPath>
     </Reference>
+    
+    <Reference Include="PropertyTools">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.dll</HintPath>
+    </Reference>
+    
+    <Reference Include="PropertyTools.Wpf">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="background1.jpg" />

@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Linq;
 using System.Net;
 using Prism.Logging;
+using Mv.Core.Interfaces;
 
 namespace Mv.Modules.P99
 {
@@ -37,11 +38,13 @@ namespace Mv.Modules.P99
     {
         private readonly ILoggerFacade logger;
         TcpClient client = new TcpClient();
-        public OPTLight(ILoggerFacade logger)
+        P99Config config = new P99Config();
+        public OPTLight(ILoggerFacade logger, IConfigureFile configureFile)
         {
             client.ReceiveTimeout = 1000;
             client.SendTimeout = 1000;
             this.logger = logger;
+            config = configureFile.GetValue<P99Config>(nameof(P99Config))??new P99Config();
         }
         public short GetCurrent(int index)
         {
@@ -49,7 +52,7 @@ namespace Mv.Modules.P99
             {
                 if(!client.Connected)
                 {
-                    client.Connect(IPAddress.Parse("192.168.1.16"),8000);
+                    client.Connect(IPAddress.Parse(config.UvLightIp),config.UvLightPort);
                 }
                 var recv = new byte[6];
                 var bs = new byte[] { 0xFF, 0x14, 0x01, 0x00, 0x01 };

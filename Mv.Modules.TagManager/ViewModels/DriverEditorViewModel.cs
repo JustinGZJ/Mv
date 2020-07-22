@@ -45,6 +45,9 @@ namespace Mv.Modules.TagManager.ViewModels
         public DelegateCommand<Driver> ShowDriverCommand =>
             _showDriverCommand ?? (_showDriverCommand = new DelegateCommand<Driver>(ShowDriver));
 
+        private DelegateCommand<Driver> _showGroupsCommand;
+        public DelegateCommand<Driver> ShowGroupsCommand =>
+            _showGroupsCommand ?? (_showGroupsCommand = new DelegateCommand<Driver>(ShowGroup));
 
         private async Task AddDriverAsync()
         {
@@ -66,7 +69,10 @@ namespace Mv.Modules.TagManager.ViewModels
             get { return selectPropery; }
             set { SetProperty(ref selectPropery, value); }
         }
-  
+        private void ShowGroup(Driver driver)
+        {
+
+        }
         private void ShowDriver(Driver driver)
         {
             IDriver dv = null;
@@ -99,15 +105,22 @@ namespace Mv.Modules.TagManager.ViewModels
                         DataContext = SelectPropery,
                         Title = "设置驱动"
                     };
-                    if (dialog.ShowDialog()==true)
+                    if (dialog.ShowDialog() == true)
                     {
-                        var arguments = dv.GetType().GetProperties().Where(x => x.CanWrite).Select(x => new DriverArgument
+                        var props = dv.GetType().GetProperties()
+                            .Where(x => x.CanWrite)
+                            .Where(x=>x.CanRead)
+                            .Where(x => x.GetIndexParameters().Length == 0);
+                        var arguments = new List<DriverArgument>();
+                        foreach (var x in props)
                         {
-                            DriverID = dv.ID,
-                            PropertyName = x.Name,
-                            PropertyValue = x.GetValue(dv).ToString()
-                        });
-
+                            arguments.Add(new DriverArgument
+                            {
+                                DriverID = dv.ID,
+                                PropertyName = x.Name,
+                                PropertyValue = x.GetValue(dv)==null? "":x.GetValue(dv).ToString()
+                            });
+                        }
                         driver.Arguments.Clear();
                         arguments.ForEach(x => driver.Arguments.Add(x));
                     }
@@ -118,6 +131,8 @@ namespace Mv.Modules.TagManager.ViewModels
                 //    AddErrorLog(e);
             }
         }
+
+        public int MyProperty { get; set; }
 
         void IViewLoadedAndUnloadedAware<DriverEditer>.OnLoaded(DriverEditer view)
         {

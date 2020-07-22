@@ -8,5 +8,7 @@ namespace Mv.Modules.P99
     {
         public string MachineNo { get; set; } = "1";
         public string SaveDir { get; set; } = @"D:\DATA";
+        public string UvLightIp { get; set; } = "192.168.1.16";
+        public int UvLightPort { get; set; } = 8000;
     }
 }

@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mv.Modules.TagManager.Views.Dialogs"
+             xmlns:vm="clr-namespace:Mv.Modules.TagManager.ViewModels.Dialogs"
              mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:DriverConfigerViewModel,IsDesignTimeCreatable=True}"
              xmlns:pg="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -20,7 +22,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">Groups</TextBlock>
-            <ListBox Grid.Row="1" x:Name="lst"></ListBox>
+            <ListBox Grid.Row="1" x:Name="lst" ItemsSource="{Binding Driver.Groups}"></ListBox>
             <Grid Grid.Row="2" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -31,8 +33,7 @@
             </Grid>
         </Grid>
         <Grid Grid.Column="1" >
-            <pg:PropertyGrid SelectedObject="{Binding ElementName=lst,Path=SelectedItem}"></pg:PropertyGrid>
+            <pg:PropertyGrid  SelectedObject="{Binding ElementName=lst,Path=SelectedItem}"></pg:PropertyGrid>
         </Grid>
-
     </Grid>
 </UserControl>
