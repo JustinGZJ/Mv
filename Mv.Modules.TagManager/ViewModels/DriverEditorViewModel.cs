@@ -17,15 +17,18 @@ using System.Linq;
 using System.Globalization;
 using PropertyTools.Wpf;
 using DelegateCommand = Prism.Commands.DelegateCommand;
+using Prism.Regions;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
     public class DriverEditerViewModel : ViewModelBase, IViewLoadedAndUnloadedAware<DriverEditer>
     {
+        private readonly IRegionManager regionManager;
         private readonly IDriverDataContext driverDataContext;
 
-        public DriverEditerViewModel(IUnityContainer container, IDriverDataContext driverDataContext) : base(container)
+        public DriverEditerViewModel(IUnityContainer container,IDriverDataContext driverDataContext) : base(container)
         {
+            this.regionManager = container.Resolve<IRegionManager>();
             this.driverDataContext = driverDataContext;
             var drivers = driverDataContext.GetDrivers();
             Drivers.AddRange(drivers);
@@ -51,6 +54,7 @@ namespace Mv.Modules.TagManager.ViewModels
 
         private async Task AddDriverAsync()
         {
+     
             var dlg = new AddDriverDlg();
             var result = await DialogHost.Show(dlg, "RootDialog");
             if (result.ToString() == "OK")
@@ -71,6 +75,12 @@ namespace Mv.Modules.TagManager.ViewModels
         }
         private void ShowGroup(Driver driver)
         {
+            if (driver == null)
+                return;
+            regionManager.RequestNavigate("DRIVER_DETAIL", nameof(DriverConfiger), new NavigationParameters
+            {
+                { nameof(Driver), driver }
+            });
 
         }
         private void ShowDriver(Driver driver)

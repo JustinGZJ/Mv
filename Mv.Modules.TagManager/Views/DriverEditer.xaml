@@ -39,14 +39,14 @@
                 <ListBox x:Name="lst" ItemsSource="{Binding Drivers}" Grid.Row="0" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding ShowDriverCommand}" CommandParameter="{Binding ElementName=lst,Path=SelectedItem}"></i:InvokeCommandAction>
+                            <i:InvokeCommandAction Command="{Binding ShowGroupsCommand}" CommandParameter="{Binding ElementName=lst,Path=SelectedItem}"></i:InvokeCommandAction>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontSize="16" Style="{StaticResource MaterialDesignTextBlock}"/>
-                                <TextBlock Text="{Binding Description}" FontSize="14" Style="{StaticResource MaterialDesignTextBlock}" />
+                                <TextBlock Text="{Binding Name}" FontSize="16" />
+                                <TextBlock Text="{Binding Description}" FontSize="14" />
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -63,5 +63,8 @@
                 </Grid>
             </Grid>
         </Border>
+        <Grid Grid.Column="1" Grid.Row="1" >
+            <ContentControl prism:RegionManager.RegionName="DRIVER_DETAIL"/>
+        </Grid>
     </Grid>
 </UserControl>

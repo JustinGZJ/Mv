@@ -6,15 +6,26 @@
              xmlns:local="clr-namespace:Mv.Modules.TagManager.Views.Dialogs"
              xmlns:vm="clr-namespace:Mv.Modules.TagManager.ViewModels.Dialogs"
              mc:Ignorable="d" 
+             xmlns:prism="http://www.codeplex.com/prism"
+             prism:ViewModelLocator.AutoWireViewModel="True"
              d:DataContext="{d:DesignInstance vm:DriverConfigerViewModel,IsDesignTimeCreatable=True}"
              xmlns:pg="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Grid>
+        <Grid Margin="10 0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="*"/>
@@ -28,8 +39,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button>添加</Button>
-                <Button Grid.Column="1">删除</Button>
+                <Button Style="{StaticResource MaterialDesignFlatButton}">添加</Button>
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Column="1">删除</Button>
             </Grid>
         </Grid>
         <Grid Grid.Column="1" >

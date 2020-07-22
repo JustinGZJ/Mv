@@ -13,12 +13,11 @@ namespace Mv.Modules.TagManager
 {
     public class TagManagerModule : ModuleBase
     {
-        private readonly IContainerRegistry containerRegistry;
         private readonly IRegionManager _regionManager;
 
-        public TagManagerModule(IUnityContainer container, IContainerRegistry containerRegistry,IRegionManager regionManager) : base(container)
+        public TagManagerModule(IUnityContainer container,IRegionManager regionManager) : base(container)
         {
-            this.containerRegistry = containerRegistry;
+
             _regionManager = regionManager;
         }
 
