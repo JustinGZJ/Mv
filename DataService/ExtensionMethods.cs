@@ -421,7 +421,6 @@ namespace DataService
             return (bit < 8 ? bit + 8 : bit - 8);
         }
 
-        [Obsolete]
         public static Storage ToStorage(this ITag tag, object obj)
         {
             Storage value = Storage.Empty;

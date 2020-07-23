@@ -13,9 +13,8 @@ namespace BatchCoreService
     {
 
         const char SPLITCHAR = '.';
-        const string SERVICELOGSOURCE = "DataProcess";
         //可配置参数，从XML文件读取
-        int CYCLE = 60000;
+        int CYCLE = 6000;
 
 
         static ILogger Log;

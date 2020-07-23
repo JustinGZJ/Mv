@@ -10,7 +10,7 @@ using DataService;
 namespace ModbusDriver
 {
     [Description("Modbus RTU_TCP协议")]
-    public sealed class ModbusRTU_TCPReader : IPLCDriver, IMultiReadWrite
+    public sealed class ModbusRTU_TCPReader : DriverInitBase, IPLCDriver, IMultiReadWrite
     {
         private int _timeout;
 
@@ -71,27 +71,15 @@ namespace ModbusDriver
         }
 
         public ModbusRTU_TCPReader(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null)
+            :base(server,id,name,serverName,timeOut,paras)
         {
             _id = id;//id 
             _name = name;
             _server = server;
             _ip = serverName;
             _timeout = timeOut;
-            if (paras != null)
-            {
-                var properties = GetType().GetProperties().Where(x => x.CanWrite).Where(x => paras.Keys.Contains(x.Name));
-                foreach (var para in paras)
-                {
-                    var prop = properties.FirstOrDefault(x => x.Name == para.Key);
-                    if (prop != null)
-                    {
-                        if (prop.PropertyType.IsEnum)
-                            prop.SetValue(this, Enum.Parse(prop.PropertyType, para.Value), null);
-                        else
-                            prop.SetValue(this, Convert.ChangeType(para.Value, prop.PropertyType, CultureInfo.CreateSpecificCulture("en-US")), null);
-                    }
-                }
-            }
+           
+
         }
 
         public bool Connect()

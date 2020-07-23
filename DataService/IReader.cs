@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace DataService
 {
@@ -60,6 +62,33 @@ namespace DataService
         int PDU { get; }
         DeviceAddress GetDeviceAddress(string address);
         string GetAddress(DeviceAddress address);
+    }
+
+
+    public abstract class DriverInitBase
+    {
+        public DriverInitBase()
+        {
+
+        }
+        public DriverInitBase(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null)
+        {
+            if (paras != null)
+            {
+                var properties = GetType().GetProperties().Where(x => x.CanWrite).Where(x => paras.Keys.Contains(x.Name));
+                foreach (var para in paras)
+                {
+                    var prop = properties.FirstOrDefault(x => x.Name == para.Key);
+                    if (prop != null)
+                    {
+                        if (prop.PropertyType.IsEnum)
+                            prop.SetValue(this, Enum.Parse(prop.PropertyType, para.Value), null);
+                        else
+                            prop.SetValue(this, Convert.ChangeType(para.Value, prop.PropertyType, CultureInfo.CreateSpecificCulture("en-US")), null);
+                    }
+                }
+            }
+        }
     }
 
     public interface IFileDriver : IDriver, IReaderWriter

@@ -12,7 +12,7 @@ using RJCP.IO.Ports;
 namespace ModbusDriver
 {
     [Description("Modbus RTU协议")]
-    public sealed class ModbusRTUReader : IPLCDriver
+    public sealed class ModbusRTUReader : DriverInitBase, IPLCDriver
     {
         short _id;
         public short ID
@@ -113,7 +113,7 @@ namespace ModbusDriver
         {
             get
             {
-                return (_serialPort ==null)|| (_serialPort.IsOpen == false);
+                return (_serialPort == null) || (_serialPort.IsOpen == false);
             }
         }
 
@@ -136,36 +136,20 @@ namespace ModbusDriver
             get { return _server; }
         }
 
-        public string port { get;  set; }
-        public string baudRate { get;  set; }
+        public string port { get; set; }
+        public string baudRate { get; set; }
+        public ModbusRTUReader()
+        {
 
-        public ModbusRTUReader(IDataServer server, short id, string name, string remote = null, int timeOut = 10000, IDictionary<string,string> paras=null)
+        }
+        public ModbusRTUReader(IDataServer server, short id, string name, string remote = null, int timeOut = 10000, IDictionary<string, string> paras = null)
+            : base(server, id, name, remote, timeOut, paras)
         {
             _id = id;
             _name = name;
             _server = server;
             _serialPort = new SerialPortStream();
-            if (paras != null)
-            {
-                var properties = GetType().GetProperties().Where(x => x.CanWrite).Where(x => paras.Keys.Contains(x.Name));
-                foreach (var para in paras)
-                {
-                    var prop = properties.FirstOrDefault(x => x.Name == para.Key);
-                    if (prop != null)
-                    {
-                        if (prop.PropertyType.IsEnum)
-                            prop.SetValue(this, Enum.Parse(prop.PropertyType, para.Value), null);
-                        else
-                            prop.SetValue(this, Convert.ChangeType(para.Value, prop.PropertyType, CultureInfo.CreateSpecificCulture("en-US")), null);
-                    }
-                }
-            }
-
-             _timeOut = timeOut;
-        }
-        public ModbusRTUReader()
-        {
-
+            _timeOut = timeOut;
         }
         public bool Connect()
         {

@@ -13,8 +13,9 @@ namespace DataService
         public string Address { get; set; }
         public DataType DataType { get; set; }
         public ushort Size { get; set; }
+        public string Description { get; set; }
         public int Cycle { get; set; } = 10;
-        public bool Archive { get; set; }
+        public bool Archive { get; set; } = true;
         public float Minimum { get; set; }
         public float Maximum { get; set; }
         [Browsable(false)]

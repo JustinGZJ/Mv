@@ -6,41 +6,44 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace CommonDriver
 {
     [Description("Melsec-MC-3E协议")]
-    public class MelsecMcNetDriver : IPLCDriver, IMultiReadWrite
+    public class MelsecMcNetDriver :DriverInitBase, IPLCDriver, IMultiReadWrite
     {
 
-        Dictionary<int, MelsecMcDataType> _dictionary = new Dictionary<int, MelsecMcDataType>()
+        protected Dictionary<int, MelsecMcDataType> _dictionary = new Dictionary<int, MelsecMcDataType>()
         {
-            {156,MelsecMcDataType.X},
-            {157,MelsecMcDataType.Y},
-            {144,MelsecMcDataType.M},
-            {168,MelsecMcDataType.D},
-            {180,MelsecMcDataType.M},
-            {146,MelsecMcDataType.L},
-            {147,MelsecMcDataType.F},
-            {148,MelsecMcDataType.V},
-            {160,MelsecMcDataType.B},
-            {175,MelsecMcDataType.R},
-            {152,MelsecMcDataType.S},
-            {204,MelsecMcDataType.Z},
-            {176,MelsecMcDataType.ZR}
         };
-        private MelsecMcNet mc = new MelsecMcNet();
+        protected MelsecMcNet mc = new MelsecMcNet();
         public void Dispose()
         {
             mc.ConnectClose();
             //  throw new System.NotImplementedException();
         }
+        public MelsecMcNetDriver() 
+        {
 
-        public MelsecMcNetDriver(IDataServer server, short id, string name)
+        }
+        public MelsecMcNetDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
         {
             ID = id;
             Name = name;
             Parent = server;
+            _ip = serverName;
+
+            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static;
+            var fields =typeof(MelsecMcDataType).GetFields(bindingFlags)
+                .Where(x => x.FieldType == typeof(MelsecMcDataType))
+                .Where(m=>!m.Name.Contains("_"))
+                .Select(x=>(MelsecMcDataType)x.GetValue(null))
+                .ToDictionary(x=>(int)x.DataCode);
+            if (fields != null)
+                _dictionary = fields;
+
         }
 
         string _ip;//服务ip
@@ -223,7 +226,7 @@ namespace CommonDriver
         }
 
         public int PDU { get; } = 960;
-        public DeviceAddress GetDeviceAddress(string address)
+        public virtual DeviceAddress GetDeviceAddress(string address)
         {
 
             OperateResult<McAddressData> operateResult = McAddressData.ParseKeyenceFrom(address, 0);

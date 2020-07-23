@@ -12,7 +12,7 @@ using DataService;
 namespace ModbusDriver
 {
     [Description("Modbus TCP协议")]
-    public sealed class ModbusTCPReader : IPLCDriver, IMultiReadWrite
+    public sealed class ModbusTCPReader :DriverInitBase, IPLCDriver, IMultiReadWrite
     {
         private int _timeout;
 
@@ -79,8 +79,12 @@ namespace ModbusDriver
         {
             get { return _server; }
         }
+        public ModbusTCPReader()
+        {
 
-        public ModbusTCPReader(IDataServer server, short id, string name, string ip, int timeOut = 500, IDictionary<string,string> paras=null)
+        }
+        public ModbusTCPReader(IDataServer server, short id, string name, string ip, int timeOut = 500, IDictionary<string,string> paras=null)  
+            : base(server, id, name, ip, timeOut, paras)
         {
             _id = id;
             _name = name;
@@ -104,10 +108,7 @@ namespace ModbusDriver
             }
        
         }
-        public ModbusTCPReader()
-        {
-
-        }
+ 
 
         public bool Connect()
         {

@@ -142,8 +142,6 @@ namespace Mv.Modules.TagManager.ViewModels
             }
         }
 
-        public int MyProperty { get; set; }
-
         void IViewLoadedAndUnloadedAware<DriverEditer>.OnLoaded(DriverEditer view)
         {
             //      throw new NotImplementedException();
