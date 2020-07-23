@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace DataService
@@ -6,25 +7,18 @@ namespace DataService
     [StructLayout(LayoutKind.Sequential)]
     public class TagMetaData : IComparable<TagMetaData>
     {
-        public bool Archive { get; set; }
-
-        public DataType DataType { get; set; }
-
-        public ushort Size { get; set; }
-
+        [Browsable(false)]
         public short ID { get; set; }
-
-        public short GroupID { get; set; }
-
-        public float Maximum { get; set; }
-
-        public float Minimum { get; set; }
-
-        public int Cycle { get; set; }
-
-        public string Address { get; set; }
-
         public string Name { get; set; }
+        public string Address { get; set; }
+        public DataType DataType { get; set; }
+        public ushort Size { get; set; }
+        public int Cycle { get; set; } = 10;
+        public bool Archive { get; set; }
+        public float Minimum { get; set; }
+        public float Maximum { get; set; }
+        [Browsable(false)]
+        public short GroupID { get; set; }
 
         public TagMetaData(short id, short grpId, string name, string address,
             DataType type, ushort size, bool archive = false, float max = 0, float min = 0, int cycle = 0)

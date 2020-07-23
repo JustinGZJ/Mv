@@ -8,6 +8,7 @@ namespace BatchCoreService
     {
         [Browsable(false)]
         public short Id { get; set; }
+        [ReadOnly(true)]
         public string Name { get; set; }
         public int UpdateRate { get; set; } = 100;
         public int DeadBand { get; set; } = 2000;

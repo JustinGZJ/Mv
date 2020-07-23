@@ -35,6 +35,7 @@ namespace Mv.Modules.TagManager.Services
             foreach (var g in gs)
             {
                 g.Second.Id = (short)g.First;
+                g.Second.TagMetas.ForEach(x => x.GroupID = g.Second.Id);
             }
             var ts = Enumerable.Range(0, drivers.SelectMany(x => x.Groups).SelectMany(m=>m.TagMetas).Count()).Zip(drivers.SelectMany(x => x.Groups).SelectMany(m => m.TagMetas));
             foreach (var t in ts)

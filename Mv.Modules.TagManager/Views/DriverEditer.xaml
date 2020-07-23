@@ -63,7 +63,7 @@
                 </Grid>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" Grid.Row="1" >
+        <Grid Grid.Column="1" Grid.RowSpan="2" >
             <ContentControl prism:RegionManager.RegionName="DRIVER_DETAIL"/>
         </Grid>
     </Grid>

@@ -44,6 +44,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GateWay", "GateWay\GateWay.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModbusDriver", "ModbusDriver\ModbusDriver.csproj", "{B1A266FB-B143-4D60-B77B-CAFF37372DEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonDriver", "CommonDriver\CommonDriver.csproj", "{3DA5DB09-7344-457B-A97E-1A1662A9959A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,14 @@ Global
 		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|x86.ActiveCfg = Release|Any CPU
 		{B1A266FB-B143-4D60-B77B-CAFF37372DEC}.Release|x86.Build.0 = Release|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Debug|x86.Build.0 = Debug|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Release|x86.ActiveCfg = Release|Any CPU
+		{3DA5DB09-7344-457B-A97E-1A1662A9959A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

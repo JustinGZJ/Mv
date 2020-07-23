@@ -32,19 +32,27 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">Groups</TextBlock>
-            <ListBox Grid.Row="1" x:Name="lst" ItemsSource="{Binding Driver.Groups}"></ListBox>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">组别</TextBlock>
+            <ListBox Grid.Row="1" x:Name="lst" ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock VerticalAlignment="Center" Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ListBox>
             <Grid Grid.Row="2" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Style="{StaticResource MaterialDesignFlatButton}">添加</Button>
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Column="1">删除</Button>
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding AddGroupCommand}">添加</Button>
+                <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Column="1"
+                        Command="{Binding RemoveGroupCommand}" 
+                        CommandParameter="{Binding ElementName=lst, Path=SelectedItem}">删除</Button>
             </Grid>
         </Grid>
         <Grid Grid.Column="1" >
-            <pg:PropertyGrid  SelectedObject="{Binding ElementName=lst,Path=SelectedItem}"></pg:PropertyGrid>
+            <pg:PropertyGrid  SelectedObject="{Binding ElementName=lst,Path=SelectedItem}" TabVisibility="VisibleIfMoreThanOne"></pg:PropertyGrid>
         </Grid>
     </Grid>
 </UserControl>
