@@ -34,7 +34,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border x:Name="Header" BorderThickness="0 0 0 1" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{StaticResource LightGreyBackgroundBrush}">
+        <Border x:Name="Header" BorderThickness="0 0 0 1" Grid.Row="0" Grid.ColumnSpan="3" BorderBrush="{StaticResource LightGreyBackgroundBrush}">
             <Grid  >
                 <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock }" Margin="10" Foreground="{StaticResource PrimaryHueMidBrush}">相机通信</TextBlock>
                 <controls1:SimpleLed HorizontalAlignment="Right" State="{Binding IsConnected.Value}" Margin="10"

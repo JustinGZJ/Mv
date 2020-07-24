@@ -1,12 +1,16 @@
-﻿using Mv.Modules.P99.Service;
+﻿using Mv.Core;
+using Mv.Modules.P99.Service;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
 using Prism.Mvvm;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
@@ -70,7 +74,7 @@ namespace Mv.Modules.P99.ViewModels
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
         public ObservableCollection<CognexValue> CognexValues { get; set; } = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
-
+        Subject<(short, short, short, short)> CurrentSubject = new Subject<(short, short, short, short)>();
         public CognexViewModel(IUnityContainer container, IPlcCognexComm plcCognex, ICognexCommunication cognex,IOPTLight light) : base(container)
         {
             this.device = plcCognex;
@@ -91,12 +95,22 @@ namespace Mv.Modules.P99.ViewModels
                         var m = (i + 1);
                         short current = light.GetCurrent(m);
                         device.SetShort(0, 22 + i, current);
-                        UVCurrents[i].Value = current;
+                        UVCurrents[i].Value = current;                   
                     }
+                    CurrentSubject.OnNext((UVCurrents[0], UVCurrents[1], UVCurrents[2], UVCurrents[3]));
                     Thread.Sleep(100);
                 }
             },TaskCreationOptions.LongRunning);
-
+            CurrentSubject.DistinctUntilChanged().Throttle(TimeSpan.FromMilliseconds(500)).Subscribe(m => {
+                var dictionary = new Dictionary<string, string>();
+                dictionary["DateTime"] =DateTime.Now.ToString();
+                dictionary["UV1"] = m.Item1.ToString();
+                dictionary["UV2"] = m.Item2.ToString();
+                dictionary["UV3"] = m.Item3.ToString();
+                dictionary["UV4"] = m.Item4.ToString();
+                var path = Path.Combine(MvFolders.MainProgram, "UVLight",$"{ DateTime.Today:yyyyMMdd}.csv");
+                Helper.SaveFile(path, dictionary);
+            });
             Task.Factory.StartNew(async () =>
             {
                 while (true)
