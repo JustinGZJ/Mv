@@ -400,10 +400,7 @@ namespace DataService
                         i++;
                     }
                 }
-                foreach (DataChangeEventHandler deleg in DataChange.GetInvocationList())
-                {
-                    deleg.BeginInvoke(this, new DataChangeEventArgs(1, values), null, null);
-                }
+                DataChange.BeginInvoke(this, new DataChangeEventArgs(1, values), null, null);
             }
             else
             {

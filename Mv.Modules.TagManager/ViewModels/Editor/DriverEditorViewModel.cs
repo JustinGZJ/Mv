@@ -131,6 +131,8 @@ namespace Mv.Modules.TagManager.ViewModels
                                 PropertyValue = x.GetValue(dv)==null? "":x.GetValue(dv).ToString()
                             });
                         }
+                        driver.Server = dv.ServerName;
+                        driver.Timeout = dv.TimeOut;
                         driver.Arguments.Clear();
                         arguments.ForEach(x => driver.Arguments.Add(x));
                     }

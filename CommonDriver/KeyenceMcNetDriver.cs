@@ -18,7 +18,7 @@ namespace CommonDriver
 
         public KeyenceMcNetDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
         {
-      
+
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static;
             var fields = typeof(MelsecMcDataType).GetFields(bindingFlags)
                 .Where(x => x.FieldType == typeof(MelsecMcDataType))
@@ -35,16 +35,28 @@ namespace CommonDriver
 
         }
 
-   
+
         public override DeviceAddress GetDeviceAddress(string address)
         {
-            if(address.ToUpper().StartsWith("MR"))
+            if (address.ToUpper().StartsWith("MR"))
             {
-                var bit =int.TryParse(address.Substring(address.Length - 2),out var v0);
-                var r = int.TryParse(address.Substring(2, address.Length - 4),out var v1);
-                if(bit&&r)
+                var bit = int.TryParse(address.Substring(address.Length - 2), out var v0);
+                var r = int.TryParse(address.Substring(2, address.Length - 4), out var v1);
+                if (bit && r)
                 {
-                    address = $"M{v1 * 16 + v0+1}";
+                    address = $"M{v1 * 16 + v0 + 1}";
+                }
+                else
+                {
+                    return DeviceAddress.Empty;
+                }
+            }
+            else if (address.ToUpper().StartsWith("EM"))
+            {
+                var r = int.TryParse(address.Substring(2), out var v1);
+                if (bit && r)
+                {
+                    address = $"M{v1 * 16 + v0 + 1}";
                 }
                 else
                 {

@@ -27,13 +27,17 @@ namespace Mv.Modules.TagManager
             this.Container.RegisterType<IDriverDataContext, DriverDataContext>();
             this.Container.RegisterSingleton<IDataServer, DAService>();
             containerRegistry.RegisterForNavigation<DriverConfiger>();
+            containerRegistry.RegisterForNavigation<GroupMonitor>();
 
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagEditor));
+            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagMonitor));
 
         }
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
+            var dataServer=containerProvider.Resolve<IDataServer>();
+            
            
         }
     }

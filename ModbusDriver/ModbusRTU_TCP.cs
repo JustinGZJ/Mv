@@ -76,7 +76,7 @@ namespace ModbusDriver
             _id = id;//id 
             _name = name;
             _server = server;
-            _ip = serverName;
+            _ip = serverName??"localhost";
             _timeout = timeOut;
            
 

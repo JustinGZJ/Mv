@@ -1,5 +1,6 @@
 ﻿using DataService;
 using Microsoft.Extensions.Logging;
+using Prism.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -17,7 +18,7 @@ namespace BatchCoreService
         int CYCLE = 6000;
 
 
-        static ILogger Log;
+        static ILoggerFacade Log;
         private readonly IDriverDataContext dataContext;
         private System.Timers.Timer timer1 = new System.Timers.Timer();
 
@@ -98,7 +99,7 @@ namespace BatchCoreService
 
         public Dictionary<short, string> ArchiveList { get; private set; } = null;
 
-        public DAService(ILogger logger, IDriverDataContext dataContext)
+        public DAService( ILoggerFacade logger,IDriverDataContext dataContext)
         {
             Log = logger;
             this.dataContext = dataContext;
@@ -141,7 +142,8 @@ namespace BatchCoreService
 
         public void AddErrorLog(Exception e)
         {
-            Log.LogError(e.GetExceptionMsg());
+            Log.Log(e.GetExceptionMsg(), Category.Exception, Priority.High);
+  
         }
 
         private void timer1_Elapsed(object sender, ElapsedEventArgs e)
@@ -204,6 +206,7 @@ namespace BatchCoreService
                 {
                     item.Value.ValueChanged += OnValueChanged;
                 }
+               
 
              
             }
@@ -289,7 +292,7 @@ namespace BatchCoreService
                             values.Add(tag, item.Value);
                     }
                 }
-                else Log.LogError(string.Format("变量{0}不在变量表中，无法下载", item.Key));
+                else AddErrorLog(new Exception(string.Format("变量{0}不在变量表中，无法下载", item.Key)));
             }
 
             foreach (var dev in dict)
@@ -343,8 +346,7 @@ namespace BatchCoreService
 
         void reader_OnClose(object sender, ShutdownRequestEventArgs e)
         {
-            Log.LogWarning(e.shutdownReason);
-            //AddErrorLog(new Exception(e.shutdownReason));
+            AddErrorLog(new Exception(e.shutdownReason));
         }
 
         public bool AddItemIndex(string key, ITag value)

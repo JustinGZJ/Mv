@@ -89,24 +89,8 @@ namespace ModbusDriver
             _id = id;
             _name = name;
             _server = server;
-            _ip = ip;
-            _timeout = timeOut;
-            if (paras != null)
-            {
-                var properties = GetType().GetProperties().Where(x => x.CanWrite).Where(x => paras.Keys.Contains(x.Name));
-                foreach (var para in paras)
-                {
-                    var prop = properties.FirstOrDefault(x => x.Name == para.Key);
-                    if (prop != null)
-                    {
-                        if (prop.PropertyType.IsEnum)
-                            prop.SetValue(this, Enum.Parse(prop.PropertyType, para.Value), null);
-                        else
-                            prop.SetValue(this, Convert.ChangeType(para.Value, prop.PropertyType, CultureInfo.CreateSpecificCulture("en-US")), null);
-                    }
-                }
-            }
-       
+            _ip = ip??"localhost";
+            _timeout = timeOut;      
         }
  
 
