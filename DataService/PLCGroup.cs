@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace DataService
@@ -400,7 +401,7 @@ namespace DataService
                         i++;
                     }
                 }
-                DataChange.BeginInvoke(this, new DataChangeEventArgs(1, values), null, null);
+                Task.Run(() => DataChange?.Invoke(this, new DataChangeEventArgs(1, values)));
             }
             else
             {

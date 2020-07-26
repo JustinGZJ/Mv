@@ -52,6 +52,11 @@ namespace Mv.Modules.TagManager.ViewModels
         public DelegateCommand<Driver> ShowGroupsCommand =>
             _showGroupsCommand ?? (_showGroupsCommand = new DelegateCommand<Driver>(ShowGroup));
 
+
+        private DelegateCommand _NaviBackCommand;
+        public DelegateCommand NaviBackCommand =>
+            _NaviBackCommand ?? (_NaviBackCommand = new DelegateCommand( () => regionManager.RequestNavigate("TAG_CONTENT",nameof(DriverMonitor))));
+
         private async Task AddDriverAsync()
         {
      

@@ -136,8 +136,8 @@ namespace ModbusDriver
             get { return _server; }
         }
 
-        public string port { get; set; }
-        public string baudRate { get; set; }
+        public string port { get; set; } = "COM1";
+        public int baudRate { get; set; } = 9600;
         public ModbusRTUReader()
         {
 
@@ -155,10 +155,10 @@ namespace ModbusDriver
         {
             try
             {
-                _serialPort.PortName = port;
+                _serialPort.PortName = string.IsNullOrEmpty(port)?"COM1":port;
                 _serialPort.ReadTimeout = _timeOut;
                 _serialPort.WriteTimeout = _timeOut;
-                _serialPort.BaudRate = int.Parse(baudRate);
+                _serialPort.BaudRate = baudRate;
                 _serialPort.DataBits = 8;
                 _serialPort.Parity = Parity.Even;
                 _serialPort.StopBits = StopBits.One;

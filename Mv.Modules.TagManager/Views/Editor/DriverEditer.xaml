@@ -9,6 +9,7 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:localvm="clr-namespace:Mv.Modules.TagManager.ViewModels"
              prism:ViewModelLocator.AutoWireViewModel="True"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:tk="http://schemas.xceed.com/wpf/xaml/toolkit"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -29,7 +30,13 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding NaviBackCommand}">
+                <md:PackIcon Kind="ArrowBack"></md:PackIcon>
+            </Button>
+             <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
+        </StackPanel>
+       
         <Border Grid.Row="1" >
             <Grid>
                 <Grid.RowDefinitions>

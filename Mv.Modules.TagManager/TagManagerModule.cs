@@ -12,11 +12,13 @@ using Unity;
 
 namespace Mv.Modules.TagManager
 {
+
+ 
     public class TagManagerModule : ModuleBase
     {
         private readonly IRegionManager _regionManager;
 
-        public TagManagerModule(IUnityContainer container,IRegionManager regionManager) : base(container)
+        public TagManagerModule(IUnityContainer container, IRegionManager regionManager) : base(container)
         {
 
             _regionManager = regionManager;
@@ -28,17 +30,16 @@ namespace Mv.Modules.TagManager
             this.Container.RegisterSingleton<IDataServer, DAService>();
             containerRegistry.RegisterForNavigation<DriverConfiger>();
             containerRegistry.RegisterForNavigation<GroupMonitor>();
-
+            containerRegistry.RegisterForNavigation<DriverMonitor>();
+            containerRegistry.RegisterForNavigation<DriverEditer>();
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagEditor));
-            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagMonitor));
 
         }
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
-            var dataServer=containerProvider.Resolve<IDataServer>();
-            
-           
+            var dataServer = containerProvider.Resolve<IDataServer>();
+          
         }
     }
 }

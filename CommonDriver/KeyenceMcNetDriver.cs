@@ -38,6 +38,11 @@ namespace CommonDriver
 
         public override DeviceAddress GetDeviceAddress(string address)
         {
+            if (string.IsNullOrEmpty(address))
+            {
+                return DeviceAddress.Empty;
+            }
+
             if (address.ToUpper().StartsWith("MR"))
             {
                 var bit = int.TryParse(address.Substring(address.Length - 2), out var v0);
@@ -54,9 +59,9 @@ namespace CommonDriver
             else if (address.ToUpper().StartsWith("EM"))
             {
                 var r = int.TryParse(address.Substring(2), out var v1);
-                if (bit && r)
+                if (r)
                 {
-                    address = $"M{v1 * 16 + v0 + 1}";
+                    address = $"D{10000 + v1 }";
                 }
                 else
                 {

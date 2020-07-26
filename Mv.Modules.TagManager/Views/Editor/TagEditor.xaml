@@ -4,10 +4,11 @@
              xmlns:local="clr-namespace:Mv.Modules.TagManager.Views"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-           
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             xmlns:prism="http://prismlibrary.com/" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                      xmlns:tgm="clr-namespace:Mv.Modules.TagManager"
+             xmlns:prism="http://prismlibrary.com/"
          prism:ViewModelLocator.AutoWireViewModel="True" >
     <TabItem.Resources>
         <ResourceDictionary>
@@ -20,22 +21,24 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </TabItem.Resources>
-    <TabItem.Header>
+    <TabItem.Header >
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="25" />
                 <RowDefinition Height="2" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <materialDesign:PackIcon Kind="Tag" Foreground="{StaticResource LightGreyBackgroundBrush}"
+            <materialDesign:PackIcon Kind="TagFaces" Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="标签管理" HorizontalAlignment="Center"
-                       Foreground="{StaticResource LightGreyBackgroundBrush}" FontSize="10" />
+            <TextBlock Grid.Row="2" Text="标签信息" HorizontalAlignment="Center"
+                       Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" />
         </Grid>
     </TabItem.Header>
     <Grid>
         <Image Source="/MV.Resources;component/Images/background1.jpg" Stretch="UniformToFill" Style="{StaticResource FadeInStyle}"/>
         <Rectangle Grid.Row="0" Grid.RowSpan="4" Fill="#AAAAAAAA" Style="{StaticResource FadeInStyle}"/>
-        <local:DriverEditer prism:ViewModelLocator.AutoWireViewModel="True"></local:DriverEditer>
+        <ContentControl  prism:RegionManager.RegionName="TAG_CONTENT"></ContentControl>
+        <!--<local:DriverEditer prism:ViewModelLocator.AutoWireViewModel="True"></local:DriverEditer>-->
+        <!--<local:DriverMonitor></local:DriverMonitor>-->
     </Grid>
 </TabItem>

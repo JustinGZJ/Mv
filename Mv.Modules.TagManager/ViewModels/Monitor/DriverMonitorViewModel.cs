@@ -2,6 +2,7 @@
 using DataService;
 using Mv.Modules.TagManager.Views;
 using Prism.Commands;
+using Prism.Mvvm;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
@@ -11,22 +12,31 @@ using System.Text;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
-   public class DriverMonitorViewModel
+    public class DriverMonitorViewModel : BindableBase
     {
         public IDataServer DataServer { get; set; }
         public ObservableCollection<IDriver> Drivers => new ObservableCollection<IDriver>(DataServer.Drivers.ToArray());
 
-        public DriverMonitorViewModel(IDataServer server,IRegionManager regionManager)
+        public DriverMonitorViewModel(IDataServer server, IRegionManager regionManager)
         {
             this.DataServer = server;
             this.regionManager = regionManager;
+            RaisePropertyChanged(nameof(Drivers));
         }
 
-        private DelegateCommand<IDriver> _showGroupsCommand;
-        private readonly IRegionManager regionManager;
 
+        private readonly IRegionManager regionManager;
+        private DelegateCommand<IDriver> _showGroupsCommand;
         public DelegateCommand<IDriver> ShowGroupsCommand =>
             _showGroupsCommand ?? (_showGroupsCommand = new DelegateCommand<IDriver>(ShowGroup));
+
+        private DelegateCommand navigateToEditorCommand;
+        public DelegateCommand NavigateToEditorCommand =>
+        navigateToEditorCommand ?? (navigateToEditorCommand = new DelegateCommand(()=> {
+            regionManager.RequestNavigate("TAG_CONTENT", nameof(DriverEditer));
+        }));
+
+
 
         private void ShowGroup(IDriver driver)
         {

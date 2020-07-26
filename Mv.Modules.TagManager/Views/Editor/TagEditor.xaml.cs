@@ -23,6 +23,7 @@ namespace Mv.Modules.TagManager.Views
         public TagEditor()
         {
             InitializeComponent();
+
         }
     }
 }
