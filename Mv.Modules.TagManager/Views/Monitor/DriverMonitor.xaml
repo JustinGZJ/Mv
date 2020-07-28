@@ -33,7 +33,7 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
+        <TextBlock Text="标签信息" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
         <Border Grid.Row="1" >
             <Grid>
                 <Grid.RowDefinitions>

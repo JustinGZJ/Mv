@@ -80,6 +80,7 @@
                     <DataGridTextColumn  Header="变量名" Binding="{Binding Path=TagName}"/>
                     <DataGridTextColumn  Header="地址" Binding="{Binding Path=Address}"/>
                     <DataGridTextColumn  Header="变量值" Binding="{Binding Path=TagValue}"/>
+                    <DataGridTextColumn  Header="描述信息" Binding="{Binding Path=Description}"/>
                     <DataGridTextColumn  Header="时间戳" Binding="{Binding Path=TimeStamp}"/>
                 </DataGrid.Columns>
             </DataGrid>

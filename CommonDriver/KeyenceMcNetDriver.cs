@@ -49,19 +49,31 @@ namespace CommonDriver
                 var r = int.TryParse(address.Substring(2, address.Length - 4), out var v1);
                 if (bit && r)
                 {
-                    address = $"M{v1 * 16 + v0 + 1}";
+                    address = $"M{v1 * 16 + v0 }";
                 }
                 else
                 {
                     return DeviceAddress.Empty;
                 }
             }
-            else if (address.ToUpper().StartsWith("EM"))
+            if (address.ToUpper().StartsWith("EM"))
             {
                 var r = int.TryParse(address.Substring(2), out var v1);
                 if (r)
                 {
                     address = $"D{10000 + v1 }";
+                }
+                else
+                {
+                    return DeviceAddress.Empty;
+                }
+            }
+            if (address.ToUpper().StartsWith("DM"))
+            {
+                var r = int.TryParse(address.Substring(2), out var v1);
+                if (r)
+                {
+                    address = $"D{ v1 }";
                 }
                 else
                 {
@@ -77,11 +89,11 @@ namespace CommonDriver
                     return new DeviceAddress
                     {
                         Area = 0,
-                        Start = (operateResult.Content.AddressStart - 1) / 16,
+                        Start = (operateResult.Content.AddressStart) / 16,
                         DBNumber = operateResult.Content.McDataType.DataCode,
                         DataSize = 0,
                         CacheIndex = 0,
-                        Bit = (byte)(((operateResult.Content.Length - 1) % 16))
+                        Bit = (byte)(((operateResult.Content.AddressStart) % 16))
                     };
                 }
                 else

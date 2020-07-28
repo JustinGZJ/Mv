@@ -101,15 +101,23 @@ namespace Mv.Modules.P99.ViewModels
                     Thread.Sleep(100);
                 }
             },TaskCreationOptions.LongRunning);
-            CurrentSubject.DistinctUntilChanged().Throttle(TimeSpan.FromMilliseconds(500)).Subscribe(m => {
-                var dictionary = new Dictionary<string, string>();
-                dictionary["DateTime"] =DateTime.Now.ToString();
-                dictionary["UV1"] = m.Item1.ToString();
-                dictionary["UV2"] = m.Item2.ToString();
-                dictionary["UV3"] = m.Item3.ToString();
-                dictionary["UV4"] = m.Item4.ToString();
-                var path = Path.Combine(MvFolders.MainProgram, "UVLight",$"{ DateTime.Today:yyyyMMdd}.csv");
-                Helper.SaveFile(path, dictionary);
+            CurrentSubject.DistinctUntilChanged().Timestamp().Buffer(timeSpan:TimeSpan.FromMilliseconds(1000)).Subscribe(ms => {
+                var list = new List<Dictionary<string, string>>();
+                foreach (var m in ms)
+                {
+                    var dictionary = new Dictionary<string, string>();
+                    dictionary["DateTime"] = m.Timestamp.DateTime.ToString();
+                    dictionary["UV1"] = m.Value.Item1.ToString();
+                    dictionary["UV2"] = m.Value.Item2.ToString();
+                    dictionary["UV3"] = m.Value.Item3.ToString();
+                    dictionary["UV4"] = m.Value.Item4.ToString();
+
+                    list.Add(dictionary);
+
+                }
+                var path = Path.Combine(MvFolders.MainProgram, "UVLight", $"{ DateTime.Today:yyyyMMdd}.csv");
+                Helper.SaveFile(path, list);
+
             });
             Task.Factory.StartNew(async () =>
             {

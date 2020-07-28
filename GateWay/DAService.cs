@@ -196,6 +196,8 @@ namespace BatchCoreService
                     driver.Assembly,
                     driver.ClassName,
                     driver.Arguments.ToImmutableDictionary(x => x.PropertyName, x => x.PropertyValue));
+                if (dv == null)
+                    continue;
                 foreach (var group in driver.Groups)
                 {
                     var gp = dv.AddGroup(group.Name, group.Id, group.UpdateRate, group.DeadBand, group.Active);
