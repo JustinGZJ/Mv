@@ -3,6 +3,7 @@ using DataService;
 using Mv.Modules.TagManager.Services;
 using Mv.Modules.TagManager.Views;
 using Mv.Modules.TagManager.Views.Dialogs;
+using Mv.Modules.TagManager.Views.Messages;
 using Mv.Ui.Core;
 using Mv.Ui.Core.Modularity;
 using Prism.Ioc;
@@ -28,17 +29,20 @@ namespace Mv.Modules.TagManager
         {
             this.Container.RegisterType<IDriverDataContext, DriverDataContext>();
             this.Container.RegisterSingleton<IDataServer, DAService>();
+            this.Container.RegisterSingleton<IAlarmManager, AlarmManager>();
             containerRegistry.RegisterForNavigation<DriverConfiger>();
             containerRegistry.RegisterForNavigation<GroupMonitor>();
             containerRegistry.RegisterForNavigation<DriverMonitor>();
             containerRegistry.RegisterForNavigation<DriverEditer>();
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(TagEditor));
+            _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(MessageCenter));
 
         }
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
             var dataServer = containerProvider.Resolve<IDataServer>();
+            var alarmmanager = containerProvider.Resolve<IAlarmManager>();
           
         }
     }

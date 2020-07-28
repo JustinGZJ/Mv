@@ -11,6 +11,8 @@
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
+             
+      xmlns:contorls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
       d:DataContext="{d:DesignInstance vms:DriverMonitorViewModel}"
       d:DesignHeight="450" d:DesignWidth="800">
 
@@ -33,7 +35,7 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
+        <TextBlock Text="标签信息" Style="{StaticResource  MaterialDesignHeadline6TextBlock}"  VerticalAlignment="Center"></TextBlock>
         <Border Grid.Row="1" >
             <Grid>
                 <Grid.RowDefinitions>
@@ -48,10 +50,20 @@
                     </i:Interaction.Triggers>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontSize="16" />
-                                <TextBlock Text="{Binding ServerName}" FontSize="14" />
-                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <contorls:SimpleLed Margin="5 10"  Grid.Column="0"
+                                                      VerticalAlignment="Center" 
+                                                      State="{Binding IsOpen}"
+                                                      Height="20" Width="20"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding Name}" FontSize="16" />
+                                    <TextBlock Text="{Binding ServerName}" FontSize="14" />
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

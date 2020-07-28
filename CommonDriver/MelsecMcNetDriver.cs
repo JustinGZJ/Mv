@@ -26,7 +26,7 @@ namespace CommonDriver
         }
         public MelsecMcNetDriver() 
         {
-
+            
         }
         public MelsecMcNetDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
         {
@@ -34,7 +34,6 @@ namespace CommonDriver
             Name = name;
             Parent = server;
             _ip = serverName;
-
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static;
             var fields =typeof(MelsecMcDataType).GetFields(bindingFlags)
                 .Where(x => x.FieldType == typeof(MelsecMcDataType))
@@ -265,13 +264,16 @@ namespace CommonDriver
 
         public string GetAddress(DeviceAddress address)
         {
+
+            if (!_dictionary.ContainsKey(address.DBNumber))
+                return null;
             var m = _dictionary[address.DBNumber];
             if (m != null)
             {
                 if (m.DataType == 0)
                     return m.AsciiCode.Trim('*') + Convert.ToString(address.Start, m.FromBase);
                 else
-                    return $"{m.AsciiCode.Trim('*')}{Convert.ToString(address.Start * 16 + address.Bit + 1, m.FromBase)}";
+                    return $"{m.AsciiCode.Trim('*')}{Convert.ToString(address.Start * 16 + address.Bit , m.FromBase)}";
             }
             else
             {

@@ -32,7 +32,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">组别</TextBlock>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" Style="{StaticResource MaterialDesignHeadline6TextBlock}">组别</TextBlock>
             <ListBox Grid.Row="1" x:Name="lst" ItemsSource="{Binding Groups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

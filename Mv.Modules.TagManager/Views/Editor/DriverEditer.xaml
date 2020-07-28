@@ -34,7 +34,7 @@
             <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding NaviBackCommand}">
                 <md:PackIcon Kind="ArrowBack"></md:PackIcon>
             </Button>
-             <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline5TextBlock}"  VerticalAlignment="Center"></TextBlock>
+             <TextBlock Text="标签管理" Style="{StaticResource  MaterialDesignHeadline6TextBlock}"  VerticalAlignment="Center"></TextBlock>
         </StackPanel>
        
         <Border Grid.Row="1" >

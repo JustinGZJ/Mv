@@ -31,7 +31,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">组别</TextBlock>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" Style="{StaticResource MaterialDesignHeadline6TextBlock}">组别</TextBlock>
             <ListBox Grid.RowSpan="2" Grid.Row="1"  x:Name="lst" ItemsSource="{Binding Groups}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -50,7 +50,7 @@
                 <RowDefinition Height="50"/>
                 <RowDefinition Height="9*"/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" FontSize="24">标签</TextBlock>
+            <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="10" Style="{StaticResource MaterialDesignHeadline6TextBlock}">标签</TextBlock>
             <DataGrid Name="list1" Background="Transparent"
                       ItemsSource="{Binding TagItems}"
                       IsReadOnly="True" 
@@ -58,7 +58,7 @@
                       AutoGenerateColumns="False" Grid.Row="1" >
                 <DataGrid.ContextMenu>
                     <ContextMenu >
-                        <!--<MenuItem Header="写入" Command="{}" >
+                        <MenuItem Header="写入" Command="{}" >
                             <MenuItem.CommandParameter>
                                 <system:Boolean>
                                     true
@@ -71,7 +71,7 @@
                                     false
                                 </system:Boolean>
                             </MenuItem.CommandParameter>
-                        </MenuItem>-->
+                        </MenuItem>
 
                         <Separator />
                     </ContextMenu>
@@ -80,6 +80,7 @@
                     <DataGridTextColumn  Header="变量名" Binding="{Binding Path=TagName}"/>
                     <DataGridTextColumn  Header="地址" Binding="{Binding Path=Address}"/>
                     <DataGridTextColumn  Header="变量值" Binding="{Binding Path=TagValue}"/>
+                    <DataGridTextColumn  Header="描述信息" Binding="{Binding Path=Description}"/>
                     <DataGridTextColumn  Header="时间戳" Binding="{Binding Path=TimeStamp}"/>
                 </DataGrid.Columns>
             </DataGrid>

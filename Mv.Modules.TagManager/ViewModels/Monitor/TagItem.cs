@@ -15,6 +15,7 @@ namespace Mv.Modules.TagManager.ViewModels
             _tagValue = _tag.ToString();
             _addr = tagAddr;
             _timestamp = _tag.TimeStamp;
+            Description = _tag.GetMetaData().Description;
             _tag.ValueChanged += new ValueChangedEventHandler(TagValueChanged);
         }
 
@@ -53,6 +54,8 @@ namespace Mv.Modules.TagManager.ViewModels
                 SetProperty(ref _timestamp, value);
             }
         }
+
+        public string Description { get; set; }
 
 
         private void TagValueChanged(object sender, ValueChangedEventArgs args)
@@ -96,7 +99,7 @@ namespace Mv.Modules.TagManager.ViewModels
             if (_tag != null)
             {
                 // ReSharper disable once DelegateSubtraction
-                if (_tag.ValueChanged != null) _tag.ValueChanged -= TagValueChanged;
+               _tag.ValueChanged -= TagValueChanged;
             }
         }
     }
