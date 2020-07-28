@@ -41,7 +41,7 @@ namespace Mv.Modules.TagManager
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
-            var dataServer = containerProvider.Resolve<IDataServer>();
+           // var dataServer = containerProvider.Resolve<IDataServer>();
             var alarmmanager = containerProvider.Resolve<IAlarmManager>();
           
         }

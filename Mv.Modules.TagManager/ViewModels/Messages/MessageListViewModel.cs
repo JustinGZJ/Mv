@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using Mv.Ui.Mvvm;
 using Prism.Events;
+using Prism.Logging;
 using Prism.Mvvm;
 using Unity;
 
@@ -15,38 +16,37 @@ namespace Mv.Modules.TagManager.ViewModels.Messages
     public class UserMessage
     {
         public string Source { get; set; }
-        public int Level { get; set; }
+        public Category Level { get; set; }
         public string Content { get; set; }
     }
 
-    public class UserMessageEvent:PubSubEvent<UserMessage>
-    { 
-    
-    }
 
-    public class MessageListViewModel:ViewModelBase
+    public class UserMessageEvent : PubSubEvent<UserMessage>
     {
 
-        public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>() {"Welcome！" };
- 
+    }
+
+    public class MessageListViewModel : ViewModelBase
+    {
+
+        public ObservableCollection<UserMessage> Messages { get; set; } = new ObservableCollection<UserMessage>() { new UserMessage { Source = "System", Level = Category.Info, Content = "Welcome!" } };
+
+
 
         public MessageListViewModel(IUnityContainer container) : base(container)
         {
-  
             EventAggregator.GetEvent<UserMessageEvent>().Subscribe(x =>
-            {
+          {
 
-             Invoke(() =>
-                {
-
-                    var Msg = DateTime.Now.ToString() + "\t" + $"{x.Source.ToUpper().PadRight(25,' ')}{ x.Content}";
-                    Messages.Add(Msg);
-                    if (Messages.Count > 1000)
-                    {
-                        Messages.RemoveAt(0);
-                    }
-                });
-            });
+              Invoke(() =>
+                   {
+                       Messages.Add(x);
+                       if (Messages.Count > 1000)
+                       {
+                           Messages.RemoveAt(0);
+                       }
+                   });
+          });
         }
     }
 }
