@@ -281,7 +281,7 @@ namespace CommonDriver
             }
         }
 
-        public int Limit { get; } = 200;
+        public int Limit { get; } = 960;
         public ItemData<Storage>[] ReadMultiple(DeviceAddress[] addrsArr)
         {
             return this.PLCReadMultiple(new ShortCacheReader(), addrsArr);
