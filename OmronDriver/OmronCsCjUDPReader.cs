@@ -199,17 +199,27 @@ namespace OmronDriver
         }
 
         IDataServer _server;
+
+        public OmronCsCjUDPReader()
+        {
+
+        }
+
+        public OmronCsCjUDPReader(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
+        {
+            _id = id;
+            _name = name;
+            _server = server;
+            TimeOut = timeOut;
+
+        }
+
         public IDataServer Parent
         {
             get { return _server; }
         }
 
-        public OmronCsCjUDPReader(IDataServer server, short id, string name)
-        {
-            _id = id;
-            _name = name;
-            _server = server;
-        }
+
 
         /// <summary>
         /// 连接
