@@ -23,16 +23,19 @@ namespace Mv.Modules.RD402.Service
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = data.Length;
+            request.Timeout = 1000;
 
             using (var stream = request.GetRequestStream())
             {
                 stream.Write(data, 0, data.Length);
+                var response = (HttpWebResponse)request.GetResponse();
+                var sr = response.GetResponseStream();
+                var responseString = new StreamReader(sr).ReadToEnd();
+                return responseString;
             }
-            var response = (HttpWebResponse)request.GetResponse();
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            return responseString;
+
         }
-        private static string ParsToString(Hashtable Pars)
+        public static string ParsToString(Hashtable Pars)
         {
             StringBuilder sb = new StringBuilder();
             foreach (string k in Pars.Keys)

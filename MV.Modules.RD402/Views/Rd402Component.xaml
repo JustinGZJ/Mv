@@ -75,74 +75,6 @@
             </Grid>
             <GroupBox Header="Code" Grid.Row="2">
                 <StackPanel >
-                    <WrapPanel Margin="10"  Visibility="{Binding Factory,Converter={StaticResource ictVisibale}}">
-                        <TextBox Margin="5" IsReadOnly="True" Width="100" materialDesign:HintAssist.Hint="Line No."
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="LineCode" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="2" Max="2" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <TextBox Margin="5"  Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Machine No." 
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="MachineCode" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="1" Max="1" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <TextBox Margin="5" Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Spindle"
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="Spindle"  UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="1" Max="1" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <TextBox Margin="5" Width="100" IsReadOnly="True" materialDesign:HintAssist.Hint="Day of Week"
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="DayOfWeek" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="1" Max="1" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <TextBox Margin="5" Width="100"  materialDesign:HintAssist.Hint="Wire Vendor Code"
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="Vendor" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="1" Max="1" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                        <TextBox IsReadOnly="True" Margin="5" Width="100" materialDesign:HintAssist.Hint="Wire Config Code"
-                                 materialDesign:HintAssist.IsFloating="True">
-                            <TextBox.Text>
-                                <Binding Path="WireConfig" UpdateSourceTrigger="PropertyChanged" Mode="OneWay"
-                                         ValidatesOnDataErrors="True">
-                                    <Binding.ValidationRules>
-                                        <validaterule:LengthRule Min="1" Max="1" />
-                                    </Binding.ValidationRules>
-                                </Binding>
-                            </TextBox.Text>
-                        </TextBox>
-                    </WrapPanel>
                     <WrapPanel >
                         <TextBox IsReadOnly="True" Margin="5" Width="100" materialDesign:HintAssist.Hint="MO"
                                  materialDesign:HintAssist.IsFloating="True">
@@ -191,13 +123,13 @@
                                       Data="{Binding Codeimage,Mode=OneWay}" />
                             </Border>
                         </Grid>
-                        <Grid Grid.Row="0" Grid.Column="1">
+                        <!--<Grid Grid.Row="0" Grid.Column="1">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                                 <TextBlock FontSize="20" Width="150"
                                            VerticalAlignment="Bottom"
                                            Text="{Binding Barcode,Mode=OneWay}" />
                             </StackPanel>
-                        </Grid>
+                        </Grid>-->
                         <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center"
                                    Text="{Binding MatrixCode}" />
                         <Grid Grid.Row="0" Grid.Column="2">

@@ -118,14 +118,15 @@ namespace Mv.Modules.RD402.ViewModels
                             var tick = Environment.TickCount;
                             var result = await GetMatrixCode().ConfigureAwait(false);
                             AddMsg($"耗时:{Environment.TickCount - tick} ms");
+                            var strRes = result ? "Success" : "Fail";
+                            AddMsg(strRes);
                             if (!result)
                             {
-                                AddMsg("Fail");
                                 _device.SetBit(0, 2, false);
                             }
                             else
                             {
-                                AddMsg("Success");
+
                                 AddMsg($"开始写入二维码: {MatrixCode}");
                                 tick = Environment.TickCount;
                                 if (!await WritePrinterCode().ConfigureAwait(false))
@@ -141,9 +142,10 @@ namespace Mv.Modules.RD402.ViewModels
                                 }
                                 AddMsg($"耗时 {Environment.TickCount - tick} ms");
                                 AddMsg("二维码设置完成...");
-                                _device.SetBit(0, 0, true);
+
                             }
-                            SpinWait.SpinUntil(() => !_device.GetBit(0, 0), 2000);
+                            _device.SetBit(0, 0, true);
+                            SpinWait.SpinUntil(() => !_device.GetBit(0, 0), 1000);
                             _device.SetBit(0, 0, false);
                             _device.SetBit(0, 2, false);
                         }
@@ -165,7 +167,7 @@ namespace Mv.Modules.RD402.ViewModels
                             }
                             AddMsg("条码设置完毕...");
                             _device.SetBit(0, 1, true);
-                            SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 2000);
+                            SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 1000);
                             _device.SetBit(0, 1, false);
                             _device.SetBit(0, 3, false);
 
@@ -177,7 +179,7 @@ namespace Mv.Modules.RD402.ViewModels
                             _device.SetBit(0, 5, result);
                             AddMsg("文件保存完毕");
                             _device.SetBit(0, 4, true);
-                            SpinWait.SpinUntil(() => !_device.GetBit(0, 4), 2000);
+                            SpinWait.SpinUntil(() => !_device.GetBit(0, 4), 1000);
                             _device.SetBit(0, 4, false);
                             _device.SetBit(0, 5, false);
                         }
@@ -283,12 +285,12 @@ namespace Mv.Modules.RD402.ViewModels
 
         public string CoilWinding
         {
-            get =>  _config.CoilWinding;
+            get => _config.CoilWinding;
         }
 
         public string Station
         {
-            get =>  _config.Station;
+            get => _config.Station;
         }
 
 
@@ -335,16 +337,15 @@ namespace Mv.Modules.RD402.ViewModels
         {
             if (e.KeyName != nameof(RD402Config)) return;
             var config = _configure.GetValue<RD402Config>(nameof(RD402Config));
-            if (_config.Factory != config.Factory)
-            {
-                factoryInfo = Container.Resolve<IFactoryInfo>(config.Factory);        
-            }
+            _config = config;
+            factoryInfo = Container.Resolve<IFactoryInfo>(config.Factory);
+          
             RaisePropertyChanged(nameof(LineNumber));
             RaisePropertyChanged(nameof(Mo));
             RaisePropertyChanged(nameof(MachineCode));
             RaisePropertyChanged(nameof(Factory));
             Barcode = factoryInfo.GetBarcode(MatrixCode, config, _device.GetWord(1));
-            _config = config;
+           
             RaisePropertyChanged(nameof(Factory));
         }
 
@@ -382,7 +383,7 @@ namespace Mv.Modules.RD402.ViewModels
 
         private async void ExecuteGet2DodeCommand()
         {
-            var result = await GetMatrixCode();
+            var result = await GetMatrixCode().ConfigureAwait(false);
         }
 
 
@@ -391,7 +392,7 @@ namespace Mv.Modules.RD402.ViewModels
         private async Task<bool> GetMatrixCode()
         {
             var result = await Task.Run(factoryInfo.GetSn).ConfigureAwait(false);
-            AddMsg($"{MvUser.Username}:获取二维码{result.Item2}.");
+            AddMsg($"{MvUser.Username}:获取二维码:{result.Item2}.");
             if (!result.Item1) return false;
             dispatcher.Invoke(() => { MatrixCode = result.Item2; });
             AddMsg($"{MvUser.Username}:二维码:{MatrixCode}.");

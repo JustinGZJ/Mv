@@ -11,7 +11,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:ViewModel="clr-namespace:Mv.Modules.RD402.ViewModels"
              d:DataContext="{d:DesignInstance ViewModel:Rd402SettingViewModel }"
-             d:DesignHeight="450" d:DesignWidth="800" Header="RD402">
+             d:DesignHeight="450" d:DesignWidth="800" Header="喷码机">
     <TabItem.Resources>
         <rs:FactoryVisiableConverter TargetFactory="信维" x:Key="xinweiVisibale"/>
         <rs:FactoryVisiableConverter TargetFactory="ICT" x:Key="ictVisibale"/>
@@ -80,18 +80,18 @@
                     <materialDesign:PackIcon Kind="Portrait"/>
                     <TextBox materialDesign:HintAssist.Hint="Line Number" Width="200" materialDesign:HintAssist.IsFloating="True" Text="{Binding LineNumber}"></TextBox>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Factory,Converter={StaticResource ictVisibale}}" >
+                <!--<StackPanel Orientation="Horizontal" Visibility="{Binding Factory,Converter={StaticResource ictVisibale}}" >
                     <materialDesign:PackIcon Kind="Numbers"/>
                     <TextBox materialDesign:HintAssist.Hint="Machine Code" Width="200" materialDesign:HintAssist.IsFloating="True" Text="{Binding MachineCode}"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                </StackPanel>-->
+                <!--<StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Folder"/>
                     <TextBox materialDesign:HintAssist.Hint="Uploadfile Folder" Width="200" materialDesign:HintAssist.IsFloating="True" Text="{Binding UploadData}"></TextBox>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
+                </StackPanel>-->
+                <!--<StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="AboutCircle"/>
                     <TextBox materialDesign:HintAssist.Hint="Machine Number" Width="200" materialDesign:HintAssist.IsFloating="True" Text="{Binding MachineNumberFile}"></TextBox>
-                </StackPanel>
+                </StackPanel>-->
                 <StackPanel Orientation="Horizontal" Visibility="{Binding Factory, Converter={StaticResource xinweiVisibale}}">
                     <materialDesign:PackIcon Kind="Textarea"/>
                     <TextBox materialDesign:HintAssist.Hint="Coil Winding" Width="200" materialDesign:HintAssist.IsFloating="True" Text="{Binding coilWinding}"></TextBox>

@@ -5,6 +5,7 @@ using Mv.Core.Interfaces;
 using Mv.Modules.RD402.Service;
 using Mv.Ui.Mvvm;
 using Prism.Commands;
+using MaterialDesignThemes.Wpf;
 using Prism.Mvvm;
 using Unity;
 
@@ -27,6 +28,7 @@ namespace Mv.Modules.RD402.ViewModels
         {
             _configure.SetValue(nameof(RD402Config), Config);
             _device.PlcConnect();
+            
         }
 
         public Rd402SettingViewModel(IUnityContainer container, IConfigureFile configure, DeviceReadWriter device) :
@@ -35,6 +37,7 @@ namespace Mv.Modules.RD402.ViewModels
             _configure = configure;
             Config = configure.GetValue<RD402Config>(nameof(RD402Config)) ?? new RD402Config();
             _device = device;
+          //  DialogHost.CloseDialogCommand.Execute()
         }
 
         public string PlcIpAddress
