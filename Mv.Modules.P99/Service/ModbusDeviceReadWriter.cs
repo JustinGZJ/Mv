@@ -1,10 +1,8 @@
-﻿
-using HslCommunication.Core;
-using HslCommunication.ModBus;
-using System;
+﻿using System;
 using System.Text;
 using System.Threading.Tasks;
-using Prism;
+using HslCommunication.Core;
+using HslCommunication.ModBus;
 using Prism.Logging;
 
 namespace Mv.Modules.P99.Service

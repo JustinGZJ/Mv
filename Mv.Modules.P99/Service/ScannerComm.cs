@@ -1,4 +1,5 @@
-﻿using Prism.Events;
+﻿using Mv.Core.Interfaces;
+using Prism.Events;
 using Prism.Logging;
 using System;
 using System.Collections.Generic;
@@ -16,15 +17,18 @@ namespace Mv.Modules.P99.Service
         private readonly ILoggerFacade logger;
         private readonly IPlcScannerComm plcScannerComm;
         private readonly IEventAggregator aggregator;
+        private readonly ICheckCode checkCode;
+        private readonly IConfigureFile configureFile;
         private List<CognexScanner> conections = new List<CognexScanner>();
         private Edge[] edges = new Edge[4] { new Edge(), new Edge(), new Edge(), new Edge() };
 
-        public ScannerComm(ILoggerFacade logger, IPlcScannerComm plcScannerComm, IEventAggregator aggregator)
+        public ScannerComm(ILoggerFacade logger, IPlcScannerComm plcScannerComm, IEventAggregator aggregator, ICheckCode checkCode, IConfigureFile configureFile)
         {
             this.logger = logger;
-            logger.Log("hello", Category.Debug, Priority.None);
             this.plcScannerComm = plcScannerComm;
             this.aggregator = aggregator;
+            this.checkCode = checkCode;
+            this.configureFile = configureFile;
             try
             {
                 conections.Add(new CognexScanner("192.168.1.51", 8000, logger));
@@ -35,8 +39,9 @@ namespace Mv.Modules.P99.Service
             catch (Exception ex)
             {
                 aggregator.GetEvent<MessageEvent>().Publish(ex.Message);
-              //  throw;
+                //  throw;
             }
+
             Task.Factory.StartNew(() =>
             {
                 for (int i = 0; i < 4; i++)
@@ -65,6 +70,7 @@ namespace Mv.Modules.P99.Service
         private void GetCodeAsync(int index)
         {
             var stopwatch = new Stopwatch();
+            var config = configureFile.GetValue<P99Config>(nameof(P99Config));
             stopwatch.Start();
             plcScannerComm.SetString(index, 4, "".PadRight(20, '\0'));
             aggregator.GetEvent<MessageEvent>().Publish($"{index + 1}号扫码枪扫码");
@@ -85,6 +91,26 @@ namespace Mv.Modules.P99.Service
             try
             {
                 code = GetCodeAsync(index, 3000);
+
+
+                var res = code.Item1 && (!code.Item2.Contains("ERROR") && (code.Item2.Length > 5));
+                if (res)
+                {
+                    var checkResult = checkCode.CheckPass(code.Item2, config.Station);
+                    aggregator.GetEvent<MessageEvent>().Publish($"SFIS:{checkResult}");
+                    if (string.IsNullOrEmpty(checkResult))
+                    {
+                        code = (false, code.Item2 + ":没有记录");
+                    }
+                    else if (checkResult.ToUpper().Contains("PASS"))
+                    {
+                        code = (true, code.Item2);
+                    }
+                    else
+                    {
+                        code = (false, code.Item2 + ":" + checkResult);
+                    }
+                }
             }
             catch (Exception ex)
             {

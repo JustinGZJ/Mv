@@ -15,4 +15,12 @@
   <ItemGroup>
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PropertyTools">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyTools.Wpf">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

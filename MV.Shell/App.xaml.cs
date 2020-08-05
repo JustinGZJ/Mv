@@ -14,6 +14,7 @@ using System.IO;
 
 
 using Prism.Logging;
+using Mv.Modules.P99;
 
 namespace Mv.Shell
 {
@@ -62,6 +63,7 @@ namespace Mv.Shell
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
+            moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 

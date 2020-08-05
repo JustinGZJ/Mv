@@ -7,21 +7,29 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="ThridParty\**" />
+    <EmbeddedResource Remove="ThridParty\**" />
+    <None Remove="ThridParty\**" />
+    <Page Remove="ThridParty\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="background1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="15.0.5" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
     <PackageReference Include="SimpleTCP.Core" Version="1.0.4" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MV.Authentication\MV.Authentication.csproj" />
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
+    <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
   </ItemGroup>
   <ItemGroup>
     
-    <Reference Include="HslCommunication">
-      <HintPath>HslCommunication.dll</HintPath>
+    <Reference Include="Communication">
+      <HintPath>..\CommonDriver\Communication.dll</HintPath>
     </Reference>
     
     <Reference Include="PropertyTools">
@@ -31,11 +39,9 @@
     <Reference Include="PropertyTools.Wpf">
       <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
     </Reference>
+   
   </ItemGroup>
   <ItemGroup>
     <Resource Include="background1.jpg" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetDir)*$(TargetExt)&quot; &quot;$(SolutionDir)$(SolutionName).Shell\bin\Debug\netcoreapp3.1\Modules&quot; /Y /S" />
-  </Target>
 </Project>

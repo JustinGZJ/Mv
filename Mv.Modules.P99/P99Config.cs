@@ -10,5 +10,6 @@ namespace Mv.Modules.P99
         public string SaveDir { get; set; } = @"D:\DATA";
         public string UvLightIp { get; set; } = "192.168.1.16";
         public int UvLightPort { get; set; } = 8000;
+        public string Station { get; set; } = "T0479";
     }
 }
