@@ -12,18 +12,19 @@ namespace Mv.Modules.P99.Service
 
     public class ICTCheckCode : ICheckCode
     {
-        string strConnection = "data source=KSSFClisa.luxshare.com.cn;initial catalog=MESDB; user id=dataquery; password=querydata";
+        string strConnection = "data source=KSSFClisa.luxshare.com.cn;initial catalog=MESDB; user id=dataquery; password=querydata;Connect Timeout=2";
         public ICTCheckCode()
         {
- 
+
         }
         public string CheckPass(string code, string station)
         {
             string result = "";
-            using (var con=new SqlConnection(strConnection))
+            using (var con = new SqlConnection(strConnection))
             {
+
                 con.Open();
-               var strSql = "select result from m_testresult_t where ppid='" + code + "' and stationid='" + station + "' ";
+                var strSql = "select result from m_testresult_t where ppid='" + code + "' and stationid='" + station + "' ";
                 SqlDataReader DataReader = new SqlCommand(strSql, con).ExecuteReader();
                 if (DataReader.HasRows)
                 {
@@ -36,8 +37,6 @@ namespace Mv.Modules.P99.Service
                 {
                     result = "";
                 }
-                DataReader.Close();
-                con.Close();
             }
             return result;
         }

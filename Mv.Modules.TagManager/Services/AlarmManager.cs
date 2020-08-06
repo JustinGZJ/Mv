@@ -2,21 +2,25 @@
 using Mv.Modules.TagManager.ViewModels.Messages;
 using Prism.Events;
 using Prism.Logging;
+using PropertyTools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
+using System.Reactive.Linq;
 
 namespace Mv.Modules.TagManager.Services
 {
     public interface IAlarmManager
     { }
-    public class AlarmManager:IAlarmManager,IDisposable 
+    public class AlarmManager : IAlarmManager, IDisposable
     {
         private readonly IDataServer server;
         private readonly IEventAggregator @event;
         private readonly ILoggerFacade logger;
+
 
         public AlarmManager(IDataServer server, IEventAggregator @event, ILoggerFacade logger)
         {
@@ -37,7 +41,11 @@ namespace Mv.Modules.TagManager.Services
                     item.ValueChanged += PARA_ValueChanged;
                 }
             }
-
+            System.Reactive.Linq.Observable.Interval(TimeSpan.FromMilliseconds(1000)).Subscribe(x =>
+            {
+                var TAG = server["HANDSHAKE"];
+                TAG?.Write((short)x % 10);
+            });
             this.server = server;
             this.@event = @event;
             this.logger = logger;
@@ -53,7 +61,6 @@ namespace Mv.Modules.TagManager.Services
                 this.@event.GetEvent<UserMessageEvent>().Publish(new UserMessage { Content = msg, Level = 0, Source = "PARAS" });
                 logger.Log(msg, Category.Info, Priority.None);
             }
-
         }
 
 
@@ -64,7 +71,7 @@ namespace Mv.Modules.TagManager.Services
                 var value = (bool)tag.GetValue(e.Value) ? "ON" : "OFF";
                 var meta = tag.GetMetaData();
                 var msg = $"{meta.Name}\t{meta.Address}\t{meta.Description}\t{value}";
-                this.@event.GetEvent<UserMessageEvent>().Publish(new UserMessage {  Content=msg, Level=0, Source="alarms"});
+                this.@event.GetEvent<UserMessageEvent>().Publish(new UserMessage { Content = msg, Level = 0, Source = "alarms" });
                 logger.Log(msg, Category.Info, Priority.None);
             }
 
@@ -79,7 +86,7 @@ namespace Mv.Modules.TagManager.Services
             {
                 if (disposing)
                 {
-                     var alarmGroup = server?.GetGroupByName("alarms");
+                    var alarmGroup = server?.GetGroupByName("alarms");
                     if (alarmGroup != null)
                     {
                         foreach (var item in alarmGroup.Items)

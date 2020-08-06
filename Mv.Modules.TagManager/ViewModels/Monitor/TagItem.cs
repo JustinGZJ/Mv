@@ -17,6 +17,7 @@ namespace Mv.Modules.TagManager.ViewModels
             _timestamp = _tag.TimeStamp;
             Description = _tag.GetMetaData().Description;
             _tag.ValueChanged += new ValueChangedEventHandler(TagValueChanged);
+            this.TagValue = _tag.ToString();
         }
 
         ITag _tag;

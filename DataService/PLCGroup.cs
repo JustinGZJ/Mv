@@ -280,7 +280,11 @@ namespace DataService
                     _cacheReader.Size = cacheLength;
                 }
                 else
-                    _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
+                {
+                     _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
+                    _rangeList.Add(new PDUArea(_start, 1, 0, 1));
+                }
+               //     _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
             }
         }
 
@@ -572,6 +576,7 @@ namespace DataService
                 if (DataChange != null)
                 {
                     ITag tag = GetTagByAddress(address);
+                    tag.Refresh();
                     if (tag != null)
                         DataChange(this, new DataChangeEventArgs(1, new HistoryData[1]
                 {
