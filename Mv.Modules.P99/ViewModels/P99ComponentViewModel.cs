@@ -138,7 +138,7 @@ namespace Mv.Modules.P99.ViewModels
                 var dic = new Dictionary<string, string>();
                 dic["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 dic["Support ring SN"] = SupportRingSNs[i].Value;
-                dic["Spindle NO."] = configureFile.GetValue<P99Config>(nameof(P99Config)).MachineNo + "-" + (i + 1).ToString();
+                dic["Spindle NO."] = configureFile.GetValue<P99Config>(nameof(P99Config)).MachineNo + "_" + (i + 1).ToString();
                 dic["Mandrel NO."] = MandrelNO[i].Value;
                 dic["Result"] = ((VerifyCode(SupportRingSNs[i].Value) && VerifyCode(MandrelNO[i].Value))) ? "PASS" : "FAIL";
                 var content = string.Join(',', dic.Values).Trim(',');

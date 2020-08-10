@@ -13,8 +13,8 @@
             xmlns:pg="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid MinHeight="300">
-        <DockPanel LastChildFill="True">
-            <Button DockPanel.Dock="Bottom"  Command="{Binding SaveCommand}">保存</Button>
+ 
+     
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
@@ -41,6 +41,6 @@
                 <TextBlock  Grid.Row="4"  VerticalAlignment="Center">前站站位编号</TextBlock>
                 <TextBox Grid.Row="4" Grid.Column="1"  Text="{Binding Config.Station}"></TextBox>     
             </Grid>
-        </DockPanel>
+
     </Grid>
 </TabItem>

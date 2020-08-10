@@ -1,11 +1,12 @@
 ﻿using Mv.Core.Interfaces;
+using Mv.Modules.P99.Views;
 using Mv.Ui.Mvvm;
 using Prism.Commands;
 using Unity;
 
 namespace Mv.Modules.P99.ViewModels
 {
-    public class P99SettingsViewModel : ViewModelBase
+    public class P99SettingsViewModel : ViewModelBase,IViewLoadedAndUnloadedAware<P99Settings>
     {
         private readonly IConfigureFile configureFile;
 
@@ -18,10 +19,19 @@ namespace Mv.Modules.P99.ViewModels
         }
 
         public P99Config Config { get; set; }
-        public DelegateCommand SaveCommand =>
-            _saveConfig ?? (_saveConfig = new DelegateCommand(Save));
 
-        public void Save()
+        public void OnLoaded(P99Settings view)
+        {
+       //     throw new System.NotImplementedException();
+        }
+
+        public void OnUnloaded(P99Settings view)
+        {
+            Save();
+    //        throw new System.NotImplementedException();
+        }
+
+        private void Save()
         {
             configureFile.SetValue(nameof(P99Config), Config);
         }

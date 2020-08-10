@@ -69,6 +69,7 @@ namespace Mv.Modules.P99.Service
 
         private void GetCodeAsync(int index)
         {
+            int checkresult = 0;
             var stopwatch = new Stopwatch();
             var config = configureFile.GetValue<P99Config>(nameof(P99Config));
             stopwatch.Start();
@@ -91,8 +92,6 @@ namespace Mv.Modules.P99.Service
             try
             {
                 code = GetCodeAsync(index, 3000);
-
-
                 var res = code.Item1 && (!code.Item2.Contains("ERROR") && (code.Item2.Length > 5));
                 if (res)
                 {
@@ -101,14 +100,18 @@ namespace Mv.Modules.P99.Service
                     if (string.IsNullOrEmpty(checkResult))
                     {
                         code = (false, code.Item2 + ":没有记录");
+                        checkresult = -1;
+
                     }
                     else if (checkResult.ToUpper().Contains("PASS"))
                     {
                         code = (true, code.Item2);
+                        checkresult = 0;
                     }
                     else
                     {
                         code = (false, code.Item2 + ":" + checkResult);
+                        checkresult = -2;
                     }
                 }
             }
@@ -118,10 +121,9 @@ namespace Mv.Modules.P99.Service
                 ;
             }
             aggregator.GetEvent<MessageEvent>().Publish($"{index + 1}号扫码枪请求数据时间:{stopwatch.ElapsedMilliseconds}ms");
-            var r = code.Item1 && (!code.Item2.Contains("ERROR"));
-            var result = r ? "PASS" : "FAIL";
+            var result = code.Item1 && (!code.Item2.Contains("ERROR")) ? "PASS" : "FAIL";
             aggregator.GetEvent<MessageEvent>().Publish(payload: $"{index + 1}#Scanner {result}:{code.Item2}");
-            if (r)
+            if (code.Item1 && (!code.Item2.Contains("ERROR")))
             {
                 plcScannerComm.SetString(index, 4, code.Item2.PadRight(20, '\0'));
                 plcScannerComm.SetShort(index, 0, 1);
@@ -129,14 +131,22 @@ namespace Mv.Modules.P99.Service
             }
             else
             {
+
                 plcScannerComm.SetString(index, 4, "".PadRight(20, '\0'));
                 aggregator.GetEvent<MessageEvent>().Publish(payload: $"{index + 1}号扫码失败,{code.Item2}");
-                plcScannerComm.SetShort(index, 0, 1);
+                if(checkresult==0)
+                {
+                    plcScannerComm.SetShort(index, 0, 1);
+                }
+                else
+                {
+                    plcScannerComm.SetShort(index, 0, -1);
+                }      
             }
-            if (!SpinWait.SpinUntil(() => plcScannerComm.GetShort(index, 1) == 1, 1000))
-            {
-                aggregator.GetEvent<MessageEvent>().Publish($" {index + 1}号扫码反馈信号置位写入到PLC超时");
-            }
+            //if (!SpinWait.SpinUntil(() => plcScannerComm.GetShort(index, 1) == 1, 1000))
+            //{
+            //    aggregator.GetEvent<MessageEvent>().Publish($" {index + 1}号扫码反馈信号置位写入到PLC超时");
+            //}
             stopwatch.Stop();
             aggregator.GetEvent<MessageEvent>().Publish($"{index + 1}号扫码流程所用时间{stopwatch.ElapsedMilliseconds}ms");
         }

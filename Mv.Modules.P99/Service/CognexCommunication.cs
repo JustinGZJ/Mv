@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Mv.Modules.P99.Service
 {
+    public static class TcpClientEx
+    {
+        public static bool IsOnline(this TcpClient c)
+        {
+            return !(c==null||(c.Client.Poll(100, SelectMode.SelectRead) && (c.Client.Available == 0)) || !c.Client.Connected);
+        }
+    }
     public class CognexCommunication : ICognexCommunication
     {
         SimpleTcpClient tcpClient = new SimpleTcpClient();
@@ -26,14 +33,14 @@ namespace Mv.Modules.P99.Service
         {
             try
             {
-                if (tcpClient.TcpClient != null && tcpClient.TcpClient.Connected)
+                if (tcpClient.TcpClient.IsOnline())
                 {
                     return true;
                 }
-                return await Task<bool>.Run(() =>
+                return await Task.Run(() =>
                  {
                      try
-                     {
+                     {         
                          tcpClient.Connect("127.0.0.1", 6000);
                          return true;
                      }
@@ -140,7 +147,7 @@ namespace Mv.Modules.P99.Service
             {
                 responseData = $"CONNECT ERROR:{EX.Message},{EX.StackTrace}";
             }
-
+            logger.Log($"康耐视反馈:{responseData}", Category.Debug, Priority.None);
             return responseData;
         }
     }

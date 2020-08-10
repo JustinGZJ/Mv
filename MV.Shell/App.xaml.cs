@@ -63,7 +63,7 @@ namespace Mv.Shell
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-        //    moduleCatalog.AddModule<P99Module>();
+            moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 

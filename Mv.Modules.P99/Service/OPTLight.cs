@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using Prism.Logging;
 using Mv.Core.Interfaces;
+using Mv.Modules.P99.Service;
 
 namespace Mv.Modules.P99
 {
@@ -50,7 +51,7 @@ namespace Mv.Modules.P99
         {
             try
             {
-                if(!client.Connected)
+                if(!client.IsOnline())
                 {
                     client.Connect(IPAddress.Parse(config.UvLightIp),config.UvLightPort);
                 }

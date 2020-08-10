@@ -34,7 +34,7 @@ namespace Mv.Modules.P99.Service
         public async Task<bool> CheckConnectedAsync()
         {
 
-            if (tcpClient.TcpClient != null && tcpClient.TcpClient.Connected)
+            if (tcpClient.TcpClient.IsOnline())
             {
                 return true;
             }
@@ -68,7 +68,7 @@ namespace Mv.Modules.P99.Service
                 tcpClient.TimeOut = TimeSpan.FromMilliseconds(TimeOut);
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                if (tcpClient.TcpClient == null || !tcpClient.TcpClient.Connected)
+                if (tcpClient.TcpClient.IsOnline())
                 {
                     try
                     {
