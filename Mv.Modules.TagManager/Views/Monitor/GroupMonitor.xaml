@@ -58,20 +58,16 @@
                       AutoGenerateColumns="False" Grid.Row="1" >
                 <DataGrid.ContextMenu>
                     <ContextMenu >
-                        <MenuItem Header="写入" Command="{}" >
-                            <MenuItem.CommandParameter>
-                                <system:Boolean>
-                                    true
-                                </system:Boolean>
-                            </MenuItem.CommandParameter>
+                        <MenuItem Header="写入" Command="{Binding EditTagCommand}" >
+    
                         </MenuItem>
-                        <MenuItem Header="仿真写入" Command="{}" >
+                        <!--<MenuItem Header="仿真写入" Command="{Binding EditTagCommand}" >
                             <MenuItem.CommandParameter>
                                 <system:Boolean>
                                     false
                                 </system:Boolean>
                             </MenuItem.CommandParameter>
-                        </MenuItem>
+                        </MenuItem>-->
 
                         <Separator />
                     </ContextMenu>

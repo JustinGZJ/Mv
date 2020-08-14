@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using Mv.Ui.Mvvm;
+using MV.Core.Events;
 using Prism.Events;
 using Prism.Logging;
 using Prism.Mvvm;
@@ -13,18 +14,7 @@ using Unity;
 
 namespace Mv.Modules.TagManager.ViewModels.Messages
 {
-    public class UserMessage
-    {
-        public string Source { get; set; }
-        public Category Level { get; set; }
-        public string Content { get; set; }
-    }
 
-
-    public class UserMessageEvent : PubSubEvent<UserMessage>
-    {
-
-    }
 
     public class MessageListViewModel : ViewModelBase
     {

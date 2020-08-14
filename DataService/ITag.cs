@@ -109,6 +109,10 @@ namespace DataService
         protected abstract int InnerWrite(Storage value);
 
         public abstract int Write(object value);
+        protected void NotityValueChanged(ValueChangedEventArgs args)
+        {
+            ValueChanged?.Invoke(this, args);
+        }
 
         public int Write(Storage value, bool bForce)
         {
@@ -142,7 +146,7 @@ namespace DataService
 
         public  ValueChangingEventHandler<Storage> ValueChanging;
 
-        public  ValueChangedEventHandler ValueChanged;
+        public event ValueChangedEventHandler ValueChanged;
 
         #region IComparable<PLCAddress> Members
 
@@ -182,10 +186,7 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _value = value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(value));
-                    }
+                    this.NotityValueChanged(new ValueChangedEventArgs(value));
                 }
                 return true;
             }
@@ -252,10 +253,8 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _value = value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(value));
-                    }
+                    NotityValueChanged(new ValueChangedEventArgs(value));
+
                 }
                 return true;
             }
@@ -321,10 +320,7 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _value = value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(value));
-                    }
+                    NotityValueChanged(new ValueChangedEventArgs(value));
                 }
                 return true;
             }
@@ -389,10 +385,7 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _value = value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(value));
-                    }
+                    NotityValueChanged(new ValueChangedEventArgs(value));
                 }
                 return true;
             }
@@ -458,10 +451,8 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _value = value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(value));
-                    }
+                    NotityValueChanged(new ValueChangedEventArgs(value));
+              
                 }
                 return true;
             }
@@ -537,10 +528,7 @@ namespace DataService
                 if (_quality == QUALITIES.QUALITY_GOOD)
                 {
                     _str = _newvalue.Value;
-                    if (ValueChanged != null)
-                    {
-                        ValueChanged(this, new ValueChangedEventArgs(_value));
-                    }
+                    NotityValueChanged(new ValueChangedEventArgs(_value));
                 }
                 return true;
             }

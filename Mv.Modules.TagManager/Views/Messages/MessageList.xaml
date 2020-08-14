@@ -31,7 +31,7 @@
         <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline6TextBlock}">消息中心</TextBlock>
         <TabControl prism:RegionManager.RegionName="MsgTabRegion" Grid.Row="1" Background="Transparent">
             <TabItem Header="全局信息">
-                <ListView ItemsSource="{Binding Messages}">
+                <ListView ItemsSource="{Binding Messages}" ctls:ListScrollToEnd.IsScrollToEnd="True" >
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="发送者" DisplayMemberBinding="{Binding Source}"/>

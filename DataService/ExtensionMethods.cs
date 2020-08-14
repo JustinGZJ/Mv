@@ -239,7 +239,10 @@ namespace DataService
                     cacheReader.Size = cacheLength;
                 }
                 else
+                {
                     cacheReader.Size = start.DataSize <= bitCount ? 1 : start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
+                }
+                 
             }
             return rangeList;
         }
