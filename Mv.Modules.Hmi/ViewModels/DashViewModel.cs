@@ -82,188 +82,190 @@ namespace Mv.Modules.Hmi.ViewModels
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             this.dataServer = dataServer;
             //PLC 心跳
-            Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x => (dataServer[GetTagName(TagNames.PC_READY)] as BoolTag).Write(x % 2 > 0));
-
+            if (dataServer[GetTagName(TagNames.PC_READY)] != null)
+                Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x => (dataServer[GetTagName(TagNames.PC_READY)] as BoolTag).Write(x % 2 > 0));
 
             //PC读取电阻值
-            Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_RES)] as BoolTag, "ValueChanged").Subscribe(x =>
-            {
-                if (x.EventArgs.Value.Boolean == true)
+            if (dataServer[GetTagName(TagNames.PLC_RES)] != null)
+                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_RES)] as BoolTag, "ValueChanged").Subscribe(x =>
                 {
-                    userMessageEvent.Publish(new UserMessage() { Content = "开始读取电阻值", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    try
+                    if (x.EventArgs.Value.Boolean == true)
                     {
-                        if (resistance.Read("Fetch?\r\n", out string result, TimeSpan.FromMilliseconds(500)) ==0)
+                        userMessageEvent.Publish(new UserMessage() { Content = "开始读取电阻值", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        try
                         {
-                            userMessageEvent.Publish(new UserMessage() { Content = result, Level = Prism.Logging.Category.Info, Source = "RESISTANCE" });
-                            if (double.TryParse(result, out var number))
+                            if (resistance.Read("Fetch?\r\n", out string result, TimeSpan.FromMilliseconds(500)) == 0)
                             {
-                                ResistanceValue = number;
+                                userMessageEvent.Publish(new UserMessage() { Content = result, Level = Prism.Logging.Category.Info, Source = "RESISTANCE" });
+                                if (double.TryParse(result, out var number))
+                                {
+                                    ResistanceValue = number;
+                                }
+                                (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(false);
+                                dataServer[GetTagName(TagNames.PC_RESISTANCE)].Write((int)(number * 1000));
                             }
-                            (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(false);
-                            dataServer[GetTagName(TagNames.PC_RESISTANCE)].Write((int)(number*1000));
+                            else
+                            {
+                                (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(true);
+                            }
+
                         }
-                        else
+                        catch (Exception ex)
                         {
                             (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(true);
+                            userMessageEvent.Publish(new UserMessage() { Content = ex.Message, Level = Prism.Logging.Category.Exception, Source = "RESISTANCE" });
                         }
-
+                        userMessageEvent.Publish(new UserMessage() { Content = "读取电阻值完成", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        (dataServer[GetTagName(TagNames.PC_RES)] as BoolTag).Write(true);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(true);
-                        userMessageEvent.Publish(new UserMessage() { Content = ex.Message, Level = Prism.Logging.Category.Exception, Source = "RESISTANCE" });
+                        (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(false);
+                        (dataServer[GetTagName(TagNames.PC_RES)] as BoolTag).Write(false);
+                        userMessageEvent.Publish(new UserMessage() { Content = "清除电阻值完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
                     }
-                    userMessageEvent.Publish(new UserMessage() { Content = "读取电阻值完成", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    (dataServer[GetTagName(TagNames.PC_RES)] as BoolTag).Write(true);
-                }
-                else
-                {
-                    (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(false);
-                    (dataServer[GetTagName(TagNames.PC_RES)] as BoolTag).Write(false);
-                    userMessageEvent.Publish(new UserMessage() { Content = "清除电阻值完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                }
-            });
+                });
 
 
             //PC读取压力值
-            Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_PRESURE)] as BoolTag, "ValueChanged").Subscribe(x =>
-            {
-                if (x.EventArgs.Value.Boolean == true)
+            if (dataServer[GetTagName(TagNames.PLC_PRESURE)] != null)
+                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_PRESURE)] as BoolTag, "ValueChanged").Subscribe(x =>
                 {
-                    userMessageEvent.Publish(new UserMessage() { Content = "开始读取压力信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    try
+                    if (x.EventArgs.Value.Boolean == true)
                     {
-                        if (presure1.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result, TimeSpan.FromMilliseconds(500)) >= 7)
+                        userMessageEvent.Publish(new UserMessage() { Content = "开始读取压力信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        try
                         {
-                            userMessageEvent.Publish(new UserMessage()
+                            if (presure1.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result, TimeSpan.FromMilliseconds(500)) >= 7)
                             {
-                                Content = string.Join(',', result.Select(x => Convert.ToString(x, 16)))
-        ,
-                                Level = Prism.Logging.Category.Info
-        ,
-                                Source = "PRESURE1"
-                            });
-                            if (result != null)
-                            {
-                                PresureValue1 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3));;
+                                userMessageEvent.Publish(new UserMessage()
+                                {
+                                    Content = string.Join(',', result.Select(x => Convert.ToString(x, 16)))
+            ,
+                                    Level = Prism.Logging.Category.Info
+            ,
+                                    Source = "PRESURE1"
+                                });
+                                if (result != null)
+                                {
+                                    PresureValue1 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3)); ;
+                                }
+                                dataServer[GetTagName(TagNames.PC_PRESURE1)].Write(PresureValue1);
+                                dataServer[GetTagName(TagNames.PC_PR_ER)].Write(false);
                             }
-                            dataServer[GetTagName(TagNames.PC_PRESURE1)].Write(PresureValue1);
-                            dataServer[GetTagName(TagNames.PC_PR_ER)].Write(false);
+                            else
+                            {
+                                dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
+                            }
+
+                            if (presure2.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result2, TimeSpan.FromMilliseconds(500)) >= 7)
+                            {
+                                userMessageEvent.Publish(new UserMessage()
+                                {
+                                    Content = String.Join(',', result.Select(x => Convert.ToString(x, 16)))
+                                    ,
+                                    Level = Prism.Logging.Category.Info
+                                    ,
+                                    Source = "PRESURE2"
+                                });
+                                if (result != null)
+                                {
+                                    PresureValue2 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result2, 3)); ;
+                                }
+                                dataServer[GetTagName(TagNames.PC_PRESURE2)].Write(PresureValue2);
+                            }
+                            else
+                            {
+                                dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
+                            }
+
                         }
-                        else
+                        catch (Exception ex)
                         {
+                            userMessageEvent.Publish(new UserMessage() { Content = ex.Message, Level = Prism.Logging.Category.Exception, Source = "PRESURE" });
                             dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
                         }
-
-                        if (presure2.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result2, TimeSpan.FromMilliseconds(500)) >= 7)
-                        {
-                            userMessageEvent.Publish(new UserMessage()
-                            {
-                                Content = String.Join(',', result.Select(x => Convert.ToString(x, 16)))
-                                ,
-                                Level = Prism.Logging.Category.Info
-                                ,
-                                Source = "PRESURE2"
-                            });
-                            if (result != null)
-                            {
-                                PresureValue2 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result2, 3)); ;
-                            }
-                            dataServer[GetTagName(TagNames.PC_PRESURE2)].Write(PresureValue2);
-                        }
-                        else
-                        {
-                            dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
-                        }
-
+                        userMessageEvent.Publish(new UserMessage() { Content = "读取压力结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        dataServer[GetTagName(TagNames.PC_PRESURE)].Write(true);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        userMessageEvent.Publish(new UserMessage() { Content = ex.Message, Level = Prism.Logging.Category.Exception, Source = "PRESURE" });
-                        dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
+                        dataServer[GetTagName(TagNames.PC_PRESURE)].Write(false);
+                        dataServer[GetTagName(TagNames.PC_PR_ER)].Write(false);
+                        userMessageEvent.Publish(new UserMessage() { Content = "清除压力读取读取完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
                     }
-                    userMessageEvent.Publish(new UserMessage() { Content = "读取压力结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    dataServer[GetTagName(TagNames.PC_PRESURE)].Write(true);
-                }
-                else
+                });
+            if (dataServer[GetTagName(TagNames.PLC_POS)] != null)
+                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_POS)] as BoolTag, "ValueChanged").Subscribe(x =>
                 {
-                    dataServer[GetTagName(TagNames.PC_PRESURE)].Write(false);
-                    dataServer[GetTagName(TagNames.PC_PR_ER)].Write(false);
-                    userMessageEvent.Publish(new UserMessage() { Content = "清除压力读取读取完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                }
-            });
-
-            Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_POS)] as BoolTag, "ValueChanged").Subscribe(x =>
-            {
-                if (x.EventArgs.Value.Boolean == true)
-                {
-                    userMessageEvent.Publish(new UserMessage() { Content = "开始读取位置信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    Thread.Sleep(100);
-                    userMessageEvent.Publish(new UserMessage() { Content = "读取位置结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    dataServer[GetTagName(TagNames.PC_POS)].Write(true);
-                }
-                else
-                {
-                    dataServer[GetTagName(TagNames.PC_POS)].Write(false);
-                    dataServer[GetTagName(TagNames.PC_POS_ER)].Write(false);
-                    userMessageEvent.Publish(new UserMessage() { Content = "清除位置读取完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                }
-            });
-
-            Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_SAVE)] as BoolTag, "ValueChanged").Subscribe(x =>
-            {
-                if (x.EventArgs.Value.Boolean == true)
-                {
-                    userMessageEvent.Publish(new UserMessage() { Content = "开始保存数据", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    var data = new DataModel();
-                    data.Position1 = dataServer[GetTagName(TagNames.UL_POS1)].ToString();
-                    data.Position2 = dataServer[GetTagName(TagNames.UL_POS2)].ToString();
-                    data.Presure1 = dataServer[GetTagName(TagNames.UL_PRESURE1)].ToString();
-                    data.Presure2 = dataServer[GetTagName(TagNames.UL_PRESURE2)].ToString();       
-                    data.Resistance = dataServer[GetTagName(TagNames.UL_RES)].ToString();
-                    data.Presure1Result = dataServer[GetTagName(TagNames.R_PRESURE1)].Value.Int16 == 0;
-                    data.Presure2Result = dataServer[GetTagName(TagNames.R_PRESURE2)].Value.Int16 == 0;
-                    data.Position1Result = dataServer[GetTagName(TagNames.R_POS1)].Value.Int16 == 0;
-                    data.Position2Result = dataServer[GetTagName(TagNames.R_POS2)].Value.Int16 == 0;
-                    data.ResistanceResult = dataServer[GetTagName(TagNames.R_RES)].Value.Int16 == 0;
-                    data.Product = dataServer[GetTagName(TagNames.PD_NUM)].Value.Int16 == 1 ? "B1" : "W2";
-                    data.Result = dataServer[GetTagName(TagNames.R_PD)].Value.Int16 == 0 ? "PASS" : "FAIL";
-                    Invoke(() =>
+                    if (x.EventArgs.Value.Boolean == true)
                     {
-                        Datas1.Add(data);
-                        if (Datas1.Count > 500)
-                            Datas1.RemoveAt(0);
-                    });
-
-                    var dic = new Dictionary<string, string>()
+                        userMessageEvent.Publish(new UserMessage() { Content = "开始读取位置信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        Thread.Sleep(100);
+                        userMessageEvent.Publish(new UserMessage() { Content = "读取位置结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        dataServer[GetTagName(TagNames.PC_POS)].Write(true);
+                    }
+                    else
                     {
-                        ["时间"]=data.Time.ToString("yyyy-MM-dd HH:mm:ss"),
-                        ["产品"] = data.Product,
-                        ["判定"]=data.Result,
-                        ["压力1"]=data.Presure1,
-                        ["压力1判定"]=data.Presure1Result?"PASS":"FAIL",
-                        ["压力2"] = data.Presure2,
-                        ["压力2判定"] = data.Presure2Result ? "PASS" : "FAIL",
-                        ["位置1"] = data.Position1,
-                        ["位置1判定"] = data.Position1Result ? "PASS" : "FAIL",
-                        ["位置2"] = data.Position2,
-                        ["位置2判定"] = data.Position2Result ? "PASS" : "FAIL",
-                        ["电阻"]=data.Resistance,
-                        ["电阻判定"]=data.ResistanceResult?"PASS":"FAIL"
-                    };
-                    Helper.SaveFile($"./生产信息/{DateTime.Today:yyyyMMdd}.csv", dic);
-                    userMessageEvent.Publish(new UserMessage() { Content = "保存数据结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                    dataServer[GetTagName(TagNames.PC_SAVE)].Write(true);
-                }
-                else
+                        dataServer[GetTagName(TagNames.PC_POS)].Write(false);
+                        dataServer[GetTagName(TagNames.PC_POS_ER)].Write(false);
+                        userMessageEvent.Publish(new UserMessage() { Content = "清除位置读取完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                    }
+                });
+            if (dataServer[GetTagName(TagNames.PLC_SAVE)] != null)
+                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_SAVE)] as BoolTag, "ValueChanged").Subscribe(x =>
                 {
-                    dataServer[GetTagName(TagNames.PC_SAVE)].Write(false);
-                 
-                    userMessageEvent.Publish(new UserMessage() { Content = "清除保存完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                }
+                    if (x.EventArgs.Value.Boolean == true)
+                    {
+                        userMessageEvent.Publish(new UserMessage() { Content = "开始保存数据", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        var data = new DataModel();
+                        data.Position1 = dataServer[GetTagName(TagNames.UL_POS1)].ToString();
+                        data.Position2 = dataServer[GetTagName(TagNames.UL_POS2)].ToString();
+                        data.Presure1 = dataServer[GetTagName(TagNames.UL_PRESURE1)].ToString();
+                        data.Presure2 = dataServer[GetTagName(TagNames.UL_PRESURE2)].ToString();
+                        data.Resistance = dataServer[GetTagName(TagNames.UL_RES)].ToString();
+                        data.Presure1Result = dataServer[GetTagName(TagNames.R_PRESURE1)].Value.Int16 == 0;
+                        data.Presure2Result = dataServer[GetTagName(TagNames.R_PRESURE2)].Value.Int16 == 0;
+                        data.Position1Result = dataServer[GetTagName(TagNames.R_POS1)].Value.Int16 == 0;
+                        data.Position2Result = dataServer[GetTagName(TagNames.R_POS2)].Value.Int16 == 0;
+                        data.ResistanceResult = dataServer[GetTagName(TagNames.R_RES)].Value.Int16 == 0;
+                        data.Product = dataServer[GetTagName(TagNames.PD_NUM)].Value.Int16 == 1 ? "B1" : "W2";
+                        data.Result = dataServer[GetTagName(TagNames.R_PD)].Value.Int16 == 0 ? "PASS" : "FAIL";
+                        Invoke(() =>
+                        {
+                            Datas1.Add(data);
+                            if (Datas1.Count > 500)
+                                Datas1.RemoveAt(0);
+                        });
 
-            });
+                        var dic = new Dictionary<string, string>()
+                        {
+                            ["时间"] = data.Time.ToString("yyyy-MM-dd HH:mm:ss"),
+                            ["产品"] = data.Product,
+                            ["判定"] = data.Result,
+                            ["压力1"] = data.Presure1,
+                            ["压力1判定"] = data.Presure1Result ? "PASS" : "FAIL",
+                            ["压力2"] = data.Presure2,
+                            ["压力2判定"] = data.Presure2Result ? "PASS" : "FAIL",
+                            ["位置1"] = data.Position1,
+                            ["位置1判定"] = data.Position1Result ? "PASS" : "FAIL",
+                            ["位置2"] = data.Position2,
+                            ["位置2判定"] = data.Position2Result ? "PASS" : "FAIL",
+                            ["电阻"] = data.Resistance,
+                            ["电阻判定"] = data.ResistanceResult ? "PASS" : "FAIL"
+                        };
+                        Helper.SaveFile($"./生产信息/{DateTime.Today:yyyyMMdd}.csv", dic);
+                        userMessageEvent.Publish(new UserMessage() { Content = "保存数据结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                        dataServer[GetTagName(TagNames.PC_SAVE)].Write(true);
+                    }
+                    else
+                    {
+                        dataServer[GetTagName(TagNames.PC_SAVE)].Write(false);
+
+                        userMessageEvent.Publish(new UserMessage() { Content = "清除保存完成信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                    }
+
+                });
         }
 
 
@@ -272,19 +274,19 @@ namespace Mv.Modules.Hmi.ViewModels
             return Enum.GetName(typeof(TagNames), tagenum);
         }
 
-        private int presureValue1=-1;
+        private int presureValue1 = -1;
         public int PresureValue1
         {
             get { return presureValue1; }
             set { SetProperty(ref presureValue1, value); }
         }
-        private int presureValue2=-1;
+        private int presureValue2 = -1;
         public int PresureValue2
         {
             get { return presureValue2; }
             set { SetProperty(ref presureValue2, value); }
         }
-        private double resistanceValue=-1;
+        private double resistanceValue = -1;
         public double ResistanceValue
         {
             get { return resistanceValue; }
@@ -315,7 +317,7 @@ namespace Mv.Modules.Hmi.ViewModels
                     });
                     if (result != null)
                     {
-                        PresureValue1 =IPAddress.NetworkToHostOrder( BitConverter.ToInt32(result, 3));
+                        PresureValue1 = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(result, 3));
                     }
                 }
             }
@@ -348,8 +350,8 @@ namespace Mv.Modules.Hmi.ViewModels
                     });
                     if (result != null)
                     {
-                        PresureValue2= IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3));
-                       // PresureValue2 =;
+                        PresureValue2 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3));
+                        // PresureValue2 =;
                     }
                 }
             }
