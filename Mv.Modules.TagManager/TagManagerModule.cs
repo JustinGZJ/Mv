@@ -42,7 +42,7 @@ namespace Mv.Modules.TagManager
         {
             base.OnInitialized(containerProvider);
            // var dataServer = containerProvider.Resolve<IDataServer>();
-            var alarmmanager = containerProvider.Resolve<IAlarmManager>();
+         //   var alarmmanager = containerProvider.Resolve<IAlarmManager>();
           
         }
     }

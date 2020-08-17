@@ -14,7 +14,8 @@ using System.IO;
 
 
 using Prism.Logging;
-using Mv.Modules.P99;
+using Mv.Modules.TagManager;
+using Mv.Modules.Hmi;
 
 namespace Mv.Shell
 {
@@ -54,16 +55,17 @@ namespace Mv.Shell
             ViewModelLocationProvider.SetDefaultViewModelFactory(new ViewModelResolver(() => Container).UseDefaultConfigure().ResolveViewModelForView);
         }
 
-        protected override IModuleCatalog CreateModuleCatalog()
-        {          
-           var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
-            directoryCatalog.Initialize();
-            return directoryCatalog;
-        }
+        //protected override IModuleCatalog CreateModuleCatalog()
+        //{          
+        //   var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
+        //    directoryCatalog.Initialize();
+        //    return directoryCatalog;
+        //}
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-            moduleCatalog.AddModule<P99Module>();
+            moduleCatalog.AddModule<TagManagerModule>();
+            moduleCatalog.AddModule<HmiModule>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 

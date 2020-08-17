@@ -3,7 +3,6 @@ using HslCommunication;
 using HslCommunication.Core.Address;
 using HslCommunication.Profinet.Keyence;
 using HslCommunication.Profinet.Melsec;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;

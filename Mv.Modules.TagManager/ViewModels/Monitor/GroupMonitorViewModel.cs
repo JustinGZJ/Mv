@@ -1,5 +1,8 @@
 ﻿using DataService;
+using MaterialDesignThemes.Wpf;
+using Mv.Modules.TagManager.ViewModels.Monitor;
 using Mv.Modules.TagManager.Views;
+using Mv.Modules.TagManager.Views.Monitor;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
@@ -54,6 +57,27 @@ namespace Mv.Modules.TagManager.ViewModels
             }
         }
         public TagItem SelectedItem { get; set; }
+
+        private DelegateCommand execEditTag;
+        public DelegateCommand EditTagCommand =>
+            execEditTag ?? (execEditTag = new DelegateCommand(async()=>await EditTagAsync()));
+
+        async System.Threading.Tasks.Task EditTagAsync()
+        {
+            if (SelectedItem == null)
+                return;
+            var vm = new TagWriterViewModel(SelectedItem.Tag);
+            var dlg = new TagWriter() { DataContext=vm};
+
+            var result = await DialogHost.Show(dlg, "RootDialog");
+            if (result.ToString() == "OK")
+            {
+               // if (realWrite)
+                    SelectedItem.Write(vm.Value);
+                //else
+                //    SelectedItem.SimWrite(vm.Value);
+            }
+        }
        
     }
 }

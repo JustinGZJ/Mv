@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Reactive.Linq;
+using MV.Core.Events;
 
 namespace Mv.Modules.TagManager.Services
 {

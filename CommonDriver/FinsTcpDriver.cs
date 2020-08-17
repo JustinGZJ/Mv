@@ -1,55 +1,18 @@
 ﻿using DataService;
-using HslCommunication;
-using HslCommunication.Core.Address;
-using HslCommunication.Profinet.Melsec;
+using HslCommunication.Profinet.Omron;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Reflection;
+using System.Xml.Xsl;
 
 namespace CommonDriver
 {
-
-
-
-    [Description("Melsec-MC-3E协议")]
-    public class MelsecMcNetDriver :DriverInitBase, IPLCDriver, IMultiReadWrite
+    [Description("FINS TCP协议")]
+    public class FinsTcpDriver : DriverInitBase, IPLCDriver, IMultiReadWrite
     {
-
-        protected Dictionary<int, MelsecMcDataType> _dictionary = new Dictionary<int, MelsecMcDataType>()
-        {
-        };
-        protected MelsecMcNet mc = new MelsecMcNet();
-        public void Dispose()
-        {
-            mc.ConnectClose();
-            //  throw new System.NotImplementedException();
-        }
-        public MelsecMcNetDriver() 
-        {
-            
-        }
-        public MelsecMcNetDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
-        {
-            ID = id;
-            Name = name;
-            Parent = server;
-            _ip = serverName;
-            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static;
-            var fields =typeof(MelsecMcDataType).GetFields(bindingFlags)
-                .Where(x => x.FieldType == typeof(MelsecMcDataType))
-                .Where(m=>!m.Name.Contains("_"))
-                .Select(x=>(MelsecMcDataType)x.GetValue(null))
-                .ToDictionary(x=>(int)x.DataCode);
-            if (fields != null)
-                _dictionary = fields;
-
-        }
-
         string _ip;//服务ip
-        int _port = 5000; //服务端口
+        int _port = 9600; //服务端口
         public int Port
         {
             get { return _port; }
@@ -65,6 +28,24 @@ namespace CommonDriver
         public short ID { get; }
         public string Name { get; }
         private bool _IsClosed = true;
+        protected OmronFinsNet mc = new OmronFinsNet();
+        public FinsTcpDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
+        {
+            ID = id;
+            Name = name;
+            Parent = server;
+            _ip = serverName;
+       
+        }
+
+        public FinsTcpDriver() : base(null, 0, "fins", "127.0.0.1", 100, null)
+        {
+            ID = 0;
+            Name = "fins";
+            Parent = null;
+            _ip = "127.0.0.1";
+        }
+
         public bool IsClosed => _IsClosed;
         public int TimeOut { get; set; }
         public IEnumerable<IGroup> Groups => _grps;
@@ -73,14 +54,17 @@ namespace CommonDriver
         {
             mc.Port = Port;
             mc.IpAddress = ServerName;
+            mc.SA1 = 222;
+            mc.DA1 = 1;
+            var MR = mc.ConnectServer();
+            _IsClosed = !MR.IsSuccess;
 
-            _IsClosed = !mc.ConnectServer().IsSuccess;
             return mc.ConnectServer().IsSuccess;
         }
 
         public IGroup AddGroup(string name, short id, int updateRate, float deadBand = 0, bool active = false)
         {
-            ShortGroup grp = new ShortGroup(id, name, updateRate, active, this);
+            NetShortGroup grp = new NetShortGroup(id, name, updateRate, active, this);
             _grps.Add(grp);
             return grp;
         }
@@ -96,13 +80,17 @@ namespace CommonDriver
 
         public byte[] ReadBytes(DeviceAddress address, ushort size)
         {
-            var r = mc.Read(GetAddress(address), size);
+            var addr = GetAddress(address);
+        //    addr = addr.Substring(0, addr.IndexOf('.'));
+            var r = mc.Read(addr, size);
             _IsClosed = !r.IsSuccess;
             return r.Content;
         }
         public ItemData<uint> ReadUInt32(DeviceAddress address)
         {
-            var r = mc.ReadUInt32(GetAddress(address));
+            var addr = GetAddress(address);
+            addr = addr.Substring(0, addr.IndexOf('.'));
+            var r = mc.ReadUInt32(addr);
             _IsClosed = !r.IsSuccess;
             return r.IsSuccess ? new ItemData<uint>(r.Content, 0, QUALITIES.QUALITY_GOOD)
                 : new ItemData<uint>(0, 0, QUALITIES.QUALITY_BAD);
@@ -158,7 +146,7 @@ namespace CommonDriver
 
         public ItemData<bool> ReadBit(DeviceAddress address)
         {
-            var r = mc.ReadBool(GetAddress(address));
+            var r = mc.ReadBool($"{GetAddress(address)}.{address.Bit}");
             _IsClosed = !r.IsSuccess;
             return r.IsSuccess ? new ItemData<bool>(r.Content, 0, QUALITIES.QUALITY_GOOD)
                 : new ItemData<bool>(false, 0, QUALITIES.QUALITY_BAD);
@@ -176,7 +164,7 @@ namespace CommonDriver
 
         public int WriteBit(DeviceAddress address, bool bit)
         {
-            return mc.Write(GetAddress(address), bit).IsSuccess ? 0 : -1;
+            return mc.Write($"{GetAddress(address)}.{address.Bit}", bit).IsSuccess ? 0 : -1;
         }
 
         public int WriteBits(DeviceAddress address, byte bits)
@@ -227,64 +215,10 @@ namespace CommonDriver
             return this.WriteValueEx(address, value);
         }
 
-        public int PDU { get; } = 960;
-        public virtual DeviceAddress GetDeviceAddress(string address)
-        {
-
-            OperateResult<McAddressData> operateResult = McAddressData.ParseKeyenceFrom(address, 0);
-            if (operateResult.IsSuccess)
-            {
-                if (operateResult.Content.McDataType.DataType == 1)
-                {
-                    return new DeviceAddress
-                    {
-                        Area = 0,
-                        Start = (operateResult.Content.AddressStart - 1) / 16,
-                        DBNumber = operateResult.Content.McDataType.DataCode,
-                        DataSize = 0,
-                        CacheIndex = 0,
-                        Bit = (byte)(((operateResult.Content.Length - 1) % 16))
-                    };
-                }
-                else
-                {
-                    return new DeviceAddress
-                    {
-                        Area = 0,
-                        Start =operateResult.Content.AddressStart,
-                        DBNumber = operateResult.Content.McDataType.DataCode,
-                        DataSize = 0,
-                        CacheIndex = 0,
-                        Bit = 0
-                    };
-                }
-            }
-            else
-            {
-                return DeviceAddress.Empty;
-            }
-        }
-
-        public string GetAddress(DeviceAddress address)
-        {
-
-            if (!_dictionary.ContainsKey(address.DBNumber))
-                return null;
-            var m = _dictionary[address.DBNumber];
-            if (m != null)
-            {
-                if (m.DataType == 0)
-                    return m.AsciiCode.Trim('*') + Convert.ToString(address.Start, m.FromBase);
-                else
-                    return $"{m.AsciiCode.Trim('*')}{Convert.ToString(address.Start * 16 + address.Bit , m.FromBase)}";
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public int Limit { get; } = 960;
+
+        public int PDU => 960;
+
         public ItemData<Storage>[] ReadMultiple(DeviceAddress[] addrsArr)
         {
             return this.PLCReadMultiple(new ShortCacheReader(), addrsArr);
@@ -293,6 +227,83 @@ namespace CommonDriver
         public int WriteMultiple(DeviceAddress[] addrArr, object[] buffer)
         {
             return this.PLCWriteMultiple(new ShortCacheReader(), addrArr, buffer, Limit);
+        }
+
+        public DeviceAddress GetDeviceAddress(string address)
+        {
+            HslCommunication.OperateResult<OmronFinsDataType, byte[]> result;
+            if (address.Contains('.'))
+            {
+                if (char.IsDigit(address[0]))
+                {
+                    address = "C" + address;
+                }
+                result = OmronFinsNetHelper.AnalysisAddress(address, true);
+            }
+            else
+            {
+                result = OmronFinsNetHelper.AnalysisAddress(address, false);
+            }          
+            if(result.IsSuccess)
+            {
+                if(address.Contains('.'))
+                {
+                    return new DeviceAddress
+                    {
+                        Area = 0,
+                        Start =int.Parse(address.Substring(1,address.IndexOf('.')-1)),
+                        DBNumber =result.Content1.WordCode,
+                        DataSize = 0,
+                        CacheIndex = 0,
+                        Bit = (byte)(byte.Parse(address.Substring(address.IndexOf('.')+1)))
+                    };
+                }
+                else
+                {
+                    return new DeviceAddress
+                    {
+                        Area = 0,
+                        Start = int.Parse(address.Substring(1)),
+                        DBNumber = result.Content1.WordCode,
+                        DataSize = 0,
+                        CacheIndex = 0,
+                        Bit = 0
+                    };
+                }
+            }
+            else
+            { }
+            return DeviceAddress.Empty;
+        }
+
+        public string GetAddress(DeviceAddress address)
+        {
+            if(address.DBNumber==OmronFinsDataType.CIO.WordCode)
+            {
+                return $"C{address.Start}";
+            }
+            if (address.DBNumber == OmronFinsDataType.AR.WordCode)
+            {
+                return $"A{address.Start}";
+            }
+            if (address.DBNumber == OmronFinsDataType.DM.WordCode)
+            {
+                return $"D{address.Start}";
+            }
+            if (address.DBNumber == OmronFinsDataType.HR.WordCode)
+            {
+                return $"H{address.Start}";
+            }
+            if (address.DBNumber == OmronFinsDataType.WR.WordCode)
+            {
+                return $"W{address.Start}";
+            }
+            return String.Empty;
+        }
+
+        public void Dispose()
+        {
+            mc.ConnectClose();
         }
     }
 }

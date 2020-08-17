@@ -277,7 +277,7 @@ namespace DataService
                             cacheLength += segmentLength;
                         }
                     }
-                    _cacheReader.Size = cacheLength;
+                    _cacheReader.Size = cacheLength+1;
                 }
                 else
                 {

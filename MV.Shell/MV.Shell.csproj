@@ -46,7 +46,8 @@
     <ProjectReference Include="..\MV.Authentication\MV.Authentication.csproj" />
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
-    <ProjectReference Include="..\Mv.Modules.P99\Mv.Modules.P99.csproj" />
+    <ProjectReference Include="..\Mv.Modules.Hmi\Mv.Modules.Hmi.csproj" />
+    <ProjectReference Include="..\Mv.Modules.TagManager\Mv.Modules.TagManager.csproj" />
     <ProjectReference Include="..\MV.Resources\MV.Resources.csproj" />
     <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
   </ItemGroup>

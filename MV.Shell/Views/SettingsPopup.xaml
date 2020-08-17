@@ -14,7 +14,7 @@
                     AllowsTransparency="True"
                     UseLayoutRounding="True"
                     mc:Ignorable="d" 
-                    d:DataContext="{d:DesignInstance {x:Type viewModels:SettingsPopupViewModel}}">
+                    d:DataContext="{d:DesignInstance {x:Type viewModels:SettingsPopupViewModel}}" Cursor="Hand">
     <Border Margin="2" Background="White" BorderThickness="1" CornerRadius="2"
             Effect="{StaticResource MaterialDesignShadowDepth2}">
         <StackPanel>

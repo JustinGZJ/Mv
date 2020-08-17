@@ -10,14 +10,14 @@ namespace Mv.Modules.TagManager.ViewModels
 
         public TagItem(ITag tag, string tagName, string tagAddr)
         {
-            _tag = tag;
+            Tag = tag;
             _tagname = tagName;
-            _tagValue = _tag.ToString();
+            _tagValue = Tag.ToString();
             _addr = tagAddr;
-            _timestamp = _tag.TimeStamp;
-            Description = _tag.GetMetaData().Description;
-            _tag.ValueChanged += new ValueChangedEventHandler(TagValueChanged);
-            this.TagValue = _tag.ToString();
+            _timestamp = Tag.TimeStamp;
+            Description = Tag.GetMetaData().Description;
+            Tag.ValueChanged += new ValueChangedEventHandler(TagValueChanged);
+            this.TagValue = Tag.ToString();
         }
 
         ITag _tag;
@@ -61,19 +61,19 @@ namespace Mv.Modules.TagManager.ViewModels
 
         private void TagValueChanged(object sender, ValueChangedEventArgs args)
         {
-            TagValue = _tag.ToString();
-            TimeStamp = _tag.TimeStamp;
+            TagValue = Tag.ToString();
+            TimeStamp = Tag.TimeStamp;
         }
 
         public int Write(string value)
         {
             if (string.IsNullOrEmpty(value)) return -1;
-            if (_tag.Address.VarType == DataType.BOOL)
+            if (Tag.Address.VarType == DataType.BOOL)
             {
                 if (value == "1") value = "true";
                 if (value == "0") value = "false";
             }
-            return _tag.Write(value);
+            return Tag.Write(value);
         }
 
         public void SimWrite(string value)
@@ -82,25 +82,27 @@ namespace Mv.Modules.TagManager.ViewModels
             Storage stor = Storage.Empty;
             try
             {
-                if (_tag.Address.VarType == DataType.STR)
+                if (Tag.Address.VarType == DataType.STR)
                 {
-                    ((StringTag)_tag).String = value;
+                    ((StringTag)Tag).String = value;
                 }
                 else
                 {
-                    stor = _tag.ToStorage(value);
+                    stor = Tag.ToStorage(value);
                 }
-                _tag.Update(stor, DateTime.Now, QUALITIES.QUALITY_GOOD);
+                Tag.Update(stor, DateTime.Now, QUALITIES.QUALITY_GOOD);
             }
             catch { }
         }
        public ObservableCollection<TagItem> TagItems { get; set; } = new ObservableCollection<TagItem>();
+        public ITag Tag { get => _tag; set => _tag = value; }
+
         public void Dispose()
         {
-            if (_tag != null)
+            if (Tag != null)
             {
                 // ReSharper disable once DelegateSubtraction
-               _tag.ValueChanged -= TagValueChanged;
+               Tag.ValueChanged -= TagValueChanged;
             }
         }
     }

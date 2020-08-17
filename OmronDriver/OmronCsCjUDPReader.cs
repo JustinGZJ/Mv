@@ -139,7 +139,7 @@ namespace OmronDriver
             }
         }
 
-        string _ip;//服务ip
+        string _ip="127.0.0.1";//服务ip
         int _port = 9600; //服务端口
         public int Port
         {
@@ -314,7 +314,7 @@ namespace OmronDriver
             data[13] = _adr[0];				// 首地址高字节
             data[14] = _adr[1];				// 首地址低字节
             data[15] = 0;                   // 固定0
-            byte[] length = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)numData / 2));
+            byte[] length = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short)(numData / 2)));
             data[16] = length[0];			// 写取数量高字节
             data[17] = length[1];			// 写取数量低字节
             return data;
@@ -390,8 +390,8 @@ namespace OmronDriver
         {
             byte[] data;
             data = CreateWriteHeader(pcnode, startAddress, 2, function, plcnode);
-            data[19] = values[0];
-            data[20] = values[1];
+            data[18] = values[0];
+            data[19] = values[1];
             return WriteSyncData(data);
         }
         /// <summary>
@@ -479,7 +479,7 @@ namespace OmronDriver
         internal void CallException(int id, byte function, byte exception)
         {
             if (udpSynCl == null) return;
-            //Console.WriteLine("OmronReader错误->" + GetErrorString(exception));
+            Console.WriteLine("OmronReader错误->" + GetErrorString(exception));
             if (exception == OmronCSCJ.excExceptionConnectionLost && IsClosed == false)
             {
              //   OnError?.Invoke(this, new IOErrorEventArgs(exception));

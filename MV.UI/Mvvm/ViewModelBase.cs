@@ -46,7 +46,7 @@ namespace Mv.Ui.Mvvm
         {
             try
             {
-                Application.Current?.Dispatcher.Invoke(action);
+                Application.Current?.Dispatcher.BeginInvoke(action);
             }
             catch (Exception ex)
             {
