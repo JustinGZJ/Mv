@@ -109,7 +109,7 @@ namespace Mv.Modules.P99.Service
             var splits = response.Split(',');
             if (splits.Length >= 10 && splits.Skip(1).All(x => double.TryParse(x, out var value)))
             {
-                if (double.TryParse(splits[1], out var result))
+                if (splits[0].Contains($"T{2 + id}") && double.TryParse(splits[1], out var result))
                 {
                     if (result == 1)
                     {

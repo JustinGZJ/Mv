@@ -27,7 +27,6 @@ namespace Mv.Ui.Mvvm
         {
             var viewModel = Container.Resolve(viewModelType);
             _configureViewAndViewModel?.Invoke(view, viewModel, Container);
-
             return viewModel;
         }
 

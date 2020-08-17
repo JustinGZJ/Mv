@@ -95,7 +95,7 @@ namespace Mv.Modules.P99.ViewModels
                         IsConnected.Value = device.IsConnected;
                         IsConnected2.Value = plcScanner.IsConnected;
                         device.SetShort(1, itick++);
-                        if (itick >= 100)
+                        if (itick >= 10)
                             itick = 0;
                     });
                     Thread.Sleep(1);

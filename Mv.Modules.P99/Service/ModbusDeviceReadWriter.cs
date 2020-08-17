@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using HslCommunication.Core;
 using HslCommunication.ModBus;
@@ -39,6 +40,7 @@ namespace Mv.Modules.P99.Service
                     }
                     IsConnected = rr.IsSuccess;
                     var wt=modbus.Write("400",wbs);
+                    Thread.Sleep(1);
                 }
             }, TaskCreationOptions.LongRunning);
             this.logger = logger;
@@ -71,8 +73,7 @@ namespace Mv.Modules.P99.Service
 
         public void SetShort(int index, short value)
         {
-            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 2);
-    
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 2);   
         }
 
         public void SetBit(int index, int bit, bool value)

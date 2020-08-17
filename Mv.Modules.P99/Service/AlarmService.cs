@@ -108,11 +108,11 @@ namespace Mv.Modules.P99.Service
             });
         }
         Dictionary<string, AlarmItem> currentAlarmItems = new Dictionary<string, AlarmItem>();
-        bool localvalue;
+        //bool localvalue;
         private void ObserveAlarms(long m)
         {
-            localvalue = !localvalue;
-            device.SetBit(0, 1, localvalue);
+            //localvalue = !localvalue;
+            //device.SetBit(0, 1, localvalue);
             //   device.GetBit(200, 1);
             var inalarms = alarms.Where(x => device.GetBit(x.AddressOffset - addressOffset + localOffset, x.BitIndex));
             var noalarms = alarms.Except(inalarms);
