@@ -28,7 +28,7 @@ namespace Mv.Modules.P99.Service
             this.logger = logger;
             this.eventAggregator = eventAggregator;
             this.device = device;
-            Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(x =>
+            Observable.Interval(TimeSpan.FromSeconds(60*5)).Subscribe(x =>
             {
                 LoadCount = device.GetInt(270);
                 UnloadCount = device.GetInt(272);
@@ -45,7 +45,7 @@ namespace Mv.Modules.P99.Service
                 dic["时间"] = DateTime.Now.ToString();
                 dic["上料数量"] = LoadCount.ToString();
                 dic["下料数量"] = UnloadCount.ToString();
-                dic["上料相机NG"] = GlueCameraNg.ToString();
+                dic["上料相机NG"] = LoadCameraNg.ToString();
                 dic["点胶相机NG"] = GlueCameraNg.ToString();
                 dic["扫码NG"] = ScanCodeNg.ToString();
                 dic["运行信息"] = Runtime.ToString();

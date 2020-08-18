@@ -12,6 +12,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 
 namespace Mv.Modules.P99.Service
 {
@@ -79,6 +80,7 @@ namespace Mv.Modules.P99.Service
             this.eventAggregator = eventAggregator;
             this.device = device;
             LoadAlarmInfos();
+            
             Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(ObserveAlarms);
             subjectNewAlarm.Subscribe(m =>
             {
@@ -107,7 +109,7 @@ namespace Mv.Modules.P99.Service
                 });
             });
         }
-        Dictionary<string, AlarmItem> currentAlarmItems = new Dictionary<string, AlarmItem>();
+        ConcurrentDictionary<string, AlarmItem> currentAlarmItems = new ConcurrentDictionary<string, AlarmItem>();
         //bool localvalue;
         private void ObserveAlarms(long m)
         {
@@ -136,7 +138,8 @@ namespace Mv.Modules.P99.Service
                 value.StopTime = DateTime.Now;
                 value.TimeSpan = value.StopTime - value.StartTime;
                 subjectAlarmItem.OnNext(value);
-                currentAlarmItems.Remove(solvedAlarm.Address);
+                currentAlarmItems.TryRemove(solvedAlarm.Address, out var removed);
+              //  currentAlarmItems.Remove(solvedAlarm.Address);
                 logger.Log($"{value.Address}:{value.Message}\t开始时间：{value.StartTime:HH:mm:ss}，结束时间：{value.StopTime:HH:mm:ss},持续时间：{value.TimeSpan.TotalSeconds}S"
                     , Category.Debug
                     , Priority.None);
