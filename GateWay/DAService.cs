@@ -74,7 +74,7 @@ namespace BatchCoreService
         }
 
 
-        Dictionary<string, ITag> _mapping=new Dictionary<string, ITag>();
+        Dictionary<string, ITag> _mapping = new Dictionary<string, ITag>();
 
         List<Scaling> _scales;
 
@@ -99,19 +99,16 @@ namespace BatchCoreService
 
         public Dictionary<short, string> ArchiveList { get; private set; } = null;
 
-        public DAService( ILoggerFacade logger,IDriverDataContext dataContext)
+        public DAService(ILoggerFacade logger, IDriverDataContext dataContext)
         {
             Log = logger;
             this.dataContext = dataContext;
             _scales = new List<Scaling>();
             _drivers = new SortedList<short, IDriver>();
             reval = new ExpressionEval(this);
-            InitServer();
-            InitConnection();
-            timer1.Elapsed += timer1_Elapsed;
+
             timer1.Interval = CYCLE;
-            timer1.Enabled = true;
-            timer1.Start();
+            Run();
         }
 
         public void Dispose()
@@ -143,17 +140,20 @@ namespace BatchCoreService
         public void AddErrorLog(Exception e)
         {
             Log.Log(e.GetExceptionMsg(), Category.Exception, Priority.High);
-  
+
         }
 
-        private void timer1_Elapsed(object sender, ElapsedEventArgs e)
+        private void checkConnection(object sender, ElapsedEventArgs e)
         {
-            foreach (IDriver d in Drivers)
+            lock (SyncRoot)
             {
-                if (d.IsClosed)
+                foreach (IDriver d in Drivers.ToList())
                 {
-                    d.Connect(); //t.IsAlive可加入判断；如线程异常，重新启动。
-                }
+                    if (d?.IsClosed==true)
+                    {
+                        d?.Connect(); //t.IsAlive可加入判断；如线程异常，重新启动。
+                    }
+                } 
             }
         }
 
@@ -163,7 +163,7 @@ namespace BatchCoreService
 
         void InitConnection()
         {
-            foreach (IDriver reader in _drivers.Values)
+            foreach (IDriver reader in _drivers.Values.Where(x=>x!=null))
             {
                 reader.OnClose += new ShutdownRequestEventHandler(reader_OnClose);
                 if (reader.IsClosed)
@@ -189,9 +189,9 @@ namespace BatchCoreService
             foreach (var driver in drivers)
             {
                 var dv = AddDriver(
-                    driver.Id, 
+                    driver.Id,
                     driver.Name,
-                    driver.Server, 
+                    driver.Server,
                     driver.Timeout,
                     driver.Assembly,
                     driver.ClassName,
@@ -208,15 +208,15 @@ namespace BatchCoreService
                 {
                     item.Value.ValueChanged += OnValueChanged;
                 }
-               
 
-             
+
+
             }
         }
 
         private void Gp_DataChange(object sender, DataChangeEventArgs e)
         {
-          //  throw new NotImplementedException();
+            //  throw new NotImplementedException();
         }
         #endregion
 
@@ -226,7 +226,6 @@ namespace BatchCoreService
         void OnValueChanged(object sender, DataService.ValueChangedEventArgs e)
         {
             var tag = sender as ITag;
-           
         }
 
         public HistoryData[] BatchRead(DataSource source, bool sync, params ITag[] itemArray)
@@ -318,7 +317,6 @@ namespace BatchCoreService
                 var dvType = ass.GetType(className);
                 if (dvType != null)
                 {
-                    //dv = new ModbusDriver.ModbusTCPReader(this, id, name, server, timeOut);
                     dv = Activator.CreateInstance(dvType,
                         new object[] { this, id, name, server, timeOut, dictionary }) as IDriver;
                     if (dv != null)
@@ -481,5 +479,27 @@ namespace BatchCoreService
             return _list.BinarySearch(new TagMetaData { ID = id });
         }
 
+        public int Run()
+        {
+            Stop();
+            InitServer();
+            InitConnection();
+            timer1.Elapsed += checkConnection;
+            timer1.Start();
+            return 0;
+        }
+
+        public int Stop()
+        {
+
+            timer1.Stop();
+            timer1.Elapsed -= checkConnection;
+            lock (SyncRoot)
+            {
+                Drivers.ToList().ForEach(x => RemoveDriver(x));
+            }
+            return 0;
+            //    throw new NotImplementedException();
+        }
     }
 }

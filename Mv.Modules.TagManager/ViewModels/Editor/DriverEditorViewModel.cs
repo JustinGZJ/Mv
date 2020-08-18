@@ -24,11 +24,13 @@ namespace Mv.Modules.TagManager.ViewModels
     public class DriverEditerViewModel : ViewModelBase, IViewLoadedAndUnloadedAware<DriverEditer>
     {
         private readonly IRegionManager regionManager;
+        private readonly IDataServer dataServer;
         private readonly IDriverDataContext driverDataContext;
 
-        public DriverEditerViewModel(IUnityContainer container,IDriverDataContext driverDataContext) : base(container)
+        public DriverEditerViewModel(IUnityContainer container,IDataServer dataServer,IDriverDataContext driverDataContext) : base(container)
         {
             this.regionManager = container.Resolve<IRegionManager>();
+            this.dataServer = dataServer;
             this.driverDataContext = driverDataContext;
             var drivers = driverDataContext.GetDrivers();
             Drivers.AddRange(drivers);
@@ -157,6 +159,7 @@ namespace Mv.Modules.TagManager.ViewModels
         void IViewLoadedAndUnloadedAware<DriverEditer>.OnUnloaded(DriverEditer view)
         {
             driverDataContext.SetDrivers(Drivers);
+   
         }
     }
 }

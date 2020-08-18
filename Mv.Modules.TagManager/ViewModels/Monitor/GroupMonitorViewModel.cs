@@ -38,6 +38,8 @@ namespace Mv.Modules.TagManager.ViewModels
         void ExecuteSelectedChanged(IGroup group)
         {
             TagItems.Clear();
+            if (group==null||group.Items == null)
+                return;
             foreach (var item in group.Items)
             {
                 TagItems.Add(new TagItem(item, item.GetTagName(), item.GetMetaData().Address));

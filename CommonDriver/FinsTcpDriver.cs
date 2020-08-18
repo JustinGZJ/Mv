@@ -53,7 +53,7 @@ namespace CommonDriver
         public bool Connect()
         {
             mc.Port = Port;
-            mc.IpAddress = ServerName;
+            mc.IpAddress = ServerName??"127.0.0.1";
             mc.SA1 = 222;
             mc.DA1 = 1;
             var MR = mc.ConnectServer();

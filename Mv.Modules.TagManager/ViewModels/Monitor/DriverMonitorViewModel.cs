@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
@@ -50,13 +51,14 @@ namespace Mv.Modules.TagManager.ViewModels
         }
 
         public IDriver Driver { get; }
+
     }
 
-    public class DriverMonitorViewModel : BindableBase
+    public class DriverMonitorViewModel : BindableBase, INavigationAware
     {
 
         public ObservableCollection<DriverVm> Drivers =>
-            new ObservableCollection<DriverVm>(DataServer.Drivers.Select(x=>new DriverVm(x)).ToArray());
+            new ObservableCollection<DriverVm>(DataServer.Drivers.Select(x => new DriverVm(x)).ToArray());
 
         public IDataServer DataServer { get; set; }
         private readonly IRegionManager regionManager;
@@ -67,7 +69,31 @@ namespace Mv.Modules.TagManager.ViewModels
             RaisePropertyChanged(nameof(Drivers));
         }
 
+        private DelegateCommand _runCommand;
+        public DelegateCommand RunCommand =>
+            _runCommand ?? (_runCommand = new DelegateCommand(async () => await ExecuteRunCommand()));
 
+        async Task ExecuteRunCommand()
+        {
+            await Task.Run(() =>
+             {
+                 DataServer.Run();
+             });
+            RaisePropertyChanged(nameof(Drivers));
+        }
+
+
+        private DelegateCommand _stopCommand;
+        public DelegateCommand StopCommand =>
+            _stopCommand ?? (_stopCommand = new DelegateCommand(async () => await ExecuteStopCommandAsync()));
+
+        async Task ExecuteStopCommandAsync()
+        {
+            await Task.Run(() =>
+           {
+               DataServer.Stop();
+           });
+        }
 
 
         #region ShowGroupsCommand 显示分组信息
@@ -83,6 +109,22 @@ namespace Mv.Modules.TagManager.ViewModels
                 { nameof(IDriver), driver.Driver }
             });
 
+        }
+
+        public void OnNavigatedTo(NavigationContext navigationContext)
+        {
+            RunCommand.Execute();
+        }
+
+        public bool IsNavigationTarget(NavigationContext navigationContext)
+        {
+            return true;
+            // throw new NotImplementedException();
+        }
+
+        public void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            //  throw new NotImplementedException();
         }
         #endregion
 

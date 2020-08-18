@@ -67,6 +67,11 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+                
+                <!--<UniformGrid  Grid.Row="1" Columns=" 2">
+                    <Button Content="启动" Command="{Binding RunCommand}" Style="{StaticResource MaterialDesignFlatButton}"/>
+                    <Button Content="停止" Command="{Binding StopCommand}" Style="{StaticResource MaterialDesignFlatButton}"></Button>
+                </UniformGrid>-->
             </Grid>
         </Border>
         <Grid Grid.Column="1" Grid.RowSpan="2" >

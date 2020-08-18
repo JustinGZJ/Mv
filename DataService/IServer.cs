@@ -26,7 +26,13 @@ namespace DataService
         IList<ICondition> ActivedConditionList { get; }
     }
 
-    public interface IDataServer : IDisposable
+    public interface IRunable
+    {
+        public int Run();
+        public int Stop();
+    }
+
+    public interface IDataServer :IRunable, IDisposable
     {
         ITag this[short id] { get; }
         ITag this[string name] { get; }
