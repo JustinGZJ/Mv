@@ -14,8 +14,7 @@ using System.IO;
 
 
 using Prism.Logging;
-using Mv.Modules.TagManager;
-using Mv.Modules.Hmi;
+using Mv.Modules.P99;
 
 namespace Mv.Shell
 {
@@ -27,6 +26,7 @@ namespace Mv.Shell
     {
         protected override Window CreateShell()
         {
+            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件启动", Category.Debug, Priority.None);
             return  IContainerProviderExtensions.Resolve<AuthenticationWindow>(Container);
         }
 
@@ -47,7 +47,9 @@ namespace Mv.Shell
                      .MinimumLevel.Debug()
                      .WriteTo.RollingFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs","log.txt"), retainedFileCountLimit: 7)
                      .CreateLogger();
-      
+
+            
+
             base.OnStartup(e);
         }
         protected override void ConfigureViewModelLocator()
@@ -64,8 +66,9 @@ namespace Mv.Shell
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-            moduleCatalog.AddModule<TagManagerModule>();
-            moduleCatalog.AddModule<HmiModule>();
+            //moduleCatalog.AddModule<TagManagerModule>();
+            //moduleCatalog.AddModule<HmiModule>();
+            moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 

@@ -73,7 +73,7 @@ namespace Mv.Modules.P99.ViewModels
         public ObservableCollection<BindableWrapper<short>> UVCurrents { get; set; } = new ObservableCollection<BindableWrapper<short>>(Enumerable.Repeat(new BindableWrapper<short>(), 4));
         public ObservableCollection<string> Messages { get; set; } = new ObservableCollection<string>();
         public BindableWrapper<bool> IsConnected { get; set; } = new BindableWrapper<bool>();
-        public ObservableCollection<CognexValue> CognexValues { get; set; } = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
+        public ObservableCollection<CognexValue> CognexValues { get; set; } 
         Subject<(short, short, short, short)> CurrentSubject = new Subject<(short, short, short, short)>();
         public CognexViewModel(IUnityContainer container, IPlcCognexComm plcCognex, ICognexCommunication cognex,IOPTLight light) : base(container)
         {
@@ -86,7 +86,7 @@ namespace Mv.Modules.P99.ViewModels
                 device.SetInt(1, 20, (x % 2 == 0) ? 0 : 1);
             }); //心跳
 
-
+            CognexValues = new ObservableCollection<CognexValue>(new CognexValue[] { new CognexValue(), new CognexValue() });
             Task.Factory.StartNew(() =>{
                 while (true)
                 {
@@ -133,14 +133,15 @@ namespace Mv.Modules.P99.ViewModels
                             var xf = device.GetInt(id, 6);
                             var yf = device.GetInt(id, 8);
                             // CognexValues[id].X = x;
+                            var mid = id;
                             Invoke(() =>
                             {
                                 IsConnected.Value = device.IsConnected;
-                                CognexValues[id].X = x / 1000d;
-                                CognexValues[id].Y = y / 1000d;
-                                CognexValues[id].Xf = xf / 1000d;
-                                CognexValues[id].Yf = yf / 1000d;
-                                CognexValues[id].Trigger = cmd;
+                                CognexValues[mid].X = x / 1000d;
+                                CognexValues[mid].Y = y / 1000d;
+                                CognexValues[mid].Xf = xf / 1000d;
+                                CognexValues[mid].Yf = yf / 1000d;
+                                CognexValues[mid].Trigger = cmd;
                             });
 
                             if (cmd == 111)
