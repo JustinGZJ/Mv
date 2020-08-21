@@ -4,6 +4,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MV.UI</AssemblyName>
     <LangVersion>8</LangVersion>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="3.0.1" />
@@ -12,7 +13,14 @@
     <PackageReference Include="Unity" Version="5.11.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MV.Core.TransferService\MV.Core.TransferService.csproj" />
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PropertyTools">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyTools.Wpf">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

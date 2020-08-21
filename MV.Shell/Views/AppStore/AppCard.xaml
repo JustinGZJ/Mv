@@ -44,7 +44,7 @@
             <TextBlock Grid.Row="0" Text="{Binding Path=AppName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card, AncestorLevel=1}}"
                        FontWeight="Bold" FontSize="20"/>
             <TextBlock Grid.Row="2" Text="{Binding Path=AppDescription, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card, AncestorLevel=1}}"
-                       TextWrapping="Wrap" FontWeight="14" Foreground="Gray"/>
+                       TextWrapping="Wrap"  Foreground="Gray"/>
             <TextBlock Grid.Row="3" Text="{Binding Path=AppAuthors, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card, AncestorLevel=1}, StringFormat='by {0}'}"
                        HorizontalAlignment="Right" Foreground="Gray"/>
             <TextBlock Grid.Row="4" Text="{Binding Path=AppDownloadCount, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card, AncestorLevel=1}, StringFormat='Downloads: {0}'}"

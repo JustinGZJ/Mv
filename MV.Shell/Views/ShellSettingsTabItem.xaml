@@ -28,8 +28,6 @@
                        Text="{i18N:Loc Application}"/>
             <TextBlock Grid.Column="0" Grid.Row="1" Margin="0 22" FontWeight="Bold" 
                        Text="{i18N:Loc Language}"/>
-            <!--<TextBlock Grid.Column="0" Grid.Row="3" Text="Notification" FontWeight="Bold" />-->
-
             <ComboBox Grid.Column="2" Grid.Row="0" Margin="0 16">
                 <ComboBoxItem IsSelected="True" 
                               Content="Light"/>

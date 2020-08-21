@@ -18,7 +18,26 @@
 
         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Style="{StaticResource FloatInRightToLeftStyle}" >
             <WrapPanel Margin="16" >
-
+                <!-- <appStore:AppCard AppImageSource="/MV.Shell;component/MockData/netdisk.png"  -->
+                <!--                AppName="Net Disk" -->
+                <!--                AppDescription="Network disk manage tool." -->
+                <!--                AppAuthors="Mrs4s &amp; ZDP" -->
+                <!--                AppDownloadCount="666" Margin="16 8 16 8"/> -->
+                <!-- <appStore:AppCard AppImageSource="/MV.Shell;component/MockData/group.png"  -->
+                <!--                AppName="Group" -->
+                <!--                AppDescription="Communicate what you want to share with others." -->
+                <!--                AppAuthors="ZDP" -->
+                <!--                AppDownloadCount="666"  Margin="16 8 16 8"/> -->
+                <!-- <appStore:AppCard AppImageSource="/MV.Shell;component/MockData/scrapylogo.png"  -->
+                <!--                AppName="Scrapy Incubator" -->
+                <!--                AppDescription="Deploy your scrapy application in a distributed manner." -->
+                <!--                AppAuthors="Unknow" -->
+                <!--                AppDownloadCount="666"  Margin="16 8 16 8"/> -->
+                <!-- <appStore:AppCard AppImageSource="/MV.Shell;component/MockData/dota2.jpg"  -->
+                <!--                AppName="Empty1" -->
+                <!--                AppDescription="Description" -->
+                <!--                AppAuthors="Unknow" -->
+                <!--                AppDownloadCount="666"  Margin="16 8 16 8"/> -->
             </WrapPanel>
         </ScrollViewer>
     </Grid>

@@ -96,7 +96,6 @@ namespace Mv.Modules.RD402.ViewModels
                             Application.Current.Dispatcher?.BeginInvoke(() =>
                             {
                                 for (var i = 0; i < 16; i++) Obs[i] = device.GetBit(0, i);
-
                                 for (var i = 0; i < 16; i++) Outs[i] = device.GetSetBit(0, i);
                                 IsConnected = device.IsConnected;
                                 Spindle = factoryInfo.GetSpindle(device.GetWord(1));

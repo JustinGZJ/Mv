@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Threading;
 using MaterialDesignThemes.Wpf;
 using Mv.Core.Interfaces;
@@ -22,12 +23,13 @@ namespace Mv.Ui.Mvvm
         protected ViewModelBase(IUnityContainer container)
         {
             Container = container;
-            EventAggregator = container.Resolve<IEventAggregator>();
+   
             Logger = container.Resolve<ILoggerFacade>();
+            EventAggregator = container.Resolve<IEventAggregator>();
             SnackbarMessageQueue = container.Resolve<ISnackbarMessageQueue>();
         }
 
-        public Dispatcher Dispatcher { get; set; }
+        public Dispatcher Dispatcher { get; set; } = Application.Current.Dispatcher;
 
         protected IUnityContainer Container { get; }
 
@@ -38,7 +40,20 @@ namespace Mv.Ui.Mvvm
 
         public IMvUser MvUser => _mvUser ??= Container.Resolve<IMvUser>();
 
-        protected virtual void Invoke(Action action) => Dispatcher.Invoke(action);
+        protected virtual void Invoke(Action action) => OnUIThread(action);
+
+        private void OnUIThread(Action action)
+        {
+            try
+            {
+                Application.Current?.Dispatcher.BeginInvoke(action);
+            }
+            catch (Exception ex)
+            {
+                ;
+        //        throw;
+            }
+        }
     }
 
     public abstract class ViewModelValidateBase : ValidateableBase

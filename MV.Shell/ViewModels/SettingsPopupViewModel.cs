@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Input;
 using MaterialDesignThemes.Wpf;
 using Mv.Core.Interfaces;
@@ -32,8 +33,8 @@ namespace Mv.Shell.ViewModels
 
             OpenSettingsPanelCommand = new RelayCommand(OpenDialog<SettingsDialog>);
 
-            HelpCommand = new RelayCommand(() => Process.Start(AcceleriderUrls.Help));
-            OpenOfficialSiteCommand = new RelayCommand(() => Process.Start(AcceleriderUrls.WebSite));
+            HelpCommand = new RelayCommand(()=>Thread.Sleep(0)) ;
+            OpenOfficialSiteCommand = new RelayCommand(() => Thread.Sleep(0));
             AboutCommand = new RelayCommand(OpenDialog<AboutDialog>);
 
             SignOutCommand = new RelayCommand(() =>

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Mv.TransferService;
-using Mv.Ui.TransferService;
+
 
 namespace Mv.Ui.Core.Modularity
 {
@@ -42,12 +41,12 @@ namespace Mv.Ui.Core.Modularity
 
         private static void DownloadFiles(IEnumerable<RemoteRef> remoteRefs)
         {
-            remoteRefs.ForEach(remoteRef => FileTransferService.GetDownloaderBuilder()
-                .UseDefaultConfigure()
-                .From(remoteRef.RemotePath)
-                .To(remoteRef.LocalPath)
-                .Build()
-                .Run());
+            //remoteRefs.ForEach(remoteRef => FileTransferService.GetDownloaderBuilder()
+            //    .UseDefaultConfigure()
+            //    .From(remoteRef.RemotePath)
+            //    .To(remoteRef.LocalPath)
+            //    .Build()
+            //    .Run());
         }
 
         //private static void Unzip(string filePath)

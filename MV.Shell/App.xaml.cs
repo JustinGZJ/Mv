@@ -11,7 +11,10 @@ using Mv.Shell.Views.Authentication;
 using Mv.Core.Interfaces;
 using Serilog;
 using System.IO;
-using Mv.Modules.RD402;
+
+
+using Prism.Logging;
+using Mv.Modules.P99;
 
 namespace Mv.Shell
 {
@@ -23,15 +26,18 @@ namespace Mv.Shell
     {
         protected override Window CreateShell()
         {
+            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件启动", Category.Debug, Priority.None);
             return  IContainerProviderExtensions.Resolve<AuthenticationWindow>(Container);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSerilog();
+            
             containerRegistry.RegisterSingleton<INonAuthenticationApi, NonAuthenticationApi>();
             containerRegistry.RegisterInstance<ISnackbarMessageQueue>(new SnackbarMessageQueue(TimeSpan.FromMilliseconds(2000)));
             containerRegistry.RegisterInstance(new ConfigureFile().Load());
+            ConfigureApplicationEventHandlers();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -41,6 +47,9 @@ namespace Mv.Shell
                      .MinimumLevel.Debug()
                      .WriteTo.RollingFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs","log.txt"), retainedFileCountLimit: 7)
                      .CreateLogger();
+
+            
+
             base.OnStartup(e);
         }
         protected override void ConfigureViewModelLocator()
@@ -48,20 +57,27 @@ namespace Mv.Shell
             ViewModelLocationProvider.SetDefaultViewModelFactory(new ViewModelResolver(() => Container).UseDefaultConfigure().ResolveViewModelForView);
         }
 
-
+        //protected override IModuleCatalog CreateModuleCatalog()
+        //{          
+        //   var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
+        //    directoryCatalog.Initialize();
+        //    return directoryCatalog;
+        //}
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
+            //moduleCatalog.AddModule<TagManagerModule>();
+            //moduleCatalog.AddModule<HmiModule>();
+            moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
-            moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }
 
         public override void Initialize()
         {
-            base.Initialize();
+            base.Initialize();    
             Settings.Default.PropertyChanged += (sender, eventArgs) => Settings.Default.Save();
         }
-
+        
         private void ConfigureApplicationEventHandlers()
         {
             var handler = Container.Resolve<ExceptionHandler>();
@@ -70,6 +86,7 @@ namespace Mv.Shell
         }
         protected override void OnExit(ExitEventArgs e)
         {
+            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件退出:{e.ApplicationExitCode}", Category.Debug, Priority.None); 
             Log.CloseAndFlush();
             base.OnExit(e);
         }
