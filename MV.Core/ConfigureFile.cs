@@ -18,7 +18,20 @@ namespace Mv.Core
 
         public bool Contains(string key) => _storage.Values().Any(token => token.Path == key);
 
-        public T GetValue<T>(string key) => (_storage[key]?.ToString() ?? string.Empty).ToObject<T>();
+        public T GetValue<T>(string key)
+        {
+
+            var result = (_storage[key]?.ToString() ?? string.Empty).ToObject<T>();
+            if (result == null && typeof(T).GetConstructors().Any(x => !x.GetParameters().Any()))
+            {
+                result = (T)Activator.CreateInstance(typeof(T));
+                _storage[key] = result.ToJson(Formatting.Indented);
+                Save();
+                ValueChanged?.Invoke(this, new ValueChangedEventArgs(key));
+            }
+            return result;
+        }
+
 
         public IConfigureFile SetValue<T>(string key, T value)
         {
@@ -27,7 +40,6 @@ namespace Mv.Core
             _storage[key] = value.ToJson(Formatting.Indented);
             Save();
             ValueChanged?.Invoke(this, new ValueChangedEventArgs(key));
-
             return this;
         }
 

@@ -6,15 +6,25 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 using DataService;
 
 namespace ModbusDriver
 {
-    [Description("Modbus TCP协议")]
-    public sealed class ModbusTCPReader :DriverInitBase, IPLCDriver, IMultiReadWrite
+
+    public static class TaskHelper
     {
-        private int _timeout;
+        public static Task WithTimeout(this Task task, TimeSpan timeout)
+        {
+            var timeoutTask = Task.Delay(timeout).ContinueWith(_ => TaskContinuationOptions.ExecuteSynchronously);
+            return Task.WhenAny(task, timeoutTask).Unwrap();
+        }
+    }
+    [Description("Modbus TCP协议")]
+    public sealed class ModbusTCPReader : DriverInitBase, IPLCDriver, IMultiReadWrite
+    {
+        private int _timeout = 1000;
 
         private Socket tcpSynCl;
         private byte[] tcpSynClBuffer = new byte[0xFF];
@@ -52,13 +62,15 @@ namespace ModbusDriver
             }
         }
 
+        public int Port { get; set; }
+
         public int TimeOut
         {
             get { return _timeout; }
             set { _timeout = value; }
         }
 
-        byte _slaveId;//设备ID 单元号  字节号
+        byte _slaveId = 1;//设备ID 单元号  字节号
         /// <summary>
         /// 设备ID 单元号  字节号
         /// </summary>
@@ -83,35 +95,39 @@ namespace ModbusDriver
         {
 
         }
-        public ModbusTCPReader(IDataServer server, short id, string name, string ip, int timeOut = 500, IDictionary<string,string> paras=null)  
+        public ModbusTCPReader(IDataServer server, short id, string name, string ip, int timeOut = 1000, IDictionary<string, string> paras = null)
             : base(server, id, name, ip, timeOut, paras)
         {
             _id = id;
             _name = name;
             _server = server;
-            _ip = ip??"localhost";
-            _timeout = timeOut;      
+            _ip = ip ?? "localhost";
+            _timeout = timeOut;
         }
- 
+
 
         public bool Connect()
         {
-            int port = 502;
+            int port = Port;
             try
             {
-                if (tcpSynCl != null)
-                    tcpSynCl.Close();
-                //IPAddress ip = IPAddress.Parse(_ip);
-                // ----------------------------------------------------------------
-                // Connect synchronous client
-                tcpSynCl = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                tcpSynCl.SendTimeout = _timeout;
-                tcpSynCl.ReceiveTimeout = _timeout;
-                tcpSynCl.NoDelay = true;
-                tcpSynCl.Connect(_ip, port);
+                lock (this)
+                {
+                    if (tcpSynCl != null)
+                        tcpSynCl.Close();
+                    //IPAddress ip = IPAddress.Parse(_ip);
+                    // ----------------------------------------------------------------
+                    // Connect synchronous client
+
+                    tcpSynCl = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    tcpSynCl.SendTimeout = _timeout;
+                    tcpSynCl.ReceiveTimeout = _timeout;
+                    tcpSynCl.NoDelay = true;
+                    tcpSynCl.ConnectAsync(_ip, port).WithTimeout(TimeSpan.FromMilliseconds(_timeout)).Wait(); 
+                }
                 return true;
             }
-            catch (SocketException error)
+            catch (AggregateException error)
             {
                 if (OnClose != null)
                     OnClose(this, new ShutdownRequestEventArgs(error.Message));
@@ -162,44 +178,54 @@ namespace ModbusDriver
         private byte[] WriteSyncData(byte[] write_data)
         {
             short id = BitConverter.ToInt16(write_data, 0);
-            if (IsClosed) CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
+            if (IsClosed)
+            {
+                //if (!Connect())
+                    CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
+            }
             else
             {
                 try
                 {
-                    tcpSynCl.Send(write_data, 0, write_data.Length, SocketFlags.None);//是否存在lock的问题？
-                    int result = tcpSynCl.Receive(tcpSynClBuffer, 0, 0xFF, SocketFlags.None);
 
-                    byte function = tcpSynClBuffer[7];
-                    byte[] data;
+                    lock (this)
+                    {
+                        tcpSynCl.Send(write_data, 0, write_data.Length, SocketFlags.None);//是否存在lock的问题？
+                        int result = tcpSynCl.Receive(tcpSynClBuffer, 0, 0xFF, SocketFlags.None);
 
-                    if (result == 0) CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
 
-                    // ------------------------------------------------------------
-                    // Response data is slave ModbusModbus.exception
-                    if (function > Modbus.excExceptionOffset)
-                    {
-                        function -= Modbus.excExceptionOffset;
-                        CallException(id, function, tcpSynClBuffer[8]);
-                        return null;
+                        byte function = tcpSynClBuffer[7];
+                        byte[] data;
+
+                        if (result == 0) CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
+
+                        // ------------------------------------------------------------
+                        // Response data is slave ModbusModbus.exception
+                        if (function > Modbus.excExceptionOffset)
+                        {
+                            function -= Modbus.excExceptionOffset;
+                            CallException(id, function, tcpSynClBuffer[8]);
+                            return null;
+                        }
+                        // ------------------------------------------------------------
+                        // Write response data
+                        else if ((function >= Modbus.fctWriteSingleCoil) && (function != Modbus.fctReadWriteMultipleRegister))
+                        {
+                            data = new byte[2];
+                            Array.Copy(tcpSynClBuffer, 10, data, 0, 2);
+                        }
+                        // ------------------------------------------------------------
+                        // Read response data
+                        else
+                        {
+                            data = new byte[tcpSynClBuffer[8]];
+                            Array.Copy(tcpSynClBuffer, 9, data, 0, tcpSynClBuffer[8]);
+                        }
+
+                        return data;
                     }
-                    // ------------------------------------------------------------
-                    // Write response data
-                    else if ((function >= Modbus.fctWriteSingleCoil) && (function != Modbus.fctReadWriteMultipleRegister))
-                    {
-                        data = new byte[2];
-                        Array.Copy(tcpSynClBuffer, 10, data, 0, 2);
-                    }
-                    // ------------------------------------------------------------
-                    // Read response data
-                    else
-                    {
-                        data = new byte[tcpSynClBuffer[8]];
-                        Array.Copy(tcpSynClBuffer, 9, data, 0, tcpSynClBuffer[8]);
-                    }
-                    return data;
                 }
-                catch (SocketException)
+                catch (SocketException ex)
                 {
                     CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
                 }
@@ -256,7 +282,16 @@ namespace ModbusDriver
             DeviceAddress dv = DeviceAddress.Empty;
             if (string.IsNullOrEmpty(address))
                 return dv;
-            dv.Area = _slaveId;
+            var sindex = address.IndexOf(':');
+            if (sindex > 0)
+            {
+                dv.Area = int.Parse(address.Substring(0, sindex));
+                address = address.Substring(sindex + 1);
+            }
+            else
+            {
+                dv.Area = 1;
+            }
             switch (address[0])
             {
                 case '0':
@@ -502,13 +537,29 @@ namespace ModbusDriver
 
         public int WriteInt32(DeviceAddress address, int value)
         {
-            var data = WriteMultipleRegister(address.Area, address.Start, BitConverter.GetBytes(value));
+            var bs = BitConverter.GetBytes(value);
+            var b = bs[0];
+            bs[0] = bs[1];
+            bs[1] = b;
+            b = bs[2];
+            bs[2] = bs[3];
+            bs[3] = b;
+            var data = WriteMultipleRegister(address.Area, address.Start, bs);
             return data == null ? -1 : 0;
         }
 
-        public int WriteFloat(DeviceAddress address, float value)
+
+
+        public unsafe int WriteFloat(DeviceAddress address, float value)
         {
-            var data = WriteMultipleRegister(address.Area, address.Start, BitConverter.GetBytes(value));
+            var bs = BitConverter.GetBytes(value);
+            var b = bs[0];
+            bs[0] = bs[1];
+            bs[1] = b;
+            b = bs[2];
+            bs[2] = bs[3];
+            bs[3] = b;
+            var data = WriteMultipleRegister(address.Area, address.Start, bs);
             return data == null ? -1 : 0;
         }
 
@@ -524,13 +575,14 @@ namespace ModbusDriver
         }
 
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
 
         public int Limit
         {
             get { return 60; }
         }
 
-   
+
 
         public ItemData<Storage>[] ReadMultiple(DeviceAddress[] addrsArr)
         {

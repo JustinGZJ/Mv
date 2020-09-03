@@ -4,6 +4,7 @@ using System.Net;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Data.SqlClient;
+using System.Reactive.Linq;
 
 namespace DataService
 {
@@ -422,6 +423,14 @@ namespace DataService
         public static int BitSwap(this byte bit)
         {
             return (bit < 8 ? bit + 8 : bit - 8);
+        }
+
+
+
+
+        public static IObservable<Storage> ToObservable(this ITag tag)
+        {
+            return Observable.FromEventPattern<ValueChangedEventArgs>(tag, "ValueChanged").Select(x => x.EventArgs.Value);
         }
 
         public static Storage ToStorage(this ITag tag, object obj)

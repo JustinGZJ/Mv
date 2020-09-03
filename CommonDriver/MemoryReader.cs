@@ -239,6 +239,7 @@ namespace CommonDriver
 
        // public event IOErrorEventHandler OnError;
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
 
         public byte[] ReadBytes(DeviceAddress address, ushort size)
         {

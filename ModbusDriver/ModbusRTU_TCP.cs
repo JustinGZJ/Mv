@@ -78,8 +78,6 @@ namespace ModbusDriver
             _server = server;
             _ip = serverName??"localhost";
             _timeout = timeOut;
-           
-
         }
 
         public bool Connect()
@@ -446,6 +444,7 @@ namespace ModbusDriver
         }
 
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
 
         public int Limit
         {

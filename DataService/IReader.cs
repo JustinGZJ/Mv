@@ -55,6 +55,7 @@ namespace DataService
         IGroup AddGroup(string name, short id, int updateRate, float deadBand = 0f, bool active = false);
         bool RemoveGroup(IGroup group);
         event ShutdownRequestEventHandler OnClose;
+        event EventHandler<Exception> OnError;
     }
 
     public interface IPLCDriver : IDriver, IReaderWriter

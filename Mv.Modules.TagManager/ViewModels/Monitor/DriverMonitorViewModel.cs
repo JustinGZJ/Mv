@@ -77,7 +77,7 @@ namespace Mv.Modules.TagManager.ViewModels
         {
             await Task.Run(() =>
              {
-                 DataServer.Run();
+                // DataServer.Run();
              });
             RaisePropertyChanged(nameof(Drivers));
         }

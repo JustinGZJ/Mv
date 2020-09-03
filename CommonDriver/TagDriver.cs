@@ -8,7 +8,7 @@ using System.Linq;
 namespace CommonDriver
 {
     [Description("标签直接读写")]
-    public sealed class TagDriver : IFileDriver
+    public sealed class TagDriver : DriverInitBase, IFileDriver
 
     {
 
@@ -70,17 +70,25 @@ namespace CommonDriver
         IDataServer _parent;
 
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
 
         public IDataServer Parent
         {
             get { return _parent; }
         }
 
-        public string FileName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string FileName { get ; set ; }
 
         public TagDriver(IDataServer parent, short id, string name)
         {
             _parent = parent;
+            _id = id;
+            _name = name;
+        }
+
+        public TagDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
+        {
+            _parent = server;
             _id = id;
             _name = name;
         }

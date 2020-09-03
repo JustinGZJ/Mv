@@ -34,10 +34,9 @@
                 <ListView ItemsSource="{Binding Messages}" ctls:ListScrollToEnd.IsScrollToEnd="True" >
                     <ListView.View>
                         <GridView>
+                            <GridViewColumn  Header="时间" DisplayMemberBinding="{Binding Time, StringFormat={}{0:HH:mm:ss}}"/>
                             <GridViewColumn Header="发送者" DisplayMemberBinding="{Binding Source}"/>
-                            <GridViewColumn Header="类型" DisplayMemberBinding="{Binding Level}" >
-
-                            </GridViewColumn>
+                            <GridViewColumn Header="类型" DisplayMemberBinding="{Binding Level}" />
                             <GridViewColumn Header="内容" DisplayMemberBinding="{Binding Content}"/>
                         </GridView>
                     </ListView.View>

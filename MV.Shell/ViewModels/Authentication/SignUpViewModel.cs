@@ -1,18 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
-using Mv.Core.Extensions;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Core.Interfaces;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
-using Prism.Commands;
-using Refit;
-using Prism.Mvvm;
-using Unity;
 using Prism.Events;
+using Prism.Mvvm;
+using System;
+using System.Linq;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Unity;
 
 namespace Mv.Shell.ViewModels.Authentication
 {

@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OmronDriver", "OmronDriver\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mv.Modules.Hmi", "Mv.Modules.Hmi\Mv.Modules.Hmi.csproj", "{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mv.Modules.Schneider", "Mv.Modules.Schneider\Mv.Modules.Schneider.csproj", "{E89074BA-E81A-4102-9644-458289D5F469}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,14 @@ Global
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|x86.ActiveCfg = Release|Any CPU
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|x86.Build.0 = Release|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Debug|x86.Build.0 = Debug|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Release|x86.ActiveCfg = Release|Any CPU
+		{E89074BA-E81A-4102-9644-458289D5F469}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -199,6 +209,7 @@ Global
 		{3DA5DB09-7344-457B-A97E-1A1662A9959A} = {D2DB5732-3541-4F2C-88A0-1032B3C46483}
 		{B1EA14D1-6F82-436D-8D84-1C2DA55FE303} = {D2DB5732-3541-4F2C-88A0-1032B3C46483}
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B} = {DA3A0E24-F310-42DF-89C1-B0DFFEF3CF5E}
+		{E89074BA-E81A-4102-9644-458289D5F469} = {DA3A0E24-F310-42DF-89C1-B0DFFEF3CF5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EE969CC2-8FAF-47B4-A4FD-5BB4C369A85C}

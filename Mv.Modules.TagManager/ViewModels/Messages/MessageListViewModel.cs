@@ -30,6 +30,7 @@ namespace Mv.Modules.TagManager.ViewModels.Messages
 
               Invoke(() =>
                    {
+                       Logger.Log(x.Content, x.Level, Priority.None);
                        Messages.Add(x);
                        if (Messages.Count > 1000)
                        {

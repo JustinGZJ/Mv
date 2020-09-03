@@ -430,6 +430,7 @@ namespace ModbusDriver
         }
 
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
     }
 
     public sealed class ModbusRtuGroup : PLCGroup

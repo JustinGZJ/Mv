@@ -95,10 +95,8 @@ namespace DataService
             if (quality == QUALITIES.QUALITY_GOOD)
             {
                 _value = newvalue;
-                if (ValueChanged != null)
-                {
-                    ValueChanged(this, new ValueChangedEventArgs(_value));
-                }
+                NotityValueChanged(new ValueChangedEventArgs(_value));
+              //  ValueChanged?.Invoke(this, );
             }
         }
 

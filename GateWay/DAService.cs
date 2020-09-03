@@ -7,6 +7,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 namespace BatchCoreService
 {
@@ -145,16 +146,15 @@ namespace BatchCoreService
 
         private void checkConnection(object sender, ElapsedEventArgs e)
         {
-            lock (SyncRoot)
-            {
-                foreach (IDriver d in Drivers.ToList())
+                Parallel.ForEach(Drivers.ToImmutableArray(), d =>
                 {
-                    if (d?.IsClosed==true)
+
+                    if (d?.IsClosed == true)
                     {
                         d?.Connect(); //t.IsAlive可加入判断；如线程异常，重新启动。
                     }
-                } 
-            }
+                });
+            
         }
 
 
@@ -163,22 +163,26 @@ namespace BatchCoreService
 
         void InitConnection()
         {
-            foreach (IDriver reader in _drivers.Values.Where(x=>x!=null))
+            lock(SyncRoot)
             {
-                reader.OnClose += new ShutdownRequestEventHandler(reader_OnClose);
-                if (reader.IsClosed)
+                foreach (IDriver reader in _drivers.Values.Where(x => x != null))
                 {
-                    //if (reader is IFileDriver)
-                    reader.Connect();
-                }
+                    reader.OnClose += new ShutdownRequestEventHandler(reader_OnClose);
+                    if (reader.IsClosed)
+                    {
+                        //if (reader is IFileDriver)
+                        reader.Connect();
+                    }
 
-                foreach (IGroup grp in reader.Groups)
-                {
-                    //    grp.DataChange += new DataChangeEventHandler(grp_DataChange);
-                    //可在此加入判断，如为ClientDriver发出，则变化数据毋须广播，只需归档。
-                    grp.IsActive = grp.IsActive;
+                    foreach (IGroup grp in reader.Groups)
+                    {
+                        //    grp.DataChange += new DataChangeEventHandler(grp_DataChange);
+                        //可在此加入判断，如为ClientDriver发出，则变化数据毋须广播，只需归档。
+                        grp.IsActive = grp.IsActive;
+                    }
                 }
             }
+
         }
 
         void InitServer()
@@ -208,9 +212,6 @@ namespace BatchCoreService
                 {
                     item.Value.ValueChanged += OnValueChanged;
                 }
-
-
-
             }
         }
 
@@ -347,7 +348,7 @@ namespace BatchCoreService
 
         void reader_OnClose(object sender, ShutdownRequestEventArgs e)
         {
-            AddErrorLog(new Exception(e.shutdownReason));
+           // AddErrorLog(new Exception(e.shutdownReason));
         }
 
         public bool AddItemIndex(string key, ITag value)
@@ -481,7 +482,6 @@ namespace BatchCoreService
 
         public int Run()
         {
-            Stop();
             InitServer();
             InitConnection();
             timer1.Elapsed += checkConnection;

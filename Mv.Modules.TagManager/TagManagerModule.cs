@@ -14,7 +14,7 @@ using Unity;
 namespace Mv.Modules.TagManager
 {
 
- 
+    [Module(ModuleName = "TagManager")]
     public class TagManagerModule : ModuleBase
     {
         private readonly IRegionManager _regionManager;

@@ -57,18 +57,18 @@ namespace Mv.Shell
             ViewModelLocationProvider.SetDefaultViewModelFactory(new ViewModelResolver(() => Container).UseDefaultConfigure().ResolveViewModelForView);
         }
 
-        //protected override IModuleCatalog CreateModuleCatalog()
-        //{          
-        //   var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
-        //    directoryCatalog.Initialize();
-        //    return directoryCatalog;
-        //}
+        protected override IModuleCatalog CreateModuleCatalog()
+        {
+            var directoryCatalog = new DirectoryModuleCatalog() { ModulePath = MvFolders.Modules };
+            directoryCatalog.Initialize();
+            return directoryCatalog;
+        }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             //moduleCatalog.AddModule<TagManagerModule>();
             //moduleCatalog.AddModule<HmiModule>();
-            moduleCatalog.AddModule<P99Module>();
+        //    moduleCatalog.AddModule<P99Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 

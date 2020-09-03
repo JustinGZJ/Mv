@@ -46,6 +46,19 @@ namespace CommonDriver
             _ip = "127.0.0.1";
         }
 
+        event EventHandler<Exception> IDriver.OnError
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public bool IsClosed => _IsClosed;
         public int TimeOut { get; set; }
         public IEnumerable<IGroup> Groups => _grps;

@@ -85,9 +85,8 @@ namespace Mv.Shell.ViewModels.Authentication
             IsRememberPassword = true;
             IsAutoSignIn = ConfigureFile.GetValue<bool>(ConfigureKeys.AutoSignIn);
             UserName = ConfigureFile.GetValue<string>(ConfigureKeys.Username);
-            passwordBox.Password = ConfigureFile.GetValue<string>(ConfigureKeys.Password).DecryptByRijndael();
-
-
+            // passwordBox.Password = ConfigureFile.GetValue<string>(ConfigureKeys.Password).DecryptByRijndael();
+            passwordBox.Password = ConfigureFile.GetValue<string>(ConfigureKeys.Password); //有些系统获取系统信息会失败
 
             if (IsAutoSignIn)
             {
@@ -125,7 +124,8 @@ namespace Mv.Shell.ViewModels.Authentication
             
             // Saves data.
             ConfigureFile.SetValue(ConfigureKeys.Username, IsRememberPassword ? username : string.Empty);
-            ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password.EncryptByRijndael() : string.Empty);
+            // ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password.EncryptByRijndael() : string.Empty);
+            ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password: string.Empty);
             ConfigureFile.SetValue(ConfigureKeys.AutoSignIn, IsAutoSignIn);
             
             // Launches main window and closes itself.

@@ -16,4 +16,14 @@
     <Compile Remove="ClientReader.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Update="C:\Users\Administrator.LAPTOP-7D6B2GK7\.nuget\packages\system.reactive\4.4.1\buildTransitive\netcoreapp3.0\..\..\lib\netstandard2.0\System.Reactive.dll">
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
 </Project>

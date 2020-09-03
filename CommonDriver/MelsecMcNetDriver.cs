@@ -48,6 +48,19 @@ namespace CommonDriver
 
         }
 
+        event EventHandler<Exception> IDriver.OnError
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         string _ip;//服务ip
         int _port = 5000; //服务端口
         public int Port
