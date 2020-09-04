@@ -48,7 +48,13 @@
                 </Border>
             </StackPanel>
             <Grid Grid.Row="1">
-                <ItemsControl prism:RegionManager.RegionName="TENSIONS"></ItemsControl>
+                <ItemsControl prism:RegionManager.RegionName="TENSIONS">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="4"></UniformGrid>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
             </Grid>
         </Grid>
     </Grid>

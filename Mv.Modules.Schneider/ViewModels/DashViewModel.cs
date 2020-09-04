@@ -11,12 +11,13 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using Unity;
 
 namespace Mv.Modules.Schneider.ViewModels
 {
 
-    public class DashViewModel : ViewModelBase
+    public class DashViewModel : ViewModelBase, IViewLoadedAndUnloadedAware<Dash>
     {
         enum ScanCode : int
         {
@@ -27,7 +28,7 @@ namespace Mv.Modules.Schneider.ViewModels
             STATIONERR = 4,
         }
 
-        private readonly IRegionManager regionManager;
+        private readonly IDataServer dataServer;
         private readonly IServerOperations operations;
         private readonly ILoggerFacade logger;
         Dictionary<string, IObservable<short>> tensionobs = new Dictionary<string, IObservable<short>>();
@@ -40,7 +41,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
         private string barcode;
         public ObservableCollection<string> Barcodes { get; private set; } = new ObservableCollection<string>(Enumerable.Repeat("", 4));
-        public DashViewModel(IUnityContainer container, IDataServer dataServer,IRegionManager regionManager, IServerOperations operations, ILoggerFacade logger) : base(container)
+        public DashViewModel(IUnityContainer container, IDataServer dataServer, IServerOperations operations, ILoggerFacade logger) : base(container)
         {
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
@@ -61,11 +62,26 @@ namespace Mv.Modules.Schneider.ViewModels
             UploadDataCollection uploaddataCollection = null;
             CompositeDisposable disposables1 = new CompositeDisposable();
             CompositeDisposable disposables2 = new CompositeDisposable();
+            CompositeDisposable disposables3 = new CompositeDisposable();
             Queue<List<string>> buffers = new Queue<List<string>>();
 
-            dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 1).Subscribe(x => {
+            dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 1).Subscribe(x =>
+            {
                 PushMsg("开始绕线");
                 uploaddataCollection = new UploadDataCollection();
+                disposables3 = new CompositeDisposable();
+                disposables3.Add(
+                        dataServer["R_Speed"].ToObservable().Select(x => x.Int32).Max().Subscribe(x =>
+                        {
+                            uploaddataCollection.UploadDatas.ForEach(m => m.Velocity = x);
+                        })
+                );
+                disposables3.Add(
+                          dataServer["R_Angle"].ToObservable().Select(x => x.Int32).Max().Subscribe(x =>
+                          {
+                              uploaddataCollection.UploadDatas.ForEach(m => m.Velocity = x);
+                          })
+                    );
                 if (buffers.TryDequeue(out var barcodes))
                 {
                     for (int i = 0; i < 4; i++)
@@ -81,7 +97,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 0).Subscribe(x =>
                 {
-
+                    disposables3.Dispose();
                     try
                     {
                         if (uploaddataCollection != null)
@@ -135,7 +151,7 @@ namespace Mv.Modules.Schneider.ViewModels
                              }
                              if (operations.CheckCode(result) == 0)
                              {
-                               
+
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.OK);
                                  PushMsg("OK!");
 
@@ -169,7 +185,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     if (uploaddataCollection == null)
                     {
                         uploaddataCollection = new UploadDataCollection();
-                        if(buffers.TryDequeue(out  var barcodes))
+                        if (buffers.TryDequeue(out var barcodes))
                         {
                             for (int i = 0; i < 4; i++)
                             {
@@ -229,7 +245,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
-                    PushMsg("输出："+output.ToString("X2"));
+                    PushMsg("输出：" + output.ToString("X2"));
                 }
 
                 disposables1.Dispose();
@@ -264,8 +280,6 @@ namespace Mv.Modules.Schneider.ViewModels
                         Index = m.First,
                         Name = m.Second.Name,
                         Values = m.Second.Values,
-                        //HighValues = m.Second.Values.Where(z => z.Value > standard2 + offset2).OrderByDescending(z => z.Value),
-                        //LowValues = m.Second.Values.Where(z => z.Value < standard2 - offset2).OrderBy(z => z.Value),
                         Result = m.Second.Values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 + offset2))
                     });
                     ps.ForEach(x =>
@@ -295,27 +309,45 @@ namespace Mv.Modules.Schneider.ViewModels
                 }
                 disposables2.Dispose();
             });
-            this.regionManager = regionManager;
+            this.dataServer = dataServer;
             #endregion
 
             //  
 
             this.operations = operations;
             this.logger = logger;
-            InitChart();
+            //     InitChart();
 
 
         }
 
         public void InitChart()
         {
-            for (int i = 0; i < 8; i++)
+            var random = new Random();
+            var regionManager = Container.Resolve<IRegionManager>();
+            if (!regionManager.Regions["TENSIONS"].Views.Any())
             {
-                var m = new TimeLineChartViewModel();
-                m.SetObservable(tensionobs[$"tension{i + 1}"].Select(x=>(double)x));
-                regionManager.AddToRegion("TENSIONS", new TimeLineChart() { DataContext = m }); 
+                for (int i = 0; i < 8; i++)
+                {
+                    var m = new TimeLineChartViewModel();
+                    m.Title = $"张力器{i + 1}";
+                    regionManager.Regions["TENSIONS"].Add(new TimeLineChart() { DataContext = m });
+                    var node = $"tension{i + 1}";
+                    m.SetObservable(tensionobs[node].Select(x=>(double)x));
+                }
             }
-           //
+
+        }
+
+        public void OnLoaded(Dash view)
+        {
+            InitChart();
+            //   throw new NotImplementedException();
+        }
+
+        public void OnUnloaded(Dash view)
+        {
+            //   throw new NotImplementedException();
         }
     }
 }

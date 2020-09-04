@@ -16,6 +16,7 @@ namespace Mv.Modules.Schneider
 
         public SchneiderModule(IUnityContainer container, IRegionManager _regionManager) : base(container)
         {
+            
             regionManager = _regionManager;
         }
 

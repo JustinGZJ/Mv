@@ -13,7 +13,7 @@ namespace Mv.Modules.Schneider.ViewModels
     public class ScheiderConfig
     {
         public string ServerIP { get; set; } = "192.168.0.1";
-        public string Station { get; set; } = "STC030";
+        public string Station { get; set; } = "ST030";
 
     }
     public class SettingsViewModel : ViewModelValidateBase,IViewLoadedAndUnloadedAware<Settings>

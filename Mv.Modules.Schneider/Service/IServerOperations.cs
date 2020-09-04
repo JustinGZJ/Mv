@@ -28,9 +28,10 @@ namespace Mv.Modules.Schneider.Service
         private readonly IDataServer dataServer;
         private readonly IConfigureFile configure;
 
-        public string Station { get; set; } = "ST030";
+        public string Station  =>configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).Station;
 
-        public string Ip { get; set; } = "192.168.0.201";
+
+        public string Ip => configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).ServerIP;
         public int Port { get; set; } = 502;
         public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure)
         {
@@ -99,8 +100,9 @@ namespace Mv.Modules.Schneider.Service
                 localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
                 localdata.Quantity = dataServer["R_QTY"].Value.Int32;
                 localdata.Turns = dataServer["R_ROWS"].Value.Int32;
-                localdata.Velocity = dataServer["R_Speed"].Value.Int32;
+     
                 localdata.Program = dataServer["PROGRAM"].ToString();
+         
                 File.WriteAllTextAsync(Path.Combine(Folders.TENSIONS, $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json"), JsonConvert.SerializeObject(localdata));
                 File.WriteAllTextAsync(Path.Combine(Folders.TENSIONSBACKUP, $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json"), JsonConvert.SerializeObject(localdata));
             }
