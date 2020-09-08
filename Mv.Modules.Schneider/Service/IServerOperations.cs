@@ -28,10 +28,10 @@ namespace Mv.Modules.Schneider.Service
         private readonly IDataServer dataServer;
         private readonly IConfigureFile configure;
 
-        public string Station  =>configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).Station;
+        public string Station  =>(configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig))??new ScheiderConfig()).Station;
 
 
-        public string Ip => configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).ServerIP;
+        public string Ip => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerIP;
         public int Port { get; set; } = 502;
         public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure)
         {

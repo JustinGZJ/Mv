@@ -12,7 +12,7 @@ namespace Mv.Modules.Schneider.ViewModels
 {
     public class ScheiderConfig
     {
-        public string ServerIP { get; set; } = "192.168.0.1";
+        public string ServerIP { get; set; } = "192.168.0.101";
         public string Station { get; set; } = "ST030";
 
     }
@@ -36,6 +36,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 if (SetProperty(ref serverIP, value))
                 {
                     config.ServerIP = value;
+                    configureFile.SetValue(nameof(ScheiderConfig), config);
                 }
             }
         }
@@ -48,6 +49,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 if (SetProperty(ref station, value))
                 {
                     config.Station = value;
+                    configureFile.SetValue(nameof(ScheiderConfig), config);
                 }
             }
         }
