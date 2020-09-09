@@ -26,6 +26,12 @@
       <HintPath>LiveCharts.Geared.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <Reference Include="PropertyTools">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyTools.Wpf">
+      <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Update="C:\Users\Administrator.LAPTOP-7D6B2GK7\.nuget\packages\system.reactive\4.4.1\buildTransitive\netcoreapp3.0\..\..\build\netcoreapp3.0\System.Reactive.dll">

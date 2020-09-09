@@ -8,6 +8,7 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -220,7 +221,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         Values = m.Second.Values,
                         //HighValues = m.Second.Values.Where(z => z.Value > standard1 + offset1).OrderByDescending(z => z.Value),
                         //LowValues = m.Second.Values.Where(z => z.Value < standard1 - offset1).OrderBy(z => z.Value),
-                        Result = m.Second.Values.All(z => z.Value < (standard1 + offset1) && z.Value > (standard1 + offset1))
+                        Result = m.Second.Values.All(z => z.Value < (standard1 + offset1) && z.Value > (standard1 - offset1))
                     });
                     ps.ForEach(x =>
                     {
@@ -268,7 +269,7 @@ namespace Mv.Modules.Schneider.ViewModels
             .Where(v => v == 0).Subscribe(x =>
             {
                 var standard2 = dataServer["TS2_STANDARD"].Value.Int32 * 1d;
-                var offset2 = standard2 * dataServer["TS2_OFFSET"].Value.Int32 / 1000.0d;
+                var offset2 = standard2 * (dataServer["TS2_OFFSET"].Value.Int32 / 1000.0d);
                 int output = 0;
                 var groups = uploaddataCollection.UploadDatas.Select(x => x.Tensions.Last()).ToList();
                 var gpNames = string.Join(",", groups.Select(x => x.Name));
@@ -280,7 +281,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         Index = m.First,
                         Name = m.Second.Name,
                         Values = m.Second.Values,
-                        Result = m.Second.Values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 + offset2))
+                        Result = m.Second.Values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 - offset2))
                     });
                     ps.ForEach(x =>
                     {
@@ -329,11 +330,14 @@ namespace Mv.Modules.Schneider.ViewModels
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    var m = new TimeLineChartViewModel();
-                    m.Title = $"张力器{i + 1}";
-                    regionManager.Regions["TENSIONS"].Add(new TimeLineChart() { DataContext = m });
                     var node = $"tension{i + 1}";
-                    m.SetObservable(tensionobs[node].Select(x=>(double)x));
+                    if (tensionobs.ContainsKey(node))
+                    {
+                        var m = new TimeLineChartViewModel();
+                        m.Title = $"张力器{i + 1}";
+                        regionManager.Regions["TENSIONS"].Add(new TimeLineChart() { DataContext = m });
+                        m.SetObservable(tensionobs[node].Select(x => (double)x));
+                    }
                 }
             }
 
