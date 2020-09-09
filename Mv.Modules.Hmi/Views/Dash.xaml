@@ -13,7 +13,16 @@
              d:DataContext="{d:DesignInstance vm:DashViewModel }"
              prism:ViewModelLocator.AutoWireViewModel="True" >
     <UserControl.Resources>
-        <cvts:ResultToColorConverter x:Key="resultcvt"/>
+        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+ 
+                <ResourceDictionary>
+                    <cvts:ResultToColorConverter x:Key="resultcvt"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
        
@@ -42,14 +51,14 @@
                     <TextBlock >压力2</TextBlock>
                     <TextBox Grid.Column="1" IsReadOnly="True" Text="{Binding PresureValue2}"></TextBox>
                 </Grid>
-                <!--<Grid Margin="5">
+                <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="7*"/>
                         <ColumnDefinition Width="18*"/>
                         <ColumnDefinition Width="7*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock >位移1</TextBlock>
-                    <TextBox Grid.Column="1" IsReadOnly="True" ></TextBox>
+                    <TextBox Grid.Column="1" IsReadOnly="True"  Text="{Binding PositionValue1}"></TextBox>
                 </Grid>
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
@@ -58,8 +67,8 @@
                         <ColumnDefinition Width="7*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock >位移2</TextBlock>
-                    <TextBox Grid.Column="1" IsReadOnly="True" ></TextBox>
-                </Grid>-->
+                    <TextBox Grid.Column="1" IsReadOnly="True"  Text="{Binding PositionValue2}"></TextBox>
+                </Grid>
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="7*"/>
@@ -70,11 +79,12 @@
                     <TextBox Grid.Column="1" IsReadOnly="True" Text="{Binding ResistanceValue}"></TextBox>
                 </Grid>
                 <Grid>
-                    <!--<StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                         <Button Command="{Binding Getpresure1}">压力1</Button>
                         <Button Command="{Binding Getpresure2}">压力2</Button>
-                        <Button Command="{Binding GetResistance}">电阻 </Button>
-                    </StackPanel>-->
+                        <Button Command="{Binding GetResistance}">电阻</Button>
+                        <Button Command="{Binding GetPosition}">位置</Button>
+                    </StackPanel>
                 </Grid>
             </UniformGrid>
         </GroupBox>
@@ -82,12 +92,48 @@
             <DataGrid  ItemsSource="{Binding Datas1}" IsReadOnly="True" ctls:ListScrollToEnd.IsScrollToEnd="True" AutoGenerateColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="时间"  Binding="{Binding Time}"/>
-                    <DataGridTextColumn Header="结果" Foreground="{Binding Result,Converter={StaticResource resultcvt}}" Binding="{Binding Result}"/>
-                    <DataGridTextColumn Header="压力1" Foreground="{Binding Presure1Result,Converter={StaticResource resultcvt}}"  Binding="{ Binding Presure1 }"/>
-                    <DataGridTextColumn Header="压力2" Foreground="{Binding Presure2Result,Converter={StaticResource resultcvt}}"  Binding="{Binding Presure2}"/>
-                    <DataGridTextColumn Header="电阻" Foreground="{Binding  ResistanceResult,Converter={StaticResource resultcvt}}"  Binding="{Binding Resistance}"/>
-                    <DataGridTextColumn Header="位移1" Foreground="{Binding Position1Result,Converter={StaticResource resultcvt}}"  Binding="{Binding Position1}"/>
-                    <DataGridTextColumn Header="位移2" Foreground="{Binding Position2Result,Converter={StaticResource resultcvt}}" Binding="{Binding Position2}"/>
+                    <DataGridTextColumn Header="结果" Binding="{Binding Result}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground"  Value="{Binding Result,Converter={StaticResource resultcvt}}"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="压力1(N)"   Binding="{ Binding Presure1 }">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground"  Value="{Binding Presure1Result,Converter={StaticResource resultcvt}}"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="压力2(N)"   Binding="{Binding Presure2}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground"   Value="{Binding Presure2Result,Converter={StaticResource resultcvt}}"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="电阻"  Binding="{Binding Resistance}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground"   Value="{Binding  ResistanceResult,Converter={StaticResource resultcvt}}"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="位移1(mm)" Binding="{Binding Position1}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground" Value= "{Binding Position1Result,Converter={StaticResource resultcvt}}" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="位移2(mm)"  Binding="{Binding Position2}">
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="DataGridCell" BasedOn="{StaticResource  MaterialDesignDataGridCell}">
+                                <Setter Property="Foreground" Value= "{Binding Position2Result,Converter={StaticResource resultcvt}}" />
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="产品" Binding="{Binding Product}" />
                 </DataGrid.Columns>
             </DataGrid>

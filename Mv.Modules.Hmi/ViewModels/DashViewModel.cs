@@ -72,6 +72,7 @@ namespace Mv.Modules.Hmi.ViewModels
         IDevice presure1;
         IDevice presure2;
         IDevice resistance;
+        IDevice position;
         UserMessageEvent userMessageEvent;
 
         public DashViewModel(IUnityContainer container, IDataServer dataServer) : base(container)
@@ -79,11 +80,14 @@ namespace Mv.Modules.Hmi.ViewModels
             presure1 = container.Resolve<IDevice>("presure1");
             presure2 = container.Resolve<IDevice>("presure2");
             resistance = container.Resolve<IDevice>("resistance");
+            position = container.Resolve<IDevice>("position");
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
+         
+
             this.dataServer = dataServer;
             //PLC 心跳
             if (dataServer[GetTagName(TagNames.PC_READY)] != null)
-                Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x => (dataServer[GetTagName(TagNames.PC_READY)] as BoolTag).Write(x % 2 > 0));
+                Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(x => (dataServer[GetTagName(TagNames.PC_READY)] as BoolTag).Write(x % 2 > 0));
 
             //PC读取电阻值
             if (dataServer[GetTagName(TagNames.PLC_RES)] != null)
@@ -106,12 +110,14 @@ namespace Mv.Modules.Hmi.ViewModels
                             }
                             else
                             {
+                                dataServer[GetTagName(TagNames.PC_RESISTANCE)].Write((int)(999999));
                                 (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(true);
                             }
 
                         }
                         catch (Exception ex)
                         {
+                            dataServer[GetTagName(TagNames.PC_RESISTANCE)].Write((int)(999999));
                             (dataServer[GetTagName(TagNames.PC_RES_ER)] as BoolTag).Write(true);
                             userMessageEvent.Publish(new UserMessage() { Content = ex.Message, Level = Prism.Logging.Category.Exception, Source = "RESISTANCE" });
                         }
@@ -196,12 +202,58 @@ namespace Mv.Modules.Hmi.ViewModels
                     }
                 });
             if (dataServer[GetTagName(TagNames.PLC_POS)] != null)
-                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_POS)] as BoolTag, "ValueChanged").Subscribe(x =>
+                Observable.FromEventPattern<ValueChangedEventArgs>(dataServer[GetTagName(TagNames.PLC_POS)] as BoolTag, "ValueChanged").ObserveOnDispatcher().Subscribe(x =>
                 {
                     if (x.EventArgs.Value.Boolean == true)
                     {
                         userMessageEvent.Publish(new UserMessage() { Content = "开始读取位置信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
-                        Thread.Sleep(100);
+                        if (position.Read("M0\r\n", out var result, TimeSpan.FromMilliseconds(800)) == 0)
+                        {
+
+                            userMessageEvent.Publish(new UserMessage() { Content = result, Level = Prism.Logging.Category.Info, Source = "位置信息" });
+                            if (result.StartsWith("M0"))
+                            {
+                                if (result.Split(',').Length > 2)
+                                {
+                                    
+                                    var sps = result.Split(',').Skip(1).Take(2).ToList();
+                                    if (sps.Count == 2)
+                                    {
+
+                                        if (double.TryParse(sps[0], out var pos1))
+                                        {
+                                            PositionValue1 = pos1 / 100;
+                                            dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(pos1));
+                                        }
+                                        else
+                                        {
+                                            PositionValue2 = 999999;
+                                            dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(999999));
+                                            dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(999999));
+                                            dataServer[GetTagName(TagNames.PC_POS_ER)].Write(true);
+                                        }
+
+                                        if (double.TryParse(sps[1], out var pos2))
+                                        {
+                                            PositionValue2 = pos2 / 100;
+                                            dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(pos2));
+                                        }
+                                        else
+                                        {
+                                            PositionValue2 = 999999;
+                                            dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(999999));
+                                            dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(999999));
+                                            dataServer[GetTagName(TagNames.PC_POS_ER)].Write(true);
+                                        }
+                                        dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(PositionValue2 * 100));
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            userMessageEvent.Publish(new UserMessage() { Content = "没收到数据", Level = Prism.Logging.Category.Debug, Source = "POSITION" });
+                        }
                         userMessageEvent.Publish(new UserMessage() { Content = "读取位置结束", Level = Prism.Logging.Category.Debug, Source = "PLC" });
                         dataServer[GetTagName(TagNames.PC_POS)].Write(true);
                     }
@@ -243,15 +295,15 @@ namespace Mv.Modules.Hmi.ViewModels
                             ["时间"] = data.Time.ToString("yyyy-MM-dd HH:mm:ss"),
                             ["产品"] = data.Product,
                             ["判定"] = data.Result,
-                            ["压力1"] = data.Presure1,
+                            ["压力1(N)"] = data.Presure1,
                             ["压力1判定"] = data.Presure1Result ? "PASS" : "FAIL",
-                            ["压力2"] = data.Presure2,
+                            ["压力2(N)"] = data.Presure2,
                             ["压力2判定"] = data.Presure2Result ? "PASS" : "FAIL",
-                            ["位置1"] = data.Position1,
+                            ["位置1(mm)"] = data.Position1,
                             ["位置1判定"] = data.Position1Result ? "PASS" : "FAIL",
-                            ["位置2"] = data.Position2,
+                            ["位置2(mm)"] = data.Position2,
                             ["位置2判定"] = data.Position2Result ? "PASS" : "FAIL",
-                            ["电阻"] = data.Resistance,
+                            ["电阻(ohm)"] = data.Resistance,
                             ["电阻判定"] = data.ResistanceResult ? "PASS" : "FAIL"
                         };
                         Helper.SaveFile($"./生产信息/{DateTime.Today:yyyyMMdd}.csv", dic);
@@ -286,6 +338,21 @@ namespace Mv.Modules.Hmi.ViewModels
             get { return presureValue2; }
             set { SetProperty(ref presureValue2, value); }
         }
+
+        private double positionValue1 = -1;
+        public double PositionValue1
+        {
+            get { return positionValue1; }
+            set { SetProperty(ref positionValue1, value); }
+        }
+
+        private double positionValue2 = -1;
+        public double PositionValue2
+        {
+            get { return positionValue2; }
+            set { SetProperty(ref positionValue2, value); }
+        }
+
         private double resistanceValue = -1;
         public double ResistanceValue
         {
@@ -300,6 +367,58 @@ namespace Mv.Modules.Hmi.ViewModels
             {
                 Task.Run(getPresure1Impl);
             }));
+
+        private DelegateCommand getPostion;
+        public DelegateCommand GetPosition =>
+            getPostion ?? (getPostion = new DelegateCommand(ExecuteGetPosition));
+
+        void ExecuteGetPosition()
+        {
+            userMessageEvent.Publish(new UserMessage() { Content = "开始读取位置信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+            if (position.Read("M0\r\n", out var result, TimeSpan.FromMilliseconds(800)) == 0)
+            {
+
+                userMessageEvent.Publish(new UserMessage() { Content = result, Level = Prism.Logging.Category.Info, Source = "位置信息" });
+                if (result.StartsWith("M0"))
+                {
+                    if (result.Split(',').Length > 2)
+                    {
+
+                        var sps = result.Split(',').Skip(1).Take(2).ToList();
+                        if (sps.Count == 2)
+                        {
+
+                            if (double.TryParse(sps[0], out var pos1))
+                            {
+                                PositionValue1 = pos1 / 100;
+                                dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(pos1));
+                            }
+                            else
+                            {
+                                PositionValue2 = 999999;
+                                dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(999999));
+                                dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(999999));
+                                dataServer[GetTagName(TagNames.PC_POS_ER)].Write(true);
+                            }
+
+                            if (double.TryParse(sps[1], out var pos2))
+                            {
+                                PositionValue2 = pos2 / 100;
+                                dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(pos2));
+                            }
+                            else
+                            {
+                                PositionValue2 = 999999;
+                                dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(999999));
+                                dataServer[GetTagName(TagNames.PC_POS1)].Write((int)(999999));
+                                dataServer[GetTagName(TagNames.PC_POS_ER)].Write(true);
+                            }
+                            dataServer[GetTagName(TagNames.PC_POS2)].Write((int)(PositionValue2 * 100));
+                        }
+                    }
+                }
+            }
+        }
 
         private void getPresure1Impl()
         {
