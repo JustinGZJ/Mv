@@ -128,28 +128,36 @@ namespace Mv.Modules.P99.ViewModels
             this.runTimeService = runTimeService;
             Observable.Interval(TimeSpan.FromSeconds(0.5)).Subscribe(x =>
             {
-                var alarmItems = alarmService.GetAlarmItems();
-                Invoke(() =>
+                try
                 {
-                    AlarmItems.Clear();
-                    alarmItems.ForEach(x => AlarmItems.Add(new AlarmItemVm
+                    var alarmItems = alarmService.GetAlarmItems();
+                    Invoke(() =>
                     {
-                        Address = x.Address,
-                        Message = x.Message,
-                        StartTime = x.StartTime.ToString(),
-                        TimeStamp = (int)x.TimeSpan.TotalSeconds
-                    }));
-                    Downtime = runTimeService.Downtime;
-                    GlueCameraNg = runTimeService.GlueCameraNg;
-                    Idletime = runTimeService.Idletime;
-                    LoadCameraNg = runTimeService.LoadCameraNg;
-                    LoadCount = runTimeService.LoadCount;
-                    Looptime = runTimeService.Looptime;
-                    Runtime = runTimeService.Runtime;
-                    ScanCodeNg = runTimeService.ScanCodeNg;
-                    UnloadCount = runTimeService.UnloadCount;
-                    WorkTime = runTimeService.Worktime;
-                });
+                        AlarmItems.Clear();
+                        alarmItems.ForEach(x => AlarmItems.Add(new AlarmItemVm
+                        {
+                            Address = x.Address,
+                            Message = x.Message,
+                            StartTime = x.StartTime.ToString(),
+                            TimeStamp = (int)x.TimeSpan.TotalSeconds
+                        }));
+                        Downtime = runTimeService.Downtime;
+                        GlueCameraNg = runTimeService.GlueCameraNg;
+                        Idletime = runTimeService.Idletime;
+                        LoadCameraNg = runTimeService.LoadCameraNg;
+                        LoadCount = runTimeService.LoadCount;
+                        Looptime = runTimeService.Looptime;
+                        Runtime = runTimeService.Runtime;
+                        ScanCodeNg = runTimeService.ScanCodeNg;
+                        UnloadCount = runTimeService.UnloadCount;
+                        WorkTime = runTimeService.Worktime;
+                    });
+                }
+                catch (Exception)
+                {
+
+                    ;
+                }
 
             });
         }
