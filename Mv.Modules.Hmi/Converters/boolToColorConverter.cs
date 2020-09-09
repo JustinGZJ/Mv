@@ -15,9 +15,10 @@ namespace Mv.Modules.Hmi.Converters
             {
                 return b ? Brushes.LimeGreen : Brushes.Red;
             }
-            if(value is string s)
+            else
             {
-                if(s.ToUpper().Contains("PASS"))
+                var s = value.ToString();
+                if(s.ToUpper().Contains("PASS")||s.ToUpper().Contains("OK"))
                 {
                     return Brushes.LimeGreen;
                 }
@@ -26,7 +27,6 @@ namespace Mv.Modules.Hmi.Converters
                     return Brushes.Red;
                 }
             }
-            return Brushes.Black;
           //  throw new NotImplementedException();
         }
 

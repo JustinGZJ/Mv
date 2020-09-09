@@ -24,7 +24,8 @@ namespace Mv.Modules.Hmi
             containerRegistry.RegisterInstance<IDevice>(new TcpDevice("192.168.250.204", 4196), "presure1");
             containerRegistry.RegisterInstance<IDevice>(new TcpDevice("192.168.250.205", 4196), "presure2");
             containerRegistry.RegisterInstance<IDevice>(new TcpDevice("192.168.250.207", 4196), "resistance");
-         
+            containerRegistry.RegisterInstance<IDevice>(new TcpDevice("192.168.250.199", 64000), "position");
+
         }
     }
 }
