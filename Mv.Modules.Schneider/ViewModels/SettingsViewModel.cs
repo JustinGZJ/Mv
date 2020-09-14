@@ -18,6 +18,9 @@ namespace Mv.Modules.Schneider.ViewModels
         [Category("配置")]
         public string Station { get; set; } = "ST030";
 
+        [Category("配置")]
+        public bool ServerDisable { get; set; } 
+
     }
     public class SettingsViewModel : ViewModelValidateBase,IViewLoadedAndUnloadedAware<Settings>
     {

@@ -152,10 +152,8 @@ namespace Mv.Modules.Schneider.ViewModels
                              }
                              if (operations.CheckCode(result) == 0)
                              {
-
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.OK);
                                  PushMsg("OK!");
-
                              }
                              else
                              {

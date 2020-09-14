@@ -30,7 +30,7 @@ namespace Mv.Modules.Schneider.Service
 
         public string Station  =>(configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig))??new ScheiderConfig()).Station;
 
-
+        bool serverDisable => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerDisable;
         public string Ip => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerIP;
         public int Port { get; set; } = 502;
         public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure)
@@ -82,7 +82,12 @@ namespace Mv.Modules.Schneider.Service
 
         public int CheckCode(string refId)
         {
-
+            if (serverDisable)
+            {
+                OnMessage("服务器验证已关闭");
+                return 0;
+            }
+             
             return Read($"{Station}SC${refId}\n", (s) =>
             {
                 if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
@@ -94,6 +99,11 @@ namespace Mv.Modules.Schneider.Service
 
         public int Upload(UploadDataCollection uploaddataCollection)
         {
+            if (serverDisable)
+            {
+                OnMessage("服务器验证已关闭");
+                return 0;
+            }         
             foreach (var localdata in uploaddataCollection.UploadDatas)
             {
                 localdata.Status = dataServer["R_STATUS"].Value.Int32;
