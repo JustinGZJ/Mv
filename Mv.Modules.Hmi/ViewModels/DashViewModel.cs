@@ -67,6 +67,7 @@ namespace Mv.Modules.Hmi.ViewModels
         public bool Position2Result { get; set; } = true;
         public string Result { get; set; }
     }
+
     public class DashViewModel : ViewModelBase
     {
         IDevice presure1;
@@ -74,6 +75,7 @@ namespace Mv.Modules.Hmi.ViewModels
         IDevice resistance;
         IDevice position;
         UserMessageEvent userMessageEvent;
+        byte[] cmd = new byte[] { 0x01, 0x03, 0x01, 0x23, 0x00, 0x02, 0x34, 0x3d };
 
         public DashViewModel(IUnityContainer container, IDataServer dataServer) : base(container)
         {
@@ -140,9 +142,12 @@ namespace Mv.Modules.Hmi.ViewModels
                     if (x.EventArgs.Value.Boolean == true)
                     {
                         userMessageEvent.Publish(new UserMessage() { Content = "开始读取压力信号", Level = Prism.Logging.Category.Debug, Source = "PLC" });
+                  
                         try
                         {
-                            if (presure1.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result, TimeSpan.FromMilliseconds(500)) >= 7)
+                          
+                           
+                            if (presure1.Read( cmd, out byte[] result, TimeSpan.FromMilliseconds(500)) >= 7)
                             {
                                 userMessageEvent.Publish(new UserMessage()
                                 {
@@ -154,9 +159,9 @@ namespace Mv.Modules.Hmi.ViewModels
                                 });
                                 if (result != null)
                                 {
-                                    PresureValue1 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3)); ;
+                                    PresureValue1 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result, 3))*1.0/100d; ;
                                 }
-                                dataServer[GetTagName(TagNames.PC_PRESURE1)].Write(PresureValue1);
+                                dataServer[GetTagName(TagNames.PC_PRESURE1)].Write((int)(PresureValue1*100));
                                 dataServer[GetTagName(TagNames.PC_PR_ER)].Write(false);
                             }
                             else
@@ -164,7 +169,7 @@ namespace Mv.Modules.Hmi.ViewModels
                                 dataServer[GetTagName(TagNames.PC_PR_ER)].Write(true);
                             }
 
-                            if (presure2.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result2, TimeSpan.FromMilliseconds(500)) >= 7)
+                            if (presure2.Read(cmd, out byte[] result2, TimeSpan.FromMilliseconds(500)) >= 7)
                             {
                                 userMessageEvent.Publish(new UserMessage()
                                 {
@@ -176,9 +181,9 @@ namespace Mv.Modules.Hmi.ViewModels
                                 });
                                 if (result != null)
                                 {
-                                    PresureValue2 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result2, 3)); ;
+                                    PresureValue2 = IPAddress.HostToNetworkOrder(BitConverter.ToInt32(result2, 3))*1.0/100d; ;
                                 }
-                                dataServer[GetTagName(TagNames.PC_PRESURE2)].Write(PresureValue2);
+                                dataServer[GetTagName(TagNames.PC_PRESURE2)].Write((int)(PresureValue2*100));
                             }
                             else
                             {
@@ -271,11 +276,11 @@ namespace Mv.Modules.Hmi.ViewModels
                     {
                         userMessageEvent.Publish(new UserMessage() { Content = "开始保存数据", Level = Prism.Logging.Category.Debug, Source = "PLC" });
                         var data = new DataModel();
-                        data.Position1 = dataServer[GetTagName(TagNames.UL_POS1)].ToString();
-                        data.Position2 = dataServer[GetTagName(TagNames.UL_POS2)].ToString();
-                        data.Presure1 = dataServer[GetTagName(TagNames.UL_PRESURE1)].ToString();
-                        data.Presure2 = dataServer[GetTagName(TagNames.UL_PRESURE2)].ToString();
-                        data.Resistance = dataServer[GetTagName(TagNames.UL_RES)].ToString();
+                        data.Position1 =(double.Parse(dataServer[GetTagName(TagNames.UL_POS1)].ToString())/100).ToString();
+                        data.Position2 = (double.Parse(dataServer[GetTagName(TagNames.UL_POS2)].ToString()) / 100).ToString();
+                        data.Presure1 =(double.Parse(dataServer[GetTagName(TagNames.UL_PRESURE1)].ToString())/100).ToString();
+                        data.Presure2 =(double.Parse(dataServer[GetTagName(TagNames.UL_PRESURE2)].ToString())/100).ToString();
+                        data.Resistance =(double.Parse(dataServer[GetTagName(TagNames.UL_RES)].ToString())/1000).ToString();
                         data.Presure1Result = dataServer[GetTagName(TagNames.R_PRESURE1)].Value.Int16 == 0;
                         data.Presure2Result = dataServer[GetTagName(TagNames.R_PRESURE2)].Value.Int16 == 0;
                         data.Position1Result = dataServer[GetTagName(TagNames.R_POS1)].Value.Int16 == 0;
@@ -326,14 +331,14 @@ namespace Mv.Modules.Hmi.ViewModels
             return Enum.GetName(typeof(TagNames), tagenum);
         }
 
-        private int presureValue1 = -1;
-        public int PresureValue1
+        private double presureValue1 = -1;
+        public double PresureValue1
         {
             get { return presureValue1; }
             set { SetProperty(ref presureValue1, value); }
         }
-        private int presureValue2 = -1;
-        public int PresureValue2
+        private double presureValue2 = -1;
+        public double PresureValue2
         {
             get { return presureValue2; }
             set { SetProperty(ref presureValue2, value); }
@@ -424,7 +429,7 @@ namespace Mv.Modules.Hmi.ViewModels
         {
             try
             {
-                if (presure1.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result, TimeSpan.FromMilliseconds(100)) >= 7)
+                if (presure1.Read(cmd, out byte[] result, TimeSpan.FromMilliseconds(100)) >= 7)
                 {
                     userMessageEvent.Publish(new UserMessage()
                     {
@@ -457,7 +462,7 @@ namespace Mv.Modules.Hmi.ViewModels
         {
             try
             {
-                if (presure2.Read(new byte[] { 0x01, 0x03, 0x00, 0x50, 0x00, 0x02, 0xC4, 0x1A }, out byte[] result, TimeSpan.FromMilliseconds(100)) >= 7)
+                if (presure2.Read(cmd, out byte[] result, TimeSpan.FromMilliseconds(100)) >= 7)
                 {
                     userMessageEvent.Publish(new UserMessage()
                     {
