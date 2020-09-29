@@ -31,7 +31,7 @@ namespace Mv.Modules.RD402
             containerRegistry.RegisterSingleton<IInkPrinter, InkPrinter>();
             containerRegistry.Register<IDeviceReadWriter, DeviceReadWriter>();
             _regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Rd402Component));
-            _regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(Rd402Setting));
+         
         }
 
         public Rd402Module(IUnityContainer container, IRegionManager regionManager) : base(container)

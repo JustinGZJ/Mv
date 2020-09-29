@@ -1,4 +1,5 @@
 ﻿using Mv.Modules.RD402.Service;
+using System.Collections.Generic;
 
 namespace Mv.Modules.RD402.ViewModels
 {
@@ -8,5 +9,6 @@ namespace Mv.Modules.RD402.ViewModels
         string GetSpindle(int value);
         bool UploadFile(bool result, string Spindle, string MatrixCode);
         (bool, string) GetSn();
+        (bool, string) CheckStation(IEnumerable<string> Sns);
     }
 }

@@ -2,6 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Security.Policy;
+using System.Text;
+using System.Web;
 using Mv.Core.Interfaces;
 using Mv.Modules.RD402.Service;
 using Unity;
@@ -62,6 +66,58 @@ namespace Mv.Modules.RD402.ViewModels
             hashtable["lineNumber"] = _config.LineNumber;
             hashtable["moName"] = _config.Mo;
             return snGetter.getsn(hashtable);
+        }
+
+        public (bool,string) CheckStation(IEnumerable<string> Sns)
+        {
+            Hashtable hashtable = new Hashtable();
+            hashtable["sn"] = string.Join(";", Sns)+";";
+            hashtable["p"] = "CheckFerriteLink";
+            hashtable["c"] = "QUERY_HISTORY";
+            try
+            {
+                if (hashtable == null)
+                    throw new ArgumentNullException($"{nameof(CheckStation)}:hashtable cannot be  null");
+                string postData = ParsToString(hashtable);
+                string ret = Post("http://10.33.24.21/bobcat/sfc_response.aspx", postData);
+                return (true, ret);
+            }
+            catch (Exception e)
+            {
+                return (false, e.Message);
+            }
+            return (false, "");
+        }
+        public static string Post(string url, string postData)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+
+            var data = Encoding.ASCII.GetBytes(postData);
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = data.Length;
+            request.Timeout = 2000;
+
+            using (var stream = request.GetRequestStream())
+            {
+                stream.Write(data, 0, data.Length);
+            }
+            var response = (HttpWebResponse)request.GetResponse();
+            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            return responseString;
+        }
+        private static string ParsToString(Hashtable Pars)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string k in Pars.Keys)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append("&");
+                }
+                sb.Append(HttpUtility.UrlEncode(k) + "=" + HttpUtility.UrlEncode(Pars[k].ToString()));
+            }
+            return sb.ToString();
         }
     }
 }

@@ -11,8 +11,7 @@ using Mv.Shell.Views.Authentication;
 using Mv.Core.Interfaces;
 using Serilog;
 using System.IO;
-
-using Mv.Modules.P92A;
+using Mv.Modules.RD402;
 
 namespace Mv.Shell
 {
@@ -51,14 +50,15 @@ namespace Mv.Shell
 
         protected override IModuleCatalog CreateModuleCatalog()
         {
-            return new DirectoryModuleCatalog() { ModulePath = "./Modules" };
-            //return base.CreateModuleCatalog();
+         //   return new DirectoryModuleCatalog() { ModulePath = "./Modules" };
+            return base.CreateModuleCatalog();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
-          //  moduleCatalog.AddModule<>
-            moduleCatalog.AddModule<P92AModule>();
+            //  moduleCatalog.AddModule<>
+            //   moduleCatalog.AddModule<P92AModule>();
+            moduleCatalog.AddModule<Rd402Module>();
             base.ConfigureModuleCatalog(moduleCatalog);
         //    moduleCatalog.AddModule(new ModuleInfo(typeof(Rd402Module)));
         }
@@ -67,6 +67,7 @@ namespace Mv.Shell
         {
             base.Initialize();
             Settings.Default.PropertyChanged += (sender, eventArgs) => Settings.Default.Save();
+            ConfigureApplicationEventHandlers();
         }
         
         private void ConfigureApplicationEventHandlers()

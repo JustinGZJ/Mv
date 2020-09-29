@@ -20,6 +20,7 @@ using ZXing;
 using ZXing.Common;
 using ZXing.Presentation;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Mv.Modules.RD402.ViewModels
 {
@@ -75,6 +76,8 @@ namespace Mv.Modules.RD402.ViewModels
         private readonly Dispatcher dispatcher = Dispatcher.CurrentDispatcher;
         private string station;
 
+        public ObservableCollection<string> PLCCodes { get;  } = new ObservableCollection<string>(Enumerable.Repeat("",4));
+
         public Rd402ComponentViewModel(IUnityContainer container, IDeviceReadWriter device, IInkPrinter inkPrinter, IConfigureFile configure
         ) : base(container)
         {
@@ -99,6 +102,7 @@ namespace Mv.Modules.RD402.ViewModels
                                 for (var i = 0; i < 16; i++) Outs[i] = device.GetSetBit(0, i);
                                 IsConnected = device.IsConnected;
                                 Spindle = factoryInfo.GetSpindle(device.GetWord(1));
+                                ReadCodes();
                             });
 
                         Thread.Sleep(100);
@@ -113,75 +117,35 @@ namespace Mv.Modules.RD402.ViewModels
                     {
                         if (_device.GetBit(0, 0))
                         {
-                            AddMsg("获取二维码...");
+                            AddMsg("check station...");
                             var tick = Environment.TickCount;
-                            var result = await GetMatrixCode().ConfigureAwait(false);
+                            var result = await CheckStation().ConfigureAwait(false);
                             AddMsg($"耗时:{Environment.TickCount - tick} ms");
-                            if (!result)
+                            if (!result.Item1)
                             {
                                 AddMsg("Fail");
-                                _device.SetBit(0, 2, false);
                             }
                             else
                             {
-                                AddMsg("Success");
-                                AddMsg($"开始写入二维码: {MatrixCode}");
-                                tick = Environment.TickCount;
-                                if (!await WritePrinterCode().ConfigureAwait(false))
-                                {
-                                    AddMsg("Fail");
-                                    _device.SetBit(0, 2, false);
-                                }
-                                else
-                                {
-                                    _device.SetString(11, MatrixCode);
-                                    AddMsg("Success");
-                                    _device.SetBit(0, 2, true);
-                                }
-                                AddMsg($"耗时 {Environment.TickCount - tick} ms");
-                                AddMsg("二维码设置完成...");
-                                _device.SetBit(0, 0, true);
+                                AddMsg("Success");              
                             }
+                            var results = result.Item2.ToArray();
+                            for (int i = 0; i < 4; i++)
+                            {
+                                _device.SetBit(0, 8 + i, results[i]);
+                            }
+                            AddMsg($"耗时 {Environment.TickCount - tick} ms");
+                            _device.SetBit(0, 0, true);
+                            AddMsg("station check done!");
                             SpinWait.SpinUntil(() => !_device.GetBit(0, 0), 2000);
                             _device.SetBit(0, 0, false);
-                            _device.SetBit(0, 2, false);
-                        }
-                        if (_device.GetBit(0, 1))
-                        {
-                            AddMsg($"start set bar code {Barcode}...");
-
-                            barcode = factoryInfo.GetBarcode(MatrixCode);
-                            _device.SetString(23, barcode);
-                            if (await inkPrinter.WritePrinterTextAsync(barcode).ConfigureAwait(false))
+                            for (int i = 0; i < 4; i++)
                             {
-                                _device.SetBit(0, 3, true);
-                                AddMsg("Success!");
+                                _device.SetBit(0, 8 + i,false);
                             }
-                            else
-                            {
-                                _device.SetBit(0, 3, false);
-                                AddMsg("Fail!");
-                            }
-                            AddMsg("条码设置完毕...");
-                            _device.SetBit(0, 1, true);
-                            SpinWait.SpinUntil(() => !_device.GetBit(0, 1), 2000);
-                            _device.SetBit(0, 1, false);
-                            _device.SetBit(0, 3, false);
-
-                        }
-                        if (_device.GetBit(0, 4))
-                        {
-                            AddMsg("开始保存文件...");
-                            var result = factoryInfo.UploadFile(_device.GetBit(0, 5), factoryInfo.GetSpindle(_device.GetWord(1)), MatrixCode);
-                            _device.SetBit(0, 5, result);
-                            AddMsg("文件保存完毕");
-                            _device.SetBit(0, 4, true);
-                            SpinWait.SpinUntil(() => !_device.GetBit(0, 4), 2000);
-                            _device.SetBit(0, 4, false);
-                            _device.SetBit(0, 5, false);
                         }
                         if (tick >= 15) tick = 0;
-                        _device.SetShort(10, tick++);
+                        _device.SetShort(49, tick++);
                         Thread.Sleep(1);
                         //    AddMsg(tick.ToString());
                     }
@@ -381,20 +345,43 @@ namespace Mv.Modules.RD402.ViewModels
 
         private async void ExecuteGet2DodeCommand()
         {
-            var result = await GetMatrixCode();
+            var result = await CheckStation().ConfigureAwait(true);
+        }
+
+        private void ReadCodes()
+        {
+            var code1 = _device.GetString(10, 10).Trim('\0').Trim();
+            var code2 = _device.GetString(15, 10).Trim('\0').Trim();
+            var code3 = _device.GetString(20, 10).Trim('\0').Trim();
+            var code4 = _device.GetString(25, 10).Trim('\0').Trim();
+            PLCCodes.Clear();
+            PLCCodes.AddRange(new string[] { code1, code2, code3, code4 });
         }
 
 
-
-
-        private async Task<bool> GetMatrixCode()
+        private async Task<(bool,IEnumerable<bool>)> CheckStation()
         {
-            var result = await Task.Run(factoryInfo.GetSn).ConfigureAwait(false);
-            AddMsg($"{MvUser.Username}:获取二维码{result.Item2}.");
-            if (!result.Item1) return false;
-            dispatcher.Invoke(() => { MatrixCode = result.Item2; });
-            AddMsg($"{MvUser.Username}:二维码:{MatrixCode}.");
-            return true;
+            bool[] results = new bool[4];
+            var code1= _device.GetString(10, 10).Trim('\0').Trim();
+            var code2 = _device.GetString(15,10).Trim('\0').Trim();
+            var code3 = _device.GetString(20, 10).Trim('\0').Trim();
+            var code4 = _device.GetString(25, 10).Trim('\0').Trim();
+            var result = await Task.Run(()=>factoryInfo.CheckStation(new string[] { code1, code2, code3, code4 })).ConfigureAwait(false);
+            AddMsg($"{MvUser.Username}:station check {result.Item2}.");
+            if ((!result.Item1)&&(!result.Item2.Contains("SFC_OK",StringComparison.CurrentCulture))) return (false,results);
+            var partern = @"::\w{4}::(\w{4});(\w{4});(\w{4});(\w{4})";
+            Regex regex = new Regex(partern, RegexOptions.IgnoreCase);
+           var match =regex.Match(result.Item2);
+        
+            if(match.Success)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    results[i]=match.Groups[1 + i].Value.Contains("PASS",StringComparison.CurrentCulture);
+                }
+            }
+            
+            return (true,results);
         }
 
         #endregion

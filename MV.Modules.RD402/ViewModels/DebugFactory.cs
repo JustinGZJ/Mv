@@ -83,5 +83,10 @@ namespace Mv.Modules.RD402.ViewModels
             else
                 return "";
         }
+
+        public (bool, string) CheckStation(IEnumerable<string> Sns)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

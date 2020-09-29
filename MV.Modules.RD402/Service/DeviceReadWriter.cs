@@ -239,7 +239,15 @@ namespace Mv.Modules.RD402.Service
         /// <returns></returns>
         public string GetString(int index, int len)
         {
-            return Encoding.ASCII.GetString(_rbs, index, len);
+            var buf = new byte[len+len%2];
+            Buffer.BlockCopy(_rbs, index * 2, buf, 0, buf.Length);
+            for (int i = 0; i < buf.Length/2; i++)
+            {
+                byte temp = buf[i * 2];
+                buf[i * 2] = buf[i * 2 + 1];
+                buf[i * 2 + 1] = temp;
+            }
+            return Encoding.ASCII.GetString(buf, 0, len);
         }
 
         public bool GetSetBit(int index, int bit)
