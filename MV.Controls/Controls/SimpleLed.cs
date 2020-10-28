@@ -11,7 +11,6 @@ namespace Mv.Controls.Controls
 
     public class SimpleLed:Control
     {
-
         public bool State { get => (bool)GetValue(StateProperty); set => SetValue(StateProperty, value); }
         public SolidColorBrush OffColor { get=>(SolidColorBrush)GetValue(OffColorProperty); set=>SetValue(OffColorProperty,value); }
         public SolidColorBrush OnColor { get=>(SolidColorBrush)GetValue(OnColorProperty); set=>SetValue(OnColorProperty,value); }

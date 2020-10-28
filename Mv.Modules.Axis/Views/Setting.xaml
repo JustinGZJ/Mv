@@ -10,9 +10,32 @@
             Header="Axis"
             xmlns:ptgrid="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
+    <TabItem.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="..\uiresources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </TabItem.Resources>
     <Grid>
-        <ptgrid:PropertyGrid SelectedObject="{Binding SelectedObject}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <ListBox ItemsSource="{Binding Collection}" DisplayMemberPath="Key" SelectedItem="{Binding SelectedObject}">
             
-        </ptgrid:PropertyGrid>
+        </ListBox>
+        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Visible" >
+
+            <ptgrid:PropertyGrid 
+                CategoryControlTemplate="{StaticResource CategoryControlTemplate1}"
+                CategoryHeaderTemplate="{StaticResource HeaderTemplate1}"
+                TabHeaderTemplate="{StaticResource HeaderTemplate2}"
+                 CategoryControlType="Expander"     
+                TabPageHeaderTemplate="{StaticResource PageHeaderTemplate1}"
+                SelectedObject="{Binding SelectedObject.Value}" Margin="8" >
+            </ptgrid:PropertyGrid>
+        </ScrollViewer>
     </Grid>
+
 </TabItem>

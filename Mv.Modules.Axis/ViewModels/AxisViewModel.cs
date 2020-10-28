@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
-using Mv.Modules.Axis.Models;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Linq;

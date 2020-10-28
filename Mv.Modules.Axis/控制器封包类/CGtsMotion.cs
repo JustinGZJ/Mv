@@ -23,7 +23,7 @@ namespace MotionWrapper
         private readonly IConfigManager<MotionConfig> configManager;
         public bool initOk = false;
 
-        private System.Threading.Thread runThread = null;       //用来刷新IO的
+        private Thread runThread = null;       //用来刷新IO的
         //私有变量
         private short cardNum = 0;
         //局部变量
@@ -39,14 +39,14 @@ namespace MotionWrapper
         //局部变量
         bool IIoPart1.getDi(IoRef input)
         {
-            mc.GT_GetDi(cardNum, (short)input.prm.ioType, out var v);
+            mc.GT_GetDi(cardNum, (short)input.prm.IoType, out var v);
             return v > 0;
           //  return false;
         }
 
         bool IIoPart1.getDo(IoRef output)
         {
-            mc.GT_GetDi(cardNum, (short)output.prm.ioType, out var v);
+            mc.GT_GetDi(cardNum, (short)output.prm.IoType, out var v);
             return v > 0;
         }
 
@@ -204,7 +204,7 @@ namespace MotionWrapper
 
         void IIoPart1.setDO(IoRef output, bool value)
         {
-            mc.GT_SetDoBit(cardNum, (short)output.prm.ioType, output.prm.index, (short)(value ? 1 : 0));
+            mc.GT_SetDoBit(cardNum, (short)output.prm.IoType, output.prm.Index, (short)(value ? 1 : 0));
         }
         private void subStatusData()
         {

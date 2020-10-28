@@ -1,4 +1,7 @@
-﻿namespace MotionWrapper
+﻿
+using PropertyTools.DataAnnotations;
+
+namespace MotionWrapper
 {
     /// <summary>
     /// 轴的参数 
@@ -14,7 +17,6 @@
         private short cardNum = 0;//固高控制卡使用 gtn的core1-2 高川0-x
         private short axisNum = 0; //固高控制卡使用 GSN从1-X 高川0-x
         private short active = 0;//激活
-        private short map_rel_io = -1;//映射的实际物理地址
         private EAxisType type = EAxisType.Line;//0=直线 1= 旋转 3=纯编码器 4=纯虚拟轴
         private float maxAcc = 4900.0f;
         private float maxDec = 4900.0f;
@@ -22,10 +24,7 @@
         private float maxVel = 500.0f;                             //最大速度 500ms/s du/s
 
         private float resolution = 10000;                              //分辨率plus
-        private short motorCircle = 1;                                  //电机转一圈
-        private short mechanicalCircle = 1;                             //减速机转几圈
         private float pitch = 5;                                     //节距mm/du
-        private short direct = 1;                                 //正方向
         private short enableSoftlmt = 0;
         private short enableAlm = 1;
         private short enableLmtP = 1;
@@ -36,8 +35,6 @@
         private short followeTime = 10;
         private float arriveDelay = 10;//ms
         private float softlmtn = 0;                       //正负软限位使能 0表示无效 !=0 并且上面限位有效的时候 才有效
-        private short enableArriveType = 0;
-        private short arriveType = 0;
 
         public short reverseHome = 0;
         public short reverseLmtp = 0;
@@ -53,36 +50,50 @@
 
         public float smoothTime = 10;
         private float softlmtp;
-
+        [DisplayName("名称")]
         public string Name { get => name; set => name = value; }
+        [DisplayName("描述")]
         public string Note { get => note; set => note = value; }
+        [DisplayName("板卡号")]
         public short CardNum { get => cardNum; set => cardNum = value; }
+        [DisplayName("轴号")]
         public short AxisNum { get => axisNum; set => axisNum = value; }
+        [DisplayName("活动")]
         public short Active { get => active; set => active = value; }
-        public short Map_rel_io { get => map_rel_io; set => map_rel_io = value; }
+       [DisplayName("类型")]
         public EAxisType Type { get => type; set => type = value; }
+        [DisplayName("最大加速度")]
         public float MaxAcc { get => maxAcc; set => maxAcc = value; }
+        [DisplayName("最大减速度")]
         public float MaxDec { get => maxDec; set => maxDec = value; }
         public float Jerk { get => jerk; set => jerk = value; }
+        [DisplayName("最大速度")]
         public float MaxVel { get => maxVel; set => maxVel = value; }
+        [DisplayName("解析度")]
         public float Resolution { get => resolution; set => resolution = value; }
-        public short MotorCircle { get => motorCircle; set => motorCircle = value; }
-        public short MechanicalCircle { get => mechanicalCircle; set => mechanicalCircle = value; }
+        [DisplayName("节距")]
         public float Pitch { get => pitch; set => pitch = value; }
-        public short Direct { get => direct; set => direct = value; }
+
+        [DisplayName("软限位使能")]
         public short EnableSoftlmt { get => enableSoftlmt; set => enableSoftlmt = value; }
+        [DisplayName("报警使能")]
         public short EnableAlm { get => enableAlm; set => enableAlm = value; }
+        [DisplayName("正限位使能")]
         public short EnableLmtP { get => enableLmtP; set => enableLmtP = value; }
+        [DisplayName("负限位使能")]
         public short EnableLmtN { get => enableLmtN; set => enableLmtN = value; }
+        [DisplayName("启用跟随误差检测")]
         public short EnableFollowErr { get => enableFollowErr; set => enableFollowErr = value; }
+        [DisplayName("跟随误差值")]
         public float FollowErrPos { get => followErrPos; set => followErrPos = value; }
-        public float ArrivePand { get => arrivePand; set => arrivePand = value; }
+        [DisplayName("跟随时间")]
         public short FolloweTime { get => followeTime; set => followeTime = value; }
         public float ArriveDelay { get => arriveDelay; set => arriveDelay = value; }
+        [DisplayName("正软限位")]
+
         public float Softlmtp { get => softlmtp; set => softlmtp = value; }
+        [DisplayName("负软限位")]
         public float Softlmtn { get => softlmtn; set => softlmtn = value; }
-        public short EnableArriveType { get => enableArriveType; set => enableArriveType = value; }
-        public short ArriveType { get => arriveType; set => arriveType = value; }
 
         //急停中的急停方式减速度
         /// <summary>

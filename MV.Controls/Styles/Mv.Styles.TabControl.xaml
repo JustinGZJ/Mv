@@ -201,7 +201,7 @@
         </DoubleAnimation>
     </Storyboard>
 
-    <Style TargetType="{x:Type TabControl}">
+    <Style TargetType="{x:Type TabControl}" x:Key="SettingTabControlStyle" >
         <Setter Property="controls:TabControlHelper.LeftToRightAnimation" Value="{StaticResource LeftToRightMovedStoryboard}"/>
         <Setter Property="controls:TabControlHelper.RightToLeftAnimation" Value="{StaticResource RightToLeftMovedStoryboard}"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

@@ -181,16 +181,7 @@
             </Grid>
         </Grid>
         <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
-            <Border Margin="10" BorderThickness="1" CornerRadius="5">
-                <DataGrid ItemsSource="{Binding AxisStatuses}">
-                    <DataGrid.Columns>
-                        <!--<DataGridTextColumn Header="轴号"/>
-                        <DataGridTextColumn Header="轴名称"/>
-                        <DataGridTextColumn Header="命令值(脉冲)"/>
-                        <DataGridTextColumn Header="实际值(脉冲)"/>-->
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Border>
+
         </Grid>
     </Grid>
 </UserControl>
