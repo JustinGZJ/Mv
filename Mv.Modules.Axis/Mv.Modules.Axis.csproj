@@ -5,12 +5,24 @@
     <AssemblyName>Mv.Modules.Axis</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="控制器封包类\CGaoChuanMotion.cs" />
+    <Compile Remove="控制器封包类\CGsnMotion.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
     <ProjectReference Include="..\MV.Core\MV.Core.csproj" />
     <ProjectReference Include="..\MV.UI\MV.UI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PropertyTools">
+      <HintPath>PropertyTools.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyTools.Wpf">
+      <HintPath>PropertyTools.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -27,18 +39,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="gts.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Gts\gts.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Gts\LAFunc.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Gts\PIFunc.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Gts\VFunc.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

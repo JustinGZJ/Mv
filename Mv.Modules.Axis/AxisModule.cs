@@ -1,5 +1,8 @@
-﻿using Mv.Modules.Axis.Service;
+﻿
+using MotionWrapper;
+using Mv.Core;
 using Mv.Modules.Axis.Views;
+using Mv.Ui.Core;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
@@ -16,14 +19,14 @@ namespace Mv.Modules.Axis
         }
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var card=containerProvider.Resolve<ICard>();
-            card.Init();
+          
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<ICard, CardGoogol>();
             regionManager.RegisterViewWithRegion("APPS", typeof(MainTab));
+            regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Setting));
+            containerRegistry.RegisterSingleton<IConfigManager<MotionConfig>, Core.ConfigManager<MotionConfig>>();
         }
     }
 }

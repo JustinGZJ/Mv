@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Mv.Modules.Axis.Models;
-using Mv.Modules.Axis.Service;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Linq;
@@ -13,15 +12,14 @@ namespace Mv.Modules.Axis.ViewModels
 {
     public class AxisViewModel : BindableBase
     {
-        private readonly ICard card;
+
 
         #region Properties
         /// <summary>
         /// 轴状态
         /// </summary>
-        public ObservableCollection<AxisStatus> AxisStatuses { get; } = new ObservableCollection<AxisStatus>();
+   ///     public ObservableCollection<AxisStatus> AxisStatuses { get; } = new ObservableCollection<AxisStatus>();
 
-        public ObservableCollection<SevoPoint> SevoPoints => new ObservableCollection<SevoPoint>();
 
         /// <summary>
         /// 伺服速度
@@ -166,14 +164,14 @@ namespace Mv.Modules.Axis.ViewModels
             {
                 Task.Run(() =>
                 {
-                    card.MoveRelative(axisName, (int)jogDistance , (short)JogSpeed);
+       //             card.MoveRelative(axisName, (int)jogDistance , (short)JogSpeed);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-                    card.Jog(axisName, (int)JogSpeed);
+    //                card.Jog(axisName, (int)JogSpeed);
                 });
             }
 
@@ -194,14 +192,14 @@ namespace Mv.Modules.Axis.ViewModels
             {
                 Task.Run(() =>
                 {
-                    card.MoveRelative(axisName, (int)jogDistance * -1, (short)JogSpeed);
+       //             card.MoveRelative(axisName, (int)jogDistance * -1, (short)JogSpeed);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-                    card.Jog(axisName, -(int)JogSpeed);
+      //              card.Jog(axisName, -(int)JogSpeed);
                 });
             }
 
@@ -217,7 +215,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteStopMove()
         {
-            card.Stop(AxisName, true);
+   //         card.Stop(AxisName, true);
         }
         #endregion
         #region 设置命令
@@ -238,7 +236,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteHome()
         {
-            card.Home(AxisName, 10000, 1000, 1000, HomeDir.N负方向, 1000, 1000);
+       //     card.Home(AxisName, 10000, 1000, 1000, HomeDir.N负方向, 1000, 1000);
         }
         #endregion
 
@@ -293,7 +291,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteGoTargetPos()
         {
-            card.MoveAbs(AxisName, 10000, 1000);
+         //   card.MoveAbs(AxisName, 10000, 1000);
         }
         #endregion
 
@@ -301,37 +299,12 @@ namespace Mv.Modules.Axis.ViewModels
 
         void UpdateStatus()
         {
-            if (AxisName == null)
-                AxisName = "AXIS1";
-             var status = card.GetStatus(AxisName);
-            SevoON = (status & gts.STATUS.GTS800_SERVO) > 0;
-            PositiveLimit = (status & gts.STATUS.GTS800_LIMIT_P) > 0;
-            NegativeLimit = (status & gts.STATUS.GTS800_LIMIT_N) > 0;
-            StopSignal = (status & gts.STATUS.GTS800_BUSY) > 0;
-            var position =card.GetCurPosition(AxisName);
-            var encoder =card.GetCurEncoder(AxisName);
-           var axisStatus= AxisStatuses.FirstOrDefault(x => x.AxisName == AxisName);
-            if(axisStatus!=null)
-            {
-            axisStatus.CrrentEncoder = position;
-            axisStatus.TargetPulse = encoder;
-            }
 
         }
         DispatcherTimer timer = new DispatcherTimer();
-        public AxisViewModel(ICard card)
+        public AxisViewModel()
         {
-            card.Init();
-            this.card = card;
-            for (int i = 0; i < 8; i++)
-            {
-                card.BindAxis((ushort)(i + 1), $"AXIS{i + 1}");
-                AxisStatuses.Add(new AxisStatus { Index = i + 1, AxisName = $"AXIS{i + 1}" });
-            }
-            axisNames = new string[] { "AXIS1" };
-            timer.Interval = TimeSpan.FromMilliseconds(100);
-            timer.Start();
-            timer.Tick += Timer_Tick; ;
+;
         }
 
         private void Timer_Tick(object sender, EventArgs e)

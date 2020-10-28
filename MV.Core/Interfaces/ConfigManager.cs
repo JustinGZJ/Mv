@@ -1,14 +1,6 @@
-﻿using Mv.Core.Interfaces;
-
-namespace Mv.Core
+﻿namespace Mv.Core.Interfaces
 {
-    public interface IConfigManager<T>
-    {
-        T Get();
-        void Set(T config);
-    }
-    
-    public class ConfigManager<T>: IConfigManager<T> where T:new()
+    public class ConfigManager<T> where T:new()
     {
         T config=new T();
         public T Get()
@@ -29,4 +21,6 @@ namespace Mv.Core
             configureFile.SetValue(nameof(T), config);
         }
     }
+
 }
+
