@@ -67,6 +67,7 @@ namespace Mv.Modules.Schneider.ViewModels
             public string Name { get; set; }
             public double UpperLimit { get; set; }
             public double LowerLimit { get; set; }
+            public bool Result { get; set; }
             public ICollection<Data> Values { get; set; }
         }
         public class Data

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Buffers.Binary;
 
 namespace DataService
 {
@@ -31,6 +32,7 @@ namespace DataService
 
         public int GetOffset(DeviceAddress start, DeviceAddress end)
         {
+           
             return start.Area == end.Area && start.DBNumber == end.DBNumber ? start.Start - end.Start : ushort.MaxValue;
         }
 

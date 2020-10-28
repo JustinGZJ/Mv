@@ -32,7 +32,7 @@
                     <lvc:Axis  Visibility="Collapsed" ></lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis  LabelFormatter="{Binding YFormater}" ></lvc:Axis>
+                    <lvc:Axis  LabelFormatter="{Binding YFormater}" MinValue="0" MaxValue="5000" ></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
         </Border>

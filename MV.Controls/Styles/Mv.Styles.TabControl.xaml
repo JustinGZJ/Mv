@@ -157,8 +157,6 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <!--<ContentPresenter x:Name="contentPresenter" ContentSource="Header" Focusable="False"
-                                          Margin="8" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>-->
                         <TextBlock x:Name="contentPresenter" Text="{TemplateBinding Header}"  Focusable="False" Margin="8"
                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
                         <Rectangle x:Name="selectedUnderline" Margin="8 0" Opacity="0" Height="4" Focusable="False" VerticalAlignment="Bottom" Fill="{TemplateBinding Foreground}"/>

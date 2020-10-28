@@ -160,9 +160,9 @@ namespace Mv.Controls
         {
             if (!(sender is TabControl tabControl)) return;
 
-            foreach (TabItem tabItem in tabControl.Items)
+            foreach (var tabItem in tabControl.Items)
             {
-                if (!(tabItem.Content is FrameworkElement content)) break;
+                if (!(tabItem is TabItem tab&& tab.Content is FrameworkElement content)) break;
 
                 // 1. Sets TranslateTransform instance to RenderTransform Property if it does not exist.
                 switch (content.RenderTransform)
