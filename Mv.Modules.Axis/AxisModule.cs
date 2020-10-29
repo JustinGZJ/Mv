@@ -6,6 +6,7 @@ using Mv.Ui.Core;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
+using Unity;
 
 namespace Mv.Modules.Axis
 {
@@ -13,10 +14,14 @@ namespace Mv.Modules.Axis
     {
         private readonly IRegionManager regionManager;
 
-        public AxisModule(IRegionManager _regionManager)
+        public AxisModule(IUnityContainer unityContainer,IRegionManager _regionManager)
         {
+            UnityContainer = unityContainer;
             regionManager = _regionManager;
         }
+
+        public IUnityContainer UnityContainer { get; }
+
         public void OnInitialized(IContainerProvider containerProvider)
         {
           
@@ -25,8 +30,9 @@ namespace Mv.Modules.Axis
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             regionManager.RegisterViewWithRegion("APPS", typeof(MainTab));
-            regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Setting));
-            containerRegistry.RegisterSingleton<IConfigManager<MotionConfig>, Core.ConfigManager<MotionConfig>>();
+            regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(Setting));
+            containerRegistry.RegisterSingleton<IConfigManager<MotionConfig>,ConfigManager<MotionConfig>>();
+            containerRegistry.RegisterSingleton<IGtsMotion, CGtsMotion>();            
         }
     }
 }

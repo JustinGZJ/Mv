@@ -1,26 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Mvvm;
+using PropertyChanged;
+using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace MotionWrapper
 {
+    [AddINotifyPropertyChangedInterface]
     //轴的定义
     public class AxisRef
     {
+        #region feilds
         //状态
-        public string name = "";//轴的名称  会到表格中初始化参数
-        public bool servoOn = false;
-        public bool alarm = false;
-        public bool limitP = false;
-        public bool limitN = false;
-        public bool followErr = false;
-        public bool moving = false;
-        public bool inPos = false; 
-        public bool isHoming = false;//如果在回零过程中 可能会进行回零检测
-        public float cmdPos = 0.0f, relPos = 0.0f, cmdVel = 0.0f, relVel = 0.0f;
-        public short homed = 0;//0初始化 1 成功 -1失败
-        public bool homeSwitch = false;//回零开关是否接通
+        private string name = "";//轴的名称  会到表格中初始化参数
+        private bool servoOn = false;
+        private bool alarm = false;
+        private bool limitP = false;
+        private bool limitN = false;
+        private bool followErr = false;
+        private bool moving = false;
+        private bool inPos = false;
+        private bool isHoming = false;//如果在回零过程中 可能会进行回零检测
+        private float relVel = 0.0f;
+        private short homed = 0;//0初始化 1 成功 -1失败
+        private bool homeSwitch = false;//回零开关是否接通
+        private float cmdPos;
+        private float relPos;
+        private float cmdVel;
+        //参数
+        private AxisParameter prm = new AxisParameter(); 
+        #endregion
         public AxisRef(string _name)
         {
-            name = _name;
+            Name = _name;
         }
         /// <summary>
         /// 通过轴名字设置参数
@@ -31,15 +42,31 @@ namespace MotionWrapper
         {
             foreach (var item in prmList)
             {
-                if (item.Name == this.name)
+                if (item.Name == this.Name)
                 {
-                    this.prm = item;
+                    this.Prm = item;
                     return true;
                 }
             }
             return false;
         }
-        //参数
-        public AxisParameter prm = new AxisParameter();
+
+
+        public bool ServoOn { get => servoOn; set => servoOn = value; }
+        public bool Alarm { get => alarm; set => alarm = value; }
+        public bool LimitP { get => limitP; set => limitP = value; }
+        public bool LimitN { get => limitN; set => limitN = value; }
+        public bool FollowErr { get => followErr; set => followErr = value; }
+        public bool Moving { get => moving; set => moving = value; }
+        public bool InPos { get => inPos; set => inPos = value; }
+        public bool IsHoming { get => isHoming; set => isHoming = value; }
+        public float CmdPos { get => cmdPos; set => cmdPos = value; }
+        public float RelPos { get => relPos; set => relPos = value; }
+        public float CmdVel { get => cmdVel; set => cmdVel = value; }
+        public float RelVel { get => relVel; set => relVel = value; }
+        public short Homed { get => homed; set => homed = value; }
+        public bool HomeSwitch { get => homeSwitch; set => homeSwitch = value; }
+        public string Name { get => name; set => name = value; }
+        public AxisParameter Prm { get => prm; set => prm = value; }
     };
 }

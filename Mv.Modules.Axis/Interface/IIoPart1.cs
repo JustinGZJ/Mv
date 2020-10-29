@@ -1,6 +1,6 @@
 ﻿namespace MotionWrapper
 {
-    public interface IGtsMotion : IMotionPart1, IMotionPart5, IIoPart1, IInitModel, IFreshModel
+    public interface IGtsMotion :ICMotionData, IMotionPart1, IMotionPart5, IIoPart1, IInitable, IFreshable
     {
 
     }

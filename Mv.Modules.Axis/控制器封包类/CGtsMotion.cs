@@ -1,11 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using System.Xml;
 using System.Threading;
 using gts;
 using Mv.Core;
@@ -29,11 +23,13 @@ namespace MotionWrapper
         //局部变量
         public CGtsMotion(IConfigManager<MotionConfig> configManager)
         {
-            for (int i = 0; i < maxAxisNum; i++)
+            List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
+            for (int i = 0; i < axisParameters.Count; i++)
             {
-                axisRefs[i] = new AxisRef("");
+                AxisRefs[i] = new AxisRef(axisParameters[i].Name) {
+                    Prm = axisParameters[i]
+                };
             }
-
             this.configManager = configManager;
         }
         //局部变量
@@ -53,15 +49,15 @@ namespace MotionWrapper
         int IMotionPart1.MC_Home(ref AxisRef axis)
         {
             mc.THomePrm prm = new mc.THomePrm();
-            axis.homed = 0;
-            axis.isHoming = false;
-            short rtn = mc.GT_GetHomePrm(axis.prm.CardNum, axis.prm.AxisNum, out prm);
-            rtn = mc.GT_ZeroPos(axis.prm.CardNum, axis.prm.AxisNum, 1);
-            rtn = mc.GT_ClrSts(axis.prm.CardNum, axis.prm.AxisNum, 1);
-            prm.mode = axis.prm.homeType;
-            prm.acc = axis.prm.getAccPlsPerMs2();
+            axis.Homed = 0;
+            axis.IsHoming = false;
+            short rtn = mc.GT_GetHomePrm(axis.Prm.CardNum, axis.Prm.AxisNum, out prm);
+            rtn = mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+            rtn = mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+            prm.mode = axis.Prm.homeType;
+            prm.acc = axis.Prm.getAccPlsPerMs2();
             prm.dec = prm.acc;
-            if (axis.prm.homeSearch >= 0)
+            if (axis.Prm.homeSearch >= 0)
             {
                 prm.moveDir = 1;
             }
@@ -71,15 +67,15 @@ namespace MotionWrapper
             }
             prm.indexDir = 1;
             prm.edge = 0;
-            prm.homeOffset = (int)axis.prm.mm2pls(axis.prm.homeoffset);
-            prm.velHigh = axis.prm.mmpers2plsperms(axis.prm.homeVel1);
-            prm.velLow = axis.prm.mmpers2plsperms(axis.prm.homeVel2);
-            prm.searchHomeDistance = Math.Abs((int)axis.prm.mm2pls(axis.prm.homeSearch));
+            prm.homeOffset = (int)axis.Prm.mm2pls(axis.Prm.homeoffset);
+            prm.velHigh = axis.Prm.mmpers2plsperms(axis.Prm.homeVel1);
+            prm.velLow = axis.Prm.mmpers2plsperms(axis.Prm.homeVel2);
+            prm.searchHomeDistance = Math.Abs((int)axis.Prm.mm2pls(axis.Prm.homeSearch));
             prm.searchIndexDistance = prm.searchHomeDistance;
-            prm.escapeStep = (int)axis.prm.mm2pls(axis.prm.homeLeave);
-            rtn += mc.GT_GoHome(axis.prm.CardNum, axis.prm.AxisNum, ref prm);
-            if (rtn == 0) axis.isHoming = true;
-            else axis.isHoming = false;
+            prm.escapeStep = (int)axis.Prm.mm2pls(axis.Prm.homeLeave);
+            rtn += mc.GT_GoHome(axis.Prm.CardNum, axis.Prm.AxisNum, ref prm);
+            if (rtn == 0) axis.IsHoming = true;
+            else axis.IsHoming = false;
             return rtn;
         }
 
@@ -89,32 +85,32 @@ namespace MotionWrapper
             int pmode;
             int psts;
             uint pclock;
-            rtn += mc.GT_GetPrfMode(axis.prm.CardNum, axis.prm.AxisNum, out pmode, 1, out pclock);
-            rtn += mc.GT_GetSts(axis.prm.CardNum, axis.prm.AxisNum, out psts, 1, out pclock);
+            rtn += mc.GT_GetPrfMode(axis.Prm.CardNum, axis.Prm.AxisNum, out pmode, 1, out pclock);
+            rtn += mc.GT_GetSts(axis.Prm.CardNum, axis.Prm.AxisNum, out psts, 1, out pclock);
             if ((psts & 0x400) == 0)
             {
                 if (pmode != 0)
                 {
-                    rtn += mc.GT_PrfTrap(axis.prm.CardNum, axis.prm.AxisNum);
+                    rtn += mc.GT_PrfTrap(axis.Prm.CardNum, axis.Prm.AxisNum);
                 }
                 mc.TTrapPrm trapprm = new mc.TTrapPrm();
-                trapprm.acc = axis.prm.getAccPlsPerMs2();
-                trapprm.dec = axis.prm.getAccPlsPerMs2();
+                trapprm.acc = axis.Prm.getAccPlsPerMs2();
+                trapprm.dec = axis.Prm.getAccPlsPerMs2();
                 trapprm.smoothTime = 50;
                 trapprm.velStart = 0;
-                rtn += mc.GT_SetTrapPrm(axis.prm.CardNum, axis.prm.AxisNum, ref trapprm);
-                rtn += mc.GT_SetVel(axis.prm.CardNum, axis.prm.AxisNum, axis.prm.getVelPlsPerMs() * beilv);
-                rtn += mc.GT_SetPos(axis.prm.CardNum, axis.prm.AxisNum, (int)(axis.prm.mm2pls(tpos)));
+                rtn += mc.GT_SetTrapPrm(axis.Prm.CardNum, axis.Prm.AxisNum, ref trapprm);
+                rtn += mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
+                rtn += mc.GT_SetPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)(axis.Prm.mm2pls(tpos)));
                 //int sts = 0;
                 //uint clock = 0;
                 //rtn = mc.GT_GetSts(cardnum, relAxis, out sts, 1, out clock);
-                rtn += mc.GT_Update(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+                rtn += mc.GT_Update(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             }
             else if (pmode == 0)
             {
-                rtn += mc.GT_SetVel(axis.prm.CardNum, axis.prm.AxisNum, axis.prm.getVelPlsPerMs() * beilv);
-                rtn += mc.GT_SetPos(axis.prm.CardNum, axis.prm.AxisNum, (int)(axis.prm.mm2pls(tpos)));
-                rtn += mc.GT_Update(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+                rtn += mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
+                rtn += mc.GT_SetPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)(axis.Prm.mm2pls(tpos)));
+                rtn += mc.GT_Update(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             }
             return rtn;
         }
@@ -126,24 +122,24 @@ namespace MotionWrapper
             int psts;
             uint pclock;
             double prfpos;
-            rtn += mc.GT_GetPrfMode(axis.prm.CardNum, axis.prm.AxisNum, out pmode, 1, out pclock);
-            rtn += mc.GT_GetSts(axis.prm.CardNum, axis.prm.AxisNum, out psts, 1, out pclock);
+            rtn += mc.GT_GetPrfMode(axis.Prm.CardNum, axis.Prm.AxisNum, out pmode, 1, out pclock);
+            rtn += mc.GT_GetSts(axis.Prm.CardNum, axis.Prm.AxisNum, out psts, 1, out pclock);
             if ((psts & 0x400) == 0)
             {
                 if (pmode != 0)
                 {
-                    rtn += mc.GT_PrfTrap(axis.prm.CardNum, axis.prm.AxisNum);
+                    rtn += mc.GT_PrfTrap(axis.Prm.CardNum, axis.Prm.AxisNum);
                 }
                 mc.TTrapPrm trapprm = new mc.TTrapPrm();
-                trapprm.acc = axis.prm.getAccPlsPerMs2();
-                trapprm.dec = axis.prm.getAccPlsPerMs2();
+                trapprm.acc = axis.Prm.getAccPlsPerMs2();
+                trapprm.dec = axis.Prm.getAccPlsPerMs2();
                 trapprm.smoothTime = 50;
                 trapprm.velStart = 0;
-                rtn += mc.GT_SetTrapPrm(axis.prm.CardNum, axis.prm.AxisNum, ref trapprm);
-                rtn += mc.GT_SetVel(axis.prm.CardNum, axis.prm.AxisNum, axis.prm.getVelPlsPerMs() * beilv);
-                rtn += mc.GT_GetPrfPos(axis.prm.CardNum, axis.prm.AxisNum, out prfpos, 1, out pclock);
-                rtn += mc.GT_SetPos(axis.prm.CardNum, axis.prm.AxisNum, (int)(axis.prm.mm2pls(dist) + prfpos));
-                rtn += mc.GT_Update(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+                rtn += mc.GT_SetTrapPrm(axis.Prm.CardNum, axis.Prm.AxisNum, ref trapprm);
+                rtn += mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
+                rtn += mc.GT_GetPrfPos(axis.Prm.CardNum, axis.Prm.AxisNum, out prfpos, 1, out pclock);
+                rtn += mc.GT_SetPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)(axis.Prm.mm2pls(dist) + prfpos));
+                rtn += mc.GT_Update(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             }
             return rtn;
         }
@@ -156,28 +152,28 @@ namespace MotionWrapper
                 int pmode;
                 int psts;
                 uint pclock;
-                rtn += mc.GT_GetPrfMode(axis.prm.CardNum, axis.prm.AxisNum, out pmode, 1, out pclock);
-                rtn += mc.GT_GetSts(axis.prm.CardNum, axis.prm.AxisNum, out psts, 1, out pclock);
+                rtn += mc.GT_GetPrfMode(axis.Prm.CardNum, axis.Prm.AxisNum, out pmode, 1, out pclock);
+                rtn += mc.GT_GetSts(axis.Prm.CardNum, axis.Prm.AxisNum, out psts, 1, out pclock);
                 if ((psts & 0x400) == 0)
                 {
                     if (pmode != 1)
                     {
-                        rtn = mc.GT_PrfJog(axis.prm.CardNum, axis.prm.AxisNum);
+                        rtn = mc.GT_PrfJog(axis.Prm.CardNum, axis.Prm.AxisNum);
                     }
                     mc.TJogPrm jogprm = new mc.TJogPrm();
-                    jogprm.acc = axis.prm.getAccPlsPerMs2();
-                    jogprm.dec = axis.prm.getAccPlsPerMs2();
+                    jogprm.acc = axis.Prm.getAccPlsPerMs2();
+                    jogprm.dec = axis.Prm.getAccPlsPerMs2();
                     jogprm.smooth = 0.5;
-                    rtn = mc.GT_SetJogPrm(axis.prm.CardNum, axis.prm.AxisNum, ref jogprm);
-                    rtn = mc.GT_SetVel(axis.prm.CardNum, axis.prm.AxisNum, axis.prm.getVelPlsPerMs() * beilv);
-                    rtn = mc.GT_ClrSts(axis.prm.CardNum, axis.prm.AxisNum, 1);
-                    rtn = mc.GT_Update(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+                    rtn = mc.GT_SetJogPrm(axis.Prm.CardNum, axis.Prm.AxisNum, ref jogprm);
+                    rtn = mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
+                    rtn = mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+                    rtn = mc.GT_Update(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
                 }
                 else if (pmode == 1)
                 {
-                    rtn = mc.GT_SetVel(axis.prm.CardNum, axis.prm.AxisNum, axis.prm.getVelPlsPerMs() * beilv);
-                    rtn = mc.GT_ClrSts(axis.prm.CardNum, axis.prm.AxisNum, 1);
-                    rtn = mc.GT_Update(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+                    rtn = mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
+                    rtn = mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+                    rtn = mc.GT_Update(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
                 }
                 return rtn;
             }
@@ -189,15 +185,15 @@ namespace MotionWrapper
 
         int IMotionPart1.MC_Power(AxisRef axis)
         {
-            return mc.GT_AxisOn(axis.prm.CardNum, axis.prm.AxisNum);
+            return mc.GT_AxisOn(axis.Prm.CardNum, axis.Prm.AxisNum);
         }
 
         int IMotionPart1.MC_Reset(AxisRef axis)
         {
-            mc.GT_ClrSts(axis.prm.CardNum, axis.prm.AxisNum, 1);
-            if (axis.alarm)
+            mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+            if (axis.Alarm)
             {
-                mc.GT_SetDoBitReverse(axis.prm.CardNum, mc.MC_CLEAR, axis.prm.AxisNum, 0, 500);
+                mc.GT_SetDoBitReverse(axis.Prm.CardNum, mc.MC_CLEAR, axis.Prm.AxisNum, 0, 500);
             }
             return 0;
         }
@@ -229,29 +225,19 @@ namespace MotionWrapper
             //解析
             for (int i = 0; i < 16; i++)
             {
-                mdis[i] = ((1 << i) & inValue) == 0;
-                mdos[i] = ((1 << i) & outValue) == 0;
+                Mdis[i] = ((1 << i) & inValue) == 0;
+                Mdos[i] = ((1 << i) & outValue) == 0;
                 if (i < 8)//轴状态分解
                 {
-                    axisRefs[i].alarm = (sts[i] & 0x2) != 0;
-                    axisRefs[i].servoOn = (sts[i] & 0x200) != 0;
-                    axisRefs[i].limitN = (sts[i] & 0x40) != 0;
-                    axisRefs[i].limitP = (sts[i] & 0x20) != 0;
-                    axisRefs[i].moving = (sts[i] & 0x400) != 0;
+                    AxisRefs[i].Alarm = (sts[i] & 0x2) != 0;
+                    AxisRefs[i].ServoOn = (sts[i] & 0x200) != 0;
+                    AxisRefs[i].LimitN = (sts[i] & 0x40) != 0;
+                    AxisRefs[i].LimitP = (sts[i] & 0x20) != 0;
+                    AxisRefs[i].Moving = (sts[i] & 0x400) != 0;
 
-                    axisRefs[i].cmdPos = (float)configManager.Get().prms[i].pls2mm((long)prfpos[i]);
-                    axisRefs[i].relPos = (float)configManager.Get().prms[i].pls2mm((long)encpos[i]);
-                    axisRefs[i].relVel = (float)configManager.Get().prms[i].plsperms2mmpers(encvel[i]);
-                }
-                if (i == 8)//辅助
-                {
-                    axisRefs[i].relPos = (float)configManager.Get().prms[i].pls2mm((long)fzencpos[i - 4]);
-                    axisRefs[i].relVel = (float)configManager.Get().prms[i].plsperms2mmpers(fzencvel[i - 4]);
-                    axisRefs[i].alarm = false;
-                    axisRefs[i].servoOn = false;
-                    axisRefs[i].limitN = false;
-                    axisRefs[i].limitN = false;
-                    axisRefs[i].moving = axisRefs[i].relVel != 0;
+                    AxisRefs[i].CmdPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)prfpos[i]);
+                    AxisRefs[i].RelPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)encpos[i]);
+                    AxisRefs[i].RelVel = (float)configManager.Get().AxisParameters[i].plsperms2mmpers(encvel[i]);
                 }
             }
         }
@@ -269,29 +255,29 @@ namespace MotionWrapper
             rtn += mc.GT_GetEncVel(0, 1, out encvel[0], 1, out clock);
             rtn += mc.GT_GetSts(0, 1, out sts[0], 1, out clock);
             //解析
-            axisref.alarm = (sts[0] & 0x2) != 0;
-            axisref.servoOn = (sts[0] & 0x200) != 0;
-            axisref.limitN = (sts[0] & 0x40) != 0;
-            axisref.limitP = (sts[0] & 0x20) != 0;
-            axisref.moving = (sts[0] & 0x400) != 0;
+            axisref.Alarm = (sts[0] & 0x2) != 0;
+            axisref.ServoOn = (sts[0] & 0x200) != 0;
+            axisref.LimitN = (sts[0] & 0x40) != 0;
+            axisref.LimitP = (sts[0] & 0x20) != 0;
+            axisref.Moving = (sts[0] & 0x400) != 0;
 
-            axisref.cmdPos = (float)axisref.prm.pls2mm((long)prfpos[0]);
-            axisref.relPos = (float)axisref.prm.pls2mm((long)encpos[0]);
-            axisref.relVel = (float)axisref.prm.plsperms2mmpers(encvel[0]);
+            axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
+            axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
+            axisref.RelVel = (float)axisref.Prm.plsperms2mmpers(encvel[0]);
 
             return rtn;
         }
 
         int IMotionPart1.MC_EStop(AxisRef axis)
         {
-            axis.isHoming = false;
-            mc.GT_Stop(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1), 1 << (axis.prm.AxisNum - 1));
+            axis.IsHoming = false;
+            mc.GT_Stop(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1), 1 << (axis.Prm.AxisNum - 1));
             return 0;
         }
 
         int IMotionPart1.MC_PowerOff(AxisRef axis)
         {
-            return mc.GT_AxisOff(axis.prm.CardNum, axis.prm.AxisNum);
+            return mc.GT_AxisOff(axis.Prm.CardNum, axis.Prm.AxisNum);
         }
 
         int IMotionPart5.MC_CrdData(string cmd, int crdNum)
@@ -318,23 +304,23 @@ namespace MotionWrapper
             int model = 0;
             uint clock = 0;
             //判断是否是跟随模式
-            short rtn = mc.GT_GetPrfMode(slaver.prm.CardNum, slaver.prm.AxisNum, out model, 1, out clock);
+            short rtn = mc.GT_GetPrfMode(slaver.Prm.CardNum, slaver.Prm.AxisNum, out model, 1, out clock);
             if (model != 4)
             {
                 int sts = 0;
-                mc.GT_GetSts(slaver.prm.CardNum, slaver.prm.AxisNum, out sts, 1, out clock);
+                mc.GT_GetSts(slaver.Prm.CardNum, slaver.Prm.AxisNum, out sts, 1, out clock);
                 if ((sts & (1 << 10)) == 0)
                 {
-                    rtn += mc.GT_PrfFollow(slaver.prm.CardNum, slaver.prm.AxisNum, 0);
+                    rtn += mc.GT_PrfFollow(slaver.Prm.CardNum, slaver.Prm.AxisNum, 0);
                 }
                 else
                 {
                     return -1;//模式不对
                 }
             }
-            rtn += mc.GT_SetFollowMaster(slaver.prm.CardNum, slaver.prm.AxisNum, master.prm.AxisNum, mc.FOLLOW_MASTER_ENCODER, 0);
-            rtn += mc.GT_FollowClear(slaver.prm.CardNum, slaver.prm.AxisNum, 0);
-            rtn += mc.GT_FollowClear(slaver.prm.CardNum, slaver.prm.AxisNum, 1);
+            rtn += mc.GT_SetFollowMaster(slaver.Prm.CardNum, slaver.Prm.AxisNum, master.Prm.AxisNum, mc.FOLLOW_MASTER_ENCODER, 0);
+            rtn += mc.GT_FollowClear(slaver.Prm.CardNum, slaver.Prm.AxisNum, 0);
+            rtn += mc.GT_FollowClear(slaver.Prm.CardNum, slaver.Prm.AxisNum, 1);
             return rtn;
         }
         /// <summary>
@@ -353,26 +339,26 @@ namespace MotionWrapper
             //判断是否是跟随模式
             foreach (var item in data)
             {
-                rtn += mc.GT_FollowData(slaver.prm.CardNum, slaver.prm.AxisNum, (int)item.master, item.slaver, (short)item.moveType, 0);
+                rtn += mc.GT_FollowData(slaver.Prm.CardNum, slaver.Prm.AxisNum, (int)item.master, item.slaver, (short)item.moveType, 0);
             }
             if (passpos != 0)
             {
                 if (relPasspos)
                 {
                     double value = 0;
-                    rtn += mc.GT_GetEncPos(master.prm.CardNum, master.prm.AxisNum, out value, 1, out clock);
-                    rtn += mc.GT_SetFollowEvent(slaver.prm.CardNum, slaver.prm.AxisNum, mc.FOLLOW_EVENT_PASS, 1, (int)(passpos + value));
+                    rtn += mc.GT_GetEncPos(master.Prm.CardNum, master.Prm.AxisNum, out value, 1, out clock);
+                    rtn += mc.GT_SetFollowEvent(slaver.Prm.CardNum, slaver.Prm.AxisNum, mc.FOLLOW_EVENT_PASS, 1, (int)(passpos + value));
                 }
                 else
                 {
-                    rtn += mc.GT_SetFollowEvent(slaver.prm.CardNum, slaver.prm.AxisNum, mc.FOLLOW_EVENT_PASS, 1, (int)passpos);
+                    rtn += mc.GT_SetFollowEvent(slaver.Prm.CardNum, slaver.Prm.AxisNum, mc.FOLLOW_EVENT_PASS, 1, (int)passpos);
                 }
             }
             else
             {
-                rtn += mc.GT_SetFollowEvent(slaver.prm.CardNum, slaver.prm.AxisNum, mc.FOLLOW_EVENT_START, 1, (int)passpos);
+                rtn += mc.GT_SetFollowEvent(slaver.Prm.CardNum, slaver.Prm.AxisNum, mc.FOLLOW_EVENT_START, 1, (int)passpos);
             }
-            rtn += mc.GT_FollowStart(slaver.prm.CardNum, 1 << (slaver.prm.AxisNum - 1), 0);
+            rtn += mc.GT_FollowStart(slaver.Prm.CardNum, 1 << (slaver.Prm.AxisNum - 1), 0);
             return rtn;
         }
 
@@ -387,7 +373,7 @@ namespace MotionWrapper
             List<bool> tmp = new List<bool>();
             for (int i = 0; i < usedInput; i++)
             {
-                tmp.Add(mdis[i]);
+                tmp.Add(Mdis[i]);
             }
             return tmp;
         }
@@ -402,7 +388,7 @@ namespace MotionWrapper
             List<bool> tmp = new List<bool>();
             for (int i = 0; i < usedOutput; i++)
             {
-                tmp.Add(mdos[i]);
+                tmp.Add(Mdos[i]);
             }
             return tmp;
         }
@@ -417,13 +403,13 @@ namespace MotionWrapper
             List<AxisRef> tmp = new List<AxisRef>();
             for (int i = 0; i < usedAxis; i++)
             {
-                tmp.Add(axisRefs[i]);
+                tmp.Add(AxisRefs[i]);
             }
             return tmp;
         }
         public void Run()
         {
-            IFreshModel freshMd = this as IFreshModel;
+            IFreshable freshMd = this as IFreshable;
             while (true)
             {
                 freshMd.Fresh();
@@ -437,7 +423,7 @@ namespace MotionWrapper
         /// <returns></returns>
         int IMotionPart5.MC_CrdStart(int crdNum)
         {
-            short rtn = mc.GT_CrdStart((short)configManager.Get().crdS[crdNum].CardNum, (short)configManager.Get().crdS[crdNum].CrdNum, 0);
+            short rtn = mc.GT_CrdStart((short)configManager.Get().CrdParameters[crdNum].CardNum, (short)configManager.Get().CrdParameters[crdNum].CrdNum, 0);
             return rtn;
         }
 
@@ -448,7 +434,7 @@ namespace MotionWrapper
 
         int IMotionPart5.MC_CrdStatus(int crdNum)
         {
-            CCrdPrm prm = configManager.Get().crdS[crdNum];
+            CCrdPrm prm = configManager.Get().CrdParameters[crdNum];
             short crdRun = 0;
             int segment = 0;
             short rtn = mc.GT_CrdStatus((short)prm.CardNum, (short)prm.CrdNum, out crdRun, out segment, 0);
@@ -464,9 +450,9 @@ namespace MotionWrapper
 
         int IMotionPart1.MC_SetPos(AxisRef axis, double pos)
         {
-            mc.GT_SetPrfPos(axis.prm.CardNum, axis.prm.AxisNum, (int)pos);
-            mc.GT_SetEncPos(axis.prm.CardNum, axis.prm.AxisNum, (int)pos);
-            mc.GT_SynchAxisPos(axis.prm.CardNum, 1 << (axis.prm.AxisNum - 1));
+            mc.GT_SetPrfPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
+            mc.GT_SetEncPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
+            mc.GT_SynchAxisPos(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             return 0;
         }
 
@@ -478,7 +464,7 @@ namespace MotionWrapper
             //CAPTURE_HSIO0(该宏定义为 6) HSIO0 口捕获
             //CAPTURE_HSIO1(该宏定义为 7) HSIO1 口捕获
             //short rtn = mc.GT_ClrSts((short)prm.cardnum, (short)prm.axisnum, 1);
-            short rtn = mc.GT_SetCaptureMode(enc.prm.CardNum, enc.prm.AxisNum, (short)capturePrm.type);
+            short rtn = mc.GT_SetCaptureMode(enc.Prm.CardNum, enc.Prm.AxisNum, (short)capturePrm.type);
             return rtn;
         }
 
@@ -487,10 +473,10 @@ namespace MotionWrapper
             short cptSts = 0;
             int value = 0;
             uint clock = 0;
-            short rtn = mc.GT_GetCaptureStatus(enc.prm.CardNum, enc.prm.AxisNum, out cptSts, out value, 1, out clock);
+            short rtn = mc.GT_GetCaptureStatus(enc.Prm.CardNum, enc.Prm.AxisNum, out cptSts, out value, 1, out clock);
             if (rtn == 0 && cptSts == 1)
             {
-                capturePos = enc.prm.pls2mm(value);
+                capturePos = enc.Prm.pls2mm(value);
                 return 0;
             }
             else
@@ -501,12 +487,12 @@ namespace MotionWrapper
 
         int IMotionPart5.MC_CrdCreate(int crdNum)
         {
-            if (cardNum < 0 || cardNum >= configManager.Get().crdS.Count) return -1;
+            if (cardNum < 0 || cardNum >= configManager.Get().CrdParameters.Count) return -1;
             short rtn = 0;
             int pmode;
             int psts;
             uint pclock;
-            CCrdPrm crdPrm = configManager.Get().crdS[crdNum];
+            CCrdPrm crdPrm = configManager.Get().CrdParameters[crdNum];
             //随便找一个轴来查看下是否是插补坐标系
             rtn += mc.GT_GetPrfMode((short)crdPrm.CardNum, (short)crdPrm.X, out pmode, 1, out pclock);
             rtn += mc.GT_GetSts((short)crdPrm.CardNum, (short)crdPrm.X, out psts, 1, out pclock);
@@ -647,9 +633,9 @@ namespace MotionWrapper
             subStatusData();
         }
 
-        void IFreshModel.Run()
+        void IFreshable.Run()
         {
-            IFreshModel fresh = this as IFreshModel;
+            IFreshable fresh = this as IFreshable;
             while (true)
             {
                 fresh.Fresh();
@@ -657,7 +643,7 @@ namespace MotionWrapper
             }
         }
 
-        bool IInitModel.Init()
+        bool IInitable.Init()
         {
             try
             {
@@ -669,7 +655,7 @@ namespace MotionWrapper
                 rtn += mc.GT_ZeroPos(cardNum, 1, 8);
                 if (rtn == 0)
                 {
-                    runThread = new System.Threading.Thread(Run);
+                    runThread =new Thread(Run);
                     runThread.IsBackground = true;
                     runThread.Start();
                     return initOk = true;
@@ -682,7 +668,7 @@ namespace MotionWrapper
             }
         }
 
-        bool IInitModel.UnInit()
+        bool IInitable.UnInit()
         {
             try
             {
@@ -706,6 +692,7 @@ namespace MotionWrapper
 
         bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
         {
+           
             throw new NotImplementedException();
         }
 
@@ -733,17 +720,17 @@ namespace MotionWrapper
         {
             short rtn = 0;
             mc.THomeStatus tmpHomeSts = new mc.THomeStatus();
-            rtn = mc.GT_GetHomeStatus(axis.prm.CardNum, axis.prm.AxisNum, out tmpHomeSts);
+            rtn = mc.GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tmpHomeSts);
             if (tmpHomeSts.run == 0 && tmpHomeSts.error == mc.HOME_ERROR_NONE)//回零完成
             {
-                axis.homed = 1;
-                mc.GT_ZeroPos(axis.prm.CardNum, axis.prm.AxisNum, 1);
-                axis.isHoming = false;
+                axis.Homed = 1;
+                mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+                axis.IsHoming = false;
             }
             if (tmpHomeSts.run == 0 && tmpHomeSts.error != mc.HOME_ERROR_NONE)//回零完成
             {
-                axis.homed = -1;
-                axis.isHoming = false;
+                axis.Homed = -1;
+                axis.IsHoming = false;
             }
             return rtn;
         }

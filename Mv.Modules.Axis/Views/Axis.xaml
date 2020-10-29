@@ -8,6 +8,7 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
              mc:Ignorable="d" 
+            
              d:DataContext="{d:DesignInstance local:AxisViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -26,29 +27,34 @@
         <Grid x:Name="toolbar" Grid.Column="0" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Text="速度"/>
-                <TextBlock x:Name="Speed" Width="60" VerticalAlignment="Center" Text="{Binding Speed}" />
+                <TextBlock x:Name="Speed" Width="60" VerticalAlignment="Center" Text="{Binding }" />
                 <TextBlock VerticalAlignment="Center" Text="mm/s"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CmdTeach}" >
+                <StackPanel.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                        
+                    </Style>
+                </StackPanel.Resources>
+                <Button  Command="{Binding CmdTeach}" >
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="Edit"/>
                         <TextBlock Text="试教"/>
                     </StackPanel>
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CmdReappear}">
+                <Button  Command="{Binding CmdReappear}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="Play"/>
                         <TextBlock Text="重现"/>
                     </StackPanel>
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CmdSaePoint}">
+                <Button  Command="{Binding CmdSaePoint}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="ContentSave"/>
                         <TextBlock Text="保存"/>
                     </StackPanel>
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFlatButton}" Command="{Binding CmdRemovePoint}">
+                <Button  Command="{Binding CmdRemovePoint}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="Delete"/>
                         <TextBlock Text="删除"/>
@@ -93,7 +99,13 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Content="轴名称:"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisNames}" SelectedValue="{Binding AxisName}"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding AxisRef}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <Label Content="点动距离:" Grid.Row="1" Grid.Column="0" />
                 <Grid Grid.Row="1" Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -154,21 +166,26 @@
                 </WrapPanel>
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Button FontSize="18" Command="{Binding CmdMoveForward}"  Style="{StaticResource MaterialDesignOutlinedButton}">+</Button>
-                <Button Grid.Row="1"  Command="{Binding CmdMoveBackward}" FontSize="18" Style="{StaticResource MaterialDesignOutlinedButton}">-</Button>
-                <Button Grid.Row="2"  FontSize="18" Command="{Binding CmdStopMove}" Style="{StaticResource MaterialDesignOutlinedButton}">停止</Button>
-                <UniformGrid Columns="2" Grid.Row="3">
-                    <Button  Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding CmdHome}">回零</Button>
-                    <Button  Style="{StaticResource MaterialDesignOutlinedButton}" Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}">
-                        <materialDesign:PackIcon Kind="Settings"/>
-                    </Button>
-                </UniformGrid>
+
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                            <Setter Property="Margin" Value="10"/>
+                            <Setter Property="FontSize" Value="18"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button   Command="{Binding CmdMoveForward}"  >+</Button>
+                    <Button  Command="{Binding CmdMoveBackward}" FontSize="18" >-</Button>
+                    <Button   Command="{Binding CmdStopMove}" >停止</Button>
+                    <UniformGrid >
+                        <Button   Command="{Binding CmdHome}" ToolTip="回零">
+                            <materialDesign:PackIcon Width="18" Height="18" Kind="House"/>
+                        </Button>
+                        <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
+                            <materialDesign:PackIcon Width="18" Height="18" Kind="Settings"/>
+                        </Button>
+                    </UniformGrid>
+                </StackPanel>
             </Grid>
             <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
                 <Grid.ColumnDefinitions>

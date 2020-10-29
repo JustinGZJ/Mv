@@ -6,7 +6,7 @@ namespace MotionWrapper
     /// <summary>
     /// 机器类,所有的并行组件都在这边
     /// </summary>
-    public class CMachManager : CMachBase, IInitModel
+    public class CMachManager : CMachBase, IInitable
     {
         //所有的机器组件都在这个列表中
         List<CMachBase> machlist = new List<CMachBase>();
@@ -53,9 +53,9 @@ namespace MotionWrapper
             initok = true;
             foreach (CMachBase item in machlist)
             {
-                if (item is IInitModel)//判断是否继承了接口
+                if (item is IInitable)//判断是否继承了接口
                 {
-                    if (!((IInitModel)item).Init()) initok = false;
+                    if (!((IInitable)item).Init()) initok = false;
                 }
             }
             return initok;
@@ -130,9 +130,9 @@ namespace MotionWrapper
         {
             foreach (CMachBase item in machlist)
             {
-                if (item is IInitModel)//判断是否继承了接口
+                if (item is IInitable)//判断是否继承了接口
                 {
-                    ((IInitModel)item).UnInit();
+                    ((IInitable)item).UnInit();
                 }
             }
             return true;

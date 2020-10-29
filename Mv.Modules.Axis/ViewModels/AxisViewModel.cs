@@ -7,6 +7,12 @@ using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Linq;
+using MotionWrapper;
+using System.Collections.Generic;
+using Mv.Modules.Axis.Views.Dialog;
+using MaterialDesignThemes.Wpf;
+using Mv.Core;
+
 namespace Mv.Modules.Axis.ViewModels
 {
     public class AxisViewModel : BindableBase
@@ -14,109 +20,8 @@ namespace Mv.Modules.Axis.ViewModels
 
 
         #region Properties
-        /// <summary>
-        /// 轴状态
-        /// </summary>
-   ///     public ObservableCollection<AxisStatus> AxisStatuses { get; } = new ObservableCollection<AxisStatus>();
 
-
-        /// <summary>
-        /// 伺服速度
-        /// </summary>
-        private double speed;
-        public double Speed
-        {
-            get { return speed; }
-            set { SetProperty(ref speed, value); }
-        }
-
-        /// <summary>
-        /// 伺服速度
-        /// </summary>
-        private double jogSpeed;
-        public double JogSpeed
-        {
-            get { return jogSpeed; }
-            set { SetProperty(ref jogSpeed, value); }
-        }
-
-        public string axisName;
-        public string AxisName
-        {
-            get { return axisName; }
-            set { SetProperty(ref axisName, value); }
-        }
-
-        /// <summary>
-        /// 目标位置
-        /// </summary>
-        private double tagrgetPos;
-        public double TargetPos
-        {
-            get { return tagrgetPos; }
-            set { SetProperty(ref tagrgetPos, value); }
-        }
-
-
-        /// <summary>
-        /// 伺服使能信号
-        /// </summary>
-        private bool sevoON;
-        public bool SevoON
-        {
-            get { return sevoON; }
-            set { SetProperty(ref sevoON, value); }
-        }
-        /// <summary>
-        /// 负向限位
-        /// </summary>
-        private bool negativeLimit;
-        public bool NegativeLimit
-        {
-
-            get { return negativeLimit; }
-            set { SetProperty(ref negativeLimit, value); }
-        }
-        /// <summary>
-        /// 正向限位
-        /// </summary>
-        /// 
-        private bool positiveLimit;
-        public bool PositiveLimit
-        {
-            get { return positiveLimit; }
-            set { SetProperty(ref positiveLimit, value); }
-        }
-
-        /// <summary>
-        /// 报警
-        /// </summary>
-        private bool alarmSignal;
-        public bool AlarmSignal
-        {
-            get { return alarmSignal; }
-            set { SetProperty(ref alarmSignal, value); }
-        }
-        /// <summary>
-        /// 原点信号
-        /// </summary>
-        private bool originSignal;
-        public bool OriginSignal
-        {
-            get { return originSignal; }
-            set { SetProperty(ref originSignal, value); }
-        }
-
-        /// <summary>
-        /// 停止信号
-        /// </summary>
-        /// 
-        private bool stop;
-        public bool StopSignal
-        {
-            get { return stop; }
-            set { SetProperty(ref stop, value); }
-        }
+        public AxisRef SelectedAxisRef { get; set; }
 
         /// <summary>
         /// 连动
@@ -130,26 +35,11 @@ namespace Mv.Modules.Axis.ViewModels
         /// <summary>
         /// 点动
         /// </summary>
-        private bool jogMove=true;
+        private bool jogMove = true;
         public bool JogMove
         {
             get { return jogMove; }
             set { SetProperty(ref jogMove, value); }
-        }
-
-        private string[] axisNames;
-        public string[] AxisNames
-        {
-            get { return axisNames; }
-            set { SetProperty(ref axisNames, value); }
-        }
-
-
-        private double jogDistance;
-        public double JogDistance
-        {
-            get { return jogDistance; }
-            set { SetProperty(ref jogDistance, value); }
         }
 
         #endregion
@@ -163,14 +53,14 @@ namespace Mv.Modules.Axis.ViewModels
             {
                 Task.Run(() =>
                 {
-       //             card.MoveRelative(axisName, (int)jogDistance , (short)JogSpeed);
+                    //             card.MoveRelative(axisName, (int)jogDistance , (short)JogSpeed);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-    //                card.Jog(axisName, (int)JogSpeed);
+                    //                card.Jog(axisName, (int)JogSpeed);
                 });
             }
 
@@ -187,18 +77,18 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteMoveBackward()
         {
-            if(jogMove)
+            if (jogMove)
             {
                 Task.Run(() =>
                 {
-       //             card.MoveRelative(axisName, (int)jogDistance * -1, (short)JogSpeed);
+                    //             card.MoveRelative(axisName, (int)jogDistance * -1, (short)JogSpeed);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-      //              card.Jog(axisName, -(int)JogSpeed);
+                    //              card.Jog(axisName, -(int)JogSpeed);
                 });
             }
 
@@ -214,7 +104,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteStopMove()
         {
-   //         card.Stop(AxisName, true);
+            //         card.Stop(AxisName, true);
         }
         #endregion
         #region 设置命令
@@ -222,9 +112,16 @@ namespace Mv.Modules.Axis.ViewModels
         public DelegateCommand<string> CmdSetAxis =>
             cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<string>(ExecuteCmdSetAxis));
 
-        void ExecuteCmdSetAxis(string para)
+        async void ExecuteCmdSetAxis(string para)
         {
-
+            await DialogHost.Show(new AxisSetting()
+            {
+                DataContext = new
+                {
+                    SelectedObject = AxisRefs.FirstOrDefault(axis => axis.Name == para).Prm
+                }
+            }, "RootDialog"); ;
+           config.Set(config.Get());
         }
         #endregion
 
@@ -235,7 +132,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteHome()
         {
-       //     card.Home(AxisName, 10000, 1000, 1000, HomeDir.N负方向, 1000, 1000);
+            //     card.Home(AxisName, 10000, 1000, 1000, HomeDir.N负方向, 1000, 1000);
         }
         #endregion
 
@@ -246,7 +143,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteTeach()
         {
-            
+
         }
         #endregion
 
@@ -257,7 +154,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteReappear()
         {
-            
+
         }
         #endregion
 
@@ -288,9 +185,11 @@ namespace Mv.Modules.Axis.ViewModels
         public DelegateCommand CmdGoTargetPos =>
             cmdGoTargetPos ?? (cmdGoTargetPos = new DelegateCommand(ExecuteGoTargetPos));
 
+        public List<AxisRef> AxisRefs { get => axisRefs; set =>SetProperty(ref axisRefs , value); }
+
         void ExecuteGoTargetPos()
         {
-         //   card.MoveAbs(AxisName, 10000, 1000);
+            //   card.MoveAbs(AxisName, 10000, 1000);
         }
         #endregion
 
@@ -301,14 +200,37 @@ namespace Mv.Modules.Axis.ViewModels
 
         }
         DispatcherTimer timer = new DispatcherTimer();
+        private readonly IGtsMotion motion;
+        private readonly IConfigManager<MotionConfig> config;
+        List<AxisRef> axisRefs;
+        ICMotionData motionData;
+        IMotionPart1 motionPart1;
+        IMotionPart5 motionPart5;
+        IIoPart1 iopart1;
+        public AxisViewModel(IGtsMotion motion, IConfigManager<MotionConfig> config)
+        {
+            this.motion = motion;
+            this.config = config;
+            motionPart1 = motion;
+            motionData = motion;
+            motionPart5 = motion;
+            iopart1 = motion;
+            AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
+
+        }
         public AxisViewModel()
         {
-;
+
+
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            UpdateStatus();
+            for (int i = 0; i < AxisRefs.Count; i++)
+            {
+                var axis = AxisRefs[i];
+                motion.MC_AxisRef(ref axis);
+            }
         }
     }
 }

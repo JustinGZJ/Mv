@@ -8,10 +8,10 @@ namespace MotionWrapper
     public class IoRef
     {
         public bool value = false;
-        public string id = "";
+        public string Name = "";
         public IoRef(string id)
         {
-            this.id = id;
+            this.Name = id;
         }
         /// <summary>
         /// 通过ID来指定IO表中的
@@ -21,7 +21,7 @@ namespace MotionWrapper
         {
             foreach (var item in io)
             {
-                if(id == item.ID)
+                if(Name == item.Name)
                 {
                     prm = item;
                     return true;

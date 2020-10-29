@@ -9,7 +9,11 @@
     <Compile Remove="控制器封包类\CGsnMotion.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="AxisModule.cs~RFab02fbe.TMP" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
+    <PackageReference Include="PropertyChanged.Fody" Version="3.2.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MV.Controls\MV.Controls.csproj" />
