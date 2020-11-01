@@ -8,8 +8,10 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
              mc:Ignorable="d" 
-            
-             d:DataContext="{d:DesignInstance local:AxisViewModel}"
+            xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:axis="clr-namespace:Mv.Modules.Axis"
+             xmlns:pt="http://propertytools.org/wpf"
+             d:DataContext="{d:DesignInstance local:AxisViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
@@ -21,21 +23,26 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="300"/>
             <RowDefinition Height="178*"/>
         </Grid.RowDefinitions>
         <Grid x:Name="toolbar" Grid.Column="0" Grid.Row="0">
             <StackPanel Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Text="速度"/>
-                <TextBlock x:Name="Speed" Width="60" VerticalAlignment="Center" Text="{Binding }" />
+                <TextBlock x:Name="Speed" Width="60" VerticalAlignment="Center" Text="{Binding SelectedAxisRef.RelPos}" />
                 <TextBlock VerticalAlignment="Center" Text="mm/s"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
-                        
                     </Style>
                 </StackPanel.Resources>
+
+                <Button  Command="{Binding CmdAdd}" >
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon  Kind="Add"/>
+                        <TextBlock Text="增加"/>
+                    </StackPanel>
+                </Button>
                 <Button  Command="{Binding CmdTeach}" >
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="Edit"/>
@@ -64,11 +71,8 @@
         </Grid>
         <Grid Grid.Row="1" Grid.Column="0">
             <Border Margin="10" BorderThickness="1" CornerRadius="5">
-                <DataGrid >
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="编号"/>
-                        <DataGridTextColumn Header="名称"/>
-                    </DataGrid.Columns>
+                <DataGrid CanUserAddRows="False" ItemsSource="{Binding P2PPrms}" SelectedItem="{Binding SelectedP2P}">
+
                 </DataGrid>
             </Border>
         </Grid>
@@ -92,14 +96,13 @@
                     <ColumnDefinition Width="15*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="50"/>
-                    <RowDefinition Height="43*"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Content="轴名称:"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding AxisRef}">
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding SelectedAxisRef}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"/>
@@ -108,81 +111,117 @@
                 </ComboBox>
                 <Label Content="点动距离:" Grid.Row="1" Grid.Column="0" />
                 <Grid Grid.Row="1" Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="25"/>
-                        <RowDefinition Height="25"/>
-                    </Grid.RowDefinitions>
-                    <Slider
-                        Grid.Row="1"
-                          Minimum="0"
-                          Maximum="100"
-                        VerticalAlignment="Center"
-                          Value="{Binding JogDistance}"
-                          />
-                    <TextBlock Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <Run  Text="{Binding JogDistance, StringFormat={}{0:f1}}" ></Run>
-                        <Run Text="mm"/>
-                    </TextBlock>
+                    <pt:SpinControl Value="{Binding JogDistance}">
+                        <TextBox Text="{Binding JogDistance}" BorderThickness="0" />
+                    </pt:SpinControl>
                 </Grid>
-                <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" Margin="5" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="70"/>
-                    </Grid.ColumnDefinitions>
-                    <Slider VerticalAlignment="Center" x:Name="Slsp" Maximum="100" Value="{Binding JogSpeed}"></Slider>
-                    <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">                   
-                        <Run Text="{Binding Path=Value, ElementName=Slsp, StringFormat={}{0:f1}}"></Run>
-                        <Run Text="mm/s"/>
-                    </TextBlock>
-                </Grid>
-                <WrapPanel  Orientation="Horizontal" Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="0">
-                    <WrapPanel.Resources>
-                        <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type controls:SimpleLed}}">
-                            <Setter Property="OnColor" Value="Lime"/>
-                            <Setter Property="OffColor" Value="Gray"/>
-                            <Setter Property="Margin" Value="10 0"/>
-                        </Style>
-                    </WrapPanel.Resources>
-                    <StackPanel>
-                        <controls:SimpleLed   State="{Binding  SevoON}" ></controls:SimpleLed>
-                        <Label Content="伺服使能"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed State="{ Binding PositiveLimit}"></controls:SimpleLed>
-                        <Label Content="正向限位"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding NegativeLimit}"></controls:SimpleLed>
-                        <Label Content="负向限位"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding OriginSignal}"></controls:SimpleLed>
-                        <Label Content="伺服原点"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding StopSignal}"></controls:SimpleLed>
-                        <Label Content="伺服停止"/>
-                    </StackPanel>
-                </WrapPanel>
+
+                <Label Grid.Column="0" Grid.Row="2" Content="Jog速度："/>
+                <pt:SpinControl Grid.Column="1" Grid.Row="2" Value="{Binding JogSpeed}" Maximum="50000" Minimum="0" >
+                    <TextBox Text="{Binding JogSpeed}" BorderThickness="0" />
+                </pt:SpinControl>
+                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
+                    <WrapPanel  Orientation="Horizontal" >
+                        <WrapPanel.Resources>
+                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type     controls:SimpleLed}}">
+                                <Setter Property="OnColor" Value="Lime"/>
+                                <Setter Property="OffColor" Value="Gray"/>
+                                <Setter Property="Margin" Value="10 0"/>
+                            </Style>
+                        </WrapPanel.Resources>
+                        <StackPanel>
+                            <controls:SimpleLed   State="{Binding  SelectedAxisRef.ServoOn}" ></controls:SimpleLed>
+                            <Label Content="伺服使能"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed State="{ Binding SelectedAxisRef.LimitP}"></controls:SimpleLed>
+                            <Label Content="正向限位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.LimitN}"></controls:SimpleLed>
+                            <Label Content="负向限位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.IsHoming}"></controls:SimpleLed>
+                            <Label Content="伺服回零"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.Moving}"></controls:SimpleLed>
+                            <Label Content="伺服停止"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.InPos}"></controls:SimpleLed>
+                            <Label Content="伺服到位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.Alarm}"></controls:SimpleLed>
+                            <Label Content="伺服报警"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.HomeSwitch}"></controls:SimpleLed>
+                            <Label Content="回零开关"/>
+                        </StackPanel>
+                    </WrapPanel>
+                    <UniformGrid Columns="3">
+                        <UniformGrid.Resources>
+                            <Style TargetType="Label">
+                                <Setter Property="FontSize" Value="20"/>
+                                <Setter Property="Margin" Value="0 2.5"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </UniformGrid.Resources>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.RelVel}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="实际速度"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.CmdVel}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="命令速度"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.CmdPos}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="命令位置"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.RelPos}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="实际位置"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.Homed}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="Home状态"/>
+                        </StackPanel>
+                    </UniformGrid>
+                </StackPanel>
+
             </Grid>
             <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5">
-
                 <StackPanel>
                     <StackPanel.Resources>
                         <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
                             <Setter Property="Margin" Value="10"/>
                             <Setter Property="FontSize" Value="18"/>
+                            <Setter Property="Cursor" Value="Hand"/>
                         </Style>
                     </StackPanel.Resources>
-                    <Button   Command="{Binding CmdMoveForward}"  >+</Button>
+                    <Button  Command="{Binding CmdPower}" ToolTip="轴设置"  axis:ControlEx.AttachedState="{Binding  SelectedAxisRef.ServoOn}">
+                        <materialDesign:PackIcon Width="24" Height="24" Kind="Power" />
+                    </Button>
+                    <Button   Command="{Binding CmdMoveForward}" Content="+">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <i:CallMethodAction TargetObject="{Binding RelativeSource={RelativeSource       Mode=FindAncestor, AncestorType=Window}}" MethodName="Close" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
                     <Button  Command="{Binding CmdMoveBackward}" FontSize="18" >-</Button>
                     <Button   Command="{Binding CmdStopMove}" >停止</Button>
                     <UniformGrid >
                         <Button   Command="{Binding CmdHome}" ToolTip="回零">
-                            <materialDesign:PackIcon Width="18" Height="18" Kind="House"/>
+                            <materialDesign:PackIcon Width="24" Height="24" Kind="House"/>
                         </Button>
                         <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
-                            <materialDesign:PackIcon Width="18" Height="18" Kind="Settings"/>
+                            <materialDesign:PackIcon Width="24" Height="24" Kind="Settings"/>
                         </Button>
                     </UniformGrid>
                 </StackPanel>
@@ -193,12 +232,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBox x:Name="目标位置" Text="{Binding TargetPos}" />
-                <Button Grid.Column="2" Command="{Binding CmdGoTargetPos}" Style="{StaticResource MaterialDesignToolButton}" Content="前往点(pulse)"/>
             </Grid>
-        </Grid>
-        <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
-
         </Grid>
     </Grid>
 </UserControl>

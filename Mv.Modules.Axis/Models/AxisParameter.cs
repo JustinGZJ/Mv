@@ -1,5 +1,6 @@
 ﻿
 using PropertyTools.DataAnnotations;
+using System.Windows.Documents;
 
 namespace MotionWrapper
 {
@@ -26,30 +27,31 @@ namespace MotionWrapper
         private float resolution = 10000;                              //分辨率plus
         private float pitch = 5;                                     //节距mm/du
         private short enableSoftlmt = 0;
-        private short enableAlm = 1;
-        private short enableLmtP = 1;
-        private short enableLmtN = 1;          //限位和报警的使能
-        private short enableFollowErr = 0;//启用跟随误差检测
-        private float followErrPos = 1.0f;
-        private float arrivePand = 1.0f;//unit
-        private short followeTime = 10;
-        private float arriveDelay = 10;//ms
+        private bool enableAlm = true;
+        private bool enableLmtP = true;
+        private bool enableLmtN = true;          //限位和报警的使能
+        //private bool enableFollowErr = false;//启用跟随误差检测
+        //private float followErrPos = 1.0f;
+   //     private float arrivePand = 1.0f;//unit
+      //  private short followeTime = 10;
+     //   private float arriveDelay = 10;//ms
         private float softlmtn = 0;                       //正负软限位使能 0表示无效 !=0 并且上面限位有效的时候 才有效
 
-        public short reverseHome = 0;
-        public short reverseLmtp = 0;
-        public short reverseLmtn = 0;//开关取反
+        //public short reverseHome = 0;
+        //public short reverseLmtp = 0;
+        //public short reverseLmtn = 0;//开关取反
         public short homeType = 0;//<0表示不需要回零
-        public float homeSearch = 1000000.0f;//搜索用
-        public short homeSequence = 0;//回零的顺序
-        public float homeLeave = 100;
-        public float homeTriger = 0;//GSN 1=上升沿 0=下降沿
-        public float homeoffset = 0, homeVel1 = 50.0f, homeVel2 = 25.0f;            //回零相关
-        public float backLash = 0;
-        public float estopdec = 9800.0f; 
+        public float homeSearch = 1000000.0f;//回零搜索距离
+        private float homeLeave = 100;
+        //public float homeTriger = 0;//GSN 1=上升沿 0=下降沿
+        private float homeVel2 = 25.0f;            //回零相关
+        public float estopdec = 9800.0f;
 
         public float smoothTime = 10;
         private float softlmtp;
+        private float homeoffset;
+        private float homeVel1;
+
         [DisplayName("名称")]
         public string Name { get => name; set => name = value; }
         [DisplayName("描述")]
@@ -60,7 +62,7 @@ namespace MotionWrapper
         public short AxisNum { get => axisNum; set => axisNum = value; }
         [DisplayName("活动")]
         public short Active { get => active; set => active = value; }
-       [DisplayName("类型")]
+        [DisplayName("类型")]
         public EAxisType Type { get => type; set => type = value; }
         [DisplayName("最大加速度")]
         public float MaxAcc { get => maxAcc; set => maxAcc = value; }
@@ -77,23 +79,29 @@ namespace MotionWrapper
         [DisplayName("软限位使能")]
         public short EnableSoftlmt { get => enableSoftlmt; set => enableSoftlmt = value; }
         [DisplayName("报警使能")]
-        public short EnableAlm { get => enableAlm; set => enableAlm = value; }
+        public bool EnableAlm { get => enableAlm; set => enableAlm = value; }
         [DisplayName("正限位使能")]
-        public short EnableLmtP { get => enableLmtP; set => enableLmtP = value; }
+        public bool EnableLmtP { get => enableLmtP; set => enableLmtP = value; }
         [DisplayName("负限位使能")]
-        public short EnableLmtN { get => enableLmtN; set => enableLmtN = value; }
-        [DisplayName("启用跟随误差检测")]
-        public short EnableFollowErr { get => enableFollowErr; set => enableFollowErr = value; }
-        [DisplayName("跟随误差值")]
-        public float FollowErrPos { get => followErrPos; set => followErrPos = value; }
-        [DisplayName("跟随时间")]
-        public short FolloweTime { get => followeTime; set => followeTime = value; }
-        public float ArriveDelay { get => arriveDelay; set => arriveDelay = value; }
+        public bool EnableLmtN { get => enableLmtN; set => enableLmtN = value; }
+        //[DisplayName("启用跟随误差检测")]
+        //public bool EnableFollowErr { get => enableFollowErr; set => enableFollowErr = value; }
+        //[DisplayName("跟随误差值")]
+        //public float FollowErrPos { get => followErrPos; set => followErrPos = value; }
+        //[DisplayName("跟随时间")]
+        //public short FolloweTime { get => followeTime; set => followeTime = value; }
         [DisplayName("正软限位")]
-
-        public float Softlmtp { get => softlmtp; set => softlmtp = value; }
+        public float SoftLimitPositive { get => softlmtp; set => softlmtp = value; }
         [DisplayName("负软限位")]
-        public float Softlmtn { get => softlmtn; set => softlmtn = value; }
+        public float SoftLimitNegative { get => softlmtn; set => softlmtn = value; }
+        [DisplayName("回零偏移量")]
+        public float Homeoffset { get => homeoffset; set => homeoffset = value; }
+        [DisplayName("回零速度上限")]
+        public float HomeVelHigh { get => homeVel1; set => homeVel1 = value; }
+        [DisplayName("回零速度下限")]
+        public float HomeVelLow { get => homeVel2; set => homeVel2 = value; }
+        [DisplayName("极限离开(极限回原点)")]
+        public float HomeLeave { get => homeLeave; set => homeLeave = value; }
 
         //急停中的急停方式减速度
         /// <summary>

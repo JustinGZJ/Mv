@@ -12,21 +12,41 @@ using System.Collections.Generic;
 using Mv.Modules.Axis.Views.Dialog;
 using MaterialDesignThemes.Wpf;
 using Mv.Core;
+using Unity;
 
 namespace Mv.Modules.Axis.ViewModels
 {
     public class AxisViewModel : BindableBase
     {
 
-
         #region Properties
 
-        public AxisRef SelectedAxisRef { get; set; }
-
+        public AxisRef SelectedAxisRef
+        {
+            get => selectedAxisRef;
+            set
+            {
+                if (SetProperty(ref selectedAxisRef, value))
+                {
+                    P2PPrms.CollectionChanged -= P2PPrms_CollectionChanged;
+                    P2PPrms.Clear();
+                    var ms = config.Get().P2PPrameters.Where(x => x.AxisName == selectedAxisRef.Name);
+                    foreach (var item in ms)
+                    {
+                        P2PPrms.Add(item);
+                    }
+                    P2PPrms.CollectionChanged += P2PPrms_CollectionChanged;
+                }
+            }
+        }
+        public List<AxisRef> AxisRefs { get => axisRefs; set => SetProperty(ref axisRefs, value); }
+        public double JogDistance { get => jogDistance; set => SetProperty(ref jogDistance, value); }
+        public int JogSpeed { get => jogSpeed; set => SetProperty(ref jogSpeed, value); }
+        public ObservableCollection<P2PPrm> P2PPrms { get => p2PPrms; set => p2PPrms = value; }
+        public P2PPrm SelectedP2P { get => selectedP2P; set => SetProperty(ref selectedP2P, value); }
         /// <summary>
         /// 连动
         /// </summary>
-        private bool continuous;
         public bool Continuous
         {
             get { return continuous; }
@@ -35,45 +55,56 @@ namespace Mv.Modules.Axis.ViewModels
         /// <summary>
         /// 点动
         /// </summary>
-        private bool jogMove = true;
         public bool JogMove
         {
             get { return jogMove; }
             set { SetProperty(ref jogMove, value); }
         }
-
         #endregion
 
         #region commands    
 
+        private DelegateCommand cmdPower;
+        public DelegateCommand CmdPower =>
+            cmdPower ?? (cmdPower = new DelegateCommand(ExecuteCmdPower));
+
+        void ExecuteCmdPower()
+        {
+            if (!SelectedAxisRef.ServoOn)
+                motionPart1.MC_Power(SelectedAxisRef);
+            else
+                motionPart1.MC_PowerOff(SelectedAxisRef);
+            motionPart1.MC_SetPos
+        }
+
         #region 正向移动
+        private DelegateCommand cmdMoveForward;
+        public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward);
         void ExecuteMoveForward()
         {
             if (jogMove)
             {
                 Task.Run(() =>
                 {
-                    //             card.MoveRelative(axisName, (int)jogDistance , (short)JogSpeed);
+                    motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-                    //                card.Jog(axisName, (int)JogSpeed);
+                    motionPart1.MC_MoveAdd(SelectedAxisRef, 10d, SelectedAxisRef.Rate);
                 });
             }
 
         }
-        private DelegateCommand cmdMoveForward;
-        public DelegateCommand CmdMoveForward =>
-            cmdMoveForward ?? (cmdMoveForward = new DelegateCommand(ExecuteMoveForward));
+
         #endregion
 
         #region 负向移动
+
         private DelegateCommand cmdMoveBackward;
-        public DelegateCommand CmdMoveBackward =>
-            cmdMoveBackward ?? (cmdMoveBackward = new DelegateCommand(ExecuteMoveBackward));
+        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward);
 
         void ExecuteMoveBackward()
         {
@@ -81,19 +112,17 @@ namespace Mv.Modules.Axis.ViewModels
             {
                 Task.Run(() =>
                 {
-                    //             card.MoveRelative(axisName, (int)jogDistance * -1, (short)JogSpeed);
+                    selectedAxisRef.Prm.MaxVel = JogSpeed;
+                    motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
                 });
             }
             else
             {
                 Task.Run(() =>
                 {
-                    //              card.Jog(axisName, -(int)JogSpeed);
+                    motionPart1.MC_MoveAdd(SelectedAxisRef, -jogDistance, SelectedAxisRef.Rate);
                 });
             }
-
-
-
         }
         #endregion
 
@@ -104,24 +133,43 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteStopMove()
         {
-            //         card.Stop(AxisName, true);
+            motionPart1.MC_EStop(SelectedAxisRef);
         }
         #endregion
         #region 设置命令
-        private DelegateCommand<string> cmdSetAxis;
-        public DelegateCommand<string> CmdSetAxis =>
-            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<string>(ExecuteCmdSetAxis));
+        private DelegateCommand<AxisRef> cmdSetAxis;
+        public DelegateCommand<AxisRef> CmdSetAxis =>
+            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis));
 
-        async void ExecuteCmdSetAxis(string para)
+        async void ExecuteCmdSetAxis(AxisRef axis)
         {
             await DialogHost.Show(new AxisSetting()
             {
                 DataContext = new
                 {
-                    SelectedObject = AxisRefs.FirstOrDefault(axis => axis.Name == para).Prm
+                    SelectedObject = axis.Prm
                 }
             }, "RootDialog"); ;
-           config.Set(config.Get());
+            config.Set(config.Get());
+        }
+        #endregion
+
+        #region 添加位置命令
+        private DelegateCommand cmdAdd;
+        public DelegateCommand CmdAdd =>
+            cmdAdd ?? (cmdAdd = new DelegateCommand(ExecutecmdAdd));
+        void ExecutecmdAdd()
+        {
+            if (selectedAxisRef == null)
+                return;
+            P2PPrms.Add(new P2PPrm()
+            {
+                Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
+                Acceleration = 100,
+                AxisName = selectedAxisRef.Name,
+                Position = selectedAxisRef.RelPos,
+                Velocity = 100
+            });
         }
         #endregion
 
@@ -132,7 +180,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteHome()
         {
-            //     card.Home(AxisName, 10000, 1000, 1000, HomeDir.N负方向, 1000, 1000);
+            motionPart1.MC_Home(ref selectedAxisRef);
         }
         #endregion
 
@@ -143,6 +191,23 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteTeach()
         {
+            if (selectedAxisRef == null)
+                return;
+            if (SelectedP2P == null)
+            {
+                P2PPrms.Add(new P2PPrm()
+                {
+                    Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
+                    Acceleration = 100,
+                    AxisName = selectedAxisRef.Name,
+                    Position = selectedAxisRef.RelPos,
+                    Velocity = 100
+                });
+            }
+            else
+            {
+                SelectedP2P.Position = selectedAxisRef.RelPos;
+            }
 
         }
         #endregion
@@ -154,7 +219,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteReappear()
         {
-
+            motionPart1.MC_MoveAbs(selectedAxisRef, selectedP2P.Position);
         }
         #endregion
 
@@ -165,7 +230,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteSaePoint()
         {
-
+            config.Set(config.Get());
         }
         #endregion
 
@@ -176,7 +241,8 @@ namespace Mv.Modules.Axis.ViewModels
 
         void ExecuteCmdRemovePoint()
         {
-
+            if (selectedP2P != null)
+                P2PPrms.Remove(SelectedP2P);
         }
         #endregion
 
@@ -184,38 +250,43 @@ namespace Mv.Modules.Axis.ViewModels
         private DelegateCommand cmdGoTargetPos;
         public DelegateCommand CmdGoTargetPos =>
             cmdGoTargetPos ?? (cmdGoTargetPos = new DelegateCommand(ExecuteGoTargetPos));
-
-        public List<AxisRef> AxisRefs { get => axisRefs; set =>SetProperty(ref axisRefs , value); }
-
         void ExecuteGoTargetPos()
         {
-            //   card.MoveAbs(AxisName, 10000, 1000);
+
         }
         #endregion
 
         #endregion
 
-        void UpdateStatus()
-        {
-
-        }
+        #region fields
         DispatcherTimer timer = new DispatcherTimer();
-        private readonly IGtsMotion motion;
-        private readonly IConfigManager<MotionConfig> config;
+        readonly IGtsMotion motion;
+        readonly IConfigManager<MotionConfig> config;
         List<AxisRef> axisRefs;
         ICMotionData motionData;
         IMotionPart1 motionPart1;
         IMotionPart5 motionPart5;
         IIoPart1 iopart1;
-        public AxisViewModel(IGtsMotion motion, IConfigManager<MotionConfig> config)
+        AxisRef selectedAxisRef;
+        ObservableCollection<P2PPrm> p2PPrms = new ObservableCollection<P2PPrm>();
+        P2PPrm selectedP2P;
+        bool continuous;
+        int jogSpeed = 10;
+        bool jogMove = true;
+        private double jogDistance;
+        #endregion
+
+        #region ctors
+        public AxisViewModel(IUnityContainer container)
         {
-            this.motion = motion;
-            this.config = config;
+            this.motion = container.Resolve<IGtsMotion>();
+            config = container.Resolve<IConfigManager<MotionConfig>>();
             motionPart1 = motion;
             motionData = motion;
             motionPart5 = motion;
             iopart1 = motion;
             AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
+            SelectedAxisRef = AxisRefs.FirstOrDefault();
 
         }
         public AxisViewModel()
@@ -223,7 +294,9 @@ namespace Mv.Modules.Axis.ViewModels
 
 
         }
+        #endregion
 
+        #region EventHandler
         private void Timer_Tick(object sender, EventArgs e)
         {
             for (int i = 0; i < AxisRefs.Count; i++)
@@ -232,5 +305,22 @@ namespace Mv.Modules.Axis.ViewModels
                 motion.MC_AxisRef(ref axis);
             }
         }
+
+        private void P2PPrms_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                config.Get().P2PPrameters.AddRange(e.NewItems.Cast<P2PPrm>());
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                var paras = config.Get().P2PPrameters;
+                foreach (var item in e.OldItems.Cast<P2PPrm>())
+                {
+                    paras.Remove(item);
+                }
+            }
+        }
+        #endregion
     }
 }

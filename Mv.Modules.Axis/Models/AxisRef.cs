@@ -1,10 +1,17 @@
-﻿using Prism.Mvvm;
-using PropertyChanged;
+﻿using PropertyChanged;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 
 namespace MotionWrapper
 {
+    public static class AxisRefExt
+    {
+        public static List<P2PPrm> GetP2PPrms(this AxisRef axisRef, List<P2PPrm> p2pList)
+        {
+            return p2pList.Where(x => x.Name == axisRef.Name).ToList();
+        }
+    }
+
     [AddINotifyPropertyChangedInterface]
     //轴的定义
     public class AxisRef
@@ -26,8 +33,10 @@ namespace MotionWrapper
         private float cmdPos;
         private float relPos;
         private float cmdVel;
+
+        private float belif = 0.5f;
         //参数
-        private AxisParameter prm = new AxisParameter(); 
+        private AxisParameter prm = new AxisParameter();
         #endregion
         public AxisRef(string _name)
         {
@@ -42,7 +51,7 @@ namespace MotionWrapper
         {
             foreach (var item in prmList)
             {
-                if (item.Name == this.Name)
+                if (item.Name == Name)
                 {
                     this.Prm = item;
                     return true;
@@ -68,5 +77,6 @@ namespace MotionWrapper
         public bool HomeSwitch { get => homeSwitch; set => homeSwitch = value; }
         public string Name { get => name; set => name = value; }
         public AxisParameter Prm { get => prm; set => prm = value; }
+        public float Rate { get => belif; set => belif = value; }
     };
 }

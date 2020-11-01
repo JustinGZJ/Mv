@@ -6,6 +6,9 @@ using Mv.Core;
 
 namespace MotionWrapper
 {
+
+
+
     /// <summary>
     /// 固高卡的封装  都在这里
     /// 数据区域都在这个类里面
@@ -13,31 +16,41 @@ namespace MotionWrapper
     /// </summary>
     public class CGtsMotion : CMotionData, IGtsMotion
     {
+        #region Fields
         public const int usedInput = 16, usedOutput = 16, usedAxis = 5;//必须外部指定
         private readonly IConfigManager<MotionConfig> configManager;
         public bool initOk = false;
-
         private Thread runThread = null;       //用来刷新IO的
         //私有变量
         private short cardNum = 0;
+        #endregion
         //局部变量
+        #region Ctors
         public CGtsMotion(IConfigManager<MotionConfig> configManager)
         {
             List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
             for (int i = 0; i < axisParameters.Count; i++)
             {
-                AxisRefs[i] = new AxisRef(axisParameters[i].Name) {
+                AxisRefs[i] = new AxisRef(axisParameters[i].Name)
+                {
                     Prm = axisParameters[i]
                 };
             }
             this.configManager = configManager;
         }
+        #endregion
         //局部变量
+
+        #region IIoPart1
         bool IIoPart1.getDi(IoRef input)
         {
             mc.GT_GetDi(cardNum, (short)input.prm.IoType, out var v);
             return v > 0;
-          //  return false;
+            //  return false;
+        }
+        void IIoPart1.setDO(IoRef output, bool value)
+        {
+            mc.GT_SetDoBit(cardNum, (short)output.prm.IoType, output.prm.Index, (short)(value ? 1 : 0));
         }
 
         bool IIoPart1.getDo(IoRef output)
@@ -45,7 +58,26 @@ namespace MotionWrapper
             mc.GT_GetDi(cardNum, (short)output.prm.IoType, out var v);
             return v > 0;
         }
+        bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
+        {
 
+            throw new NotImplementedException();
+        }
+
+        bool IIoPart1.getDo(int startIndex, int lenth, ref bool[] value)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region IMotionPart1
+        int IMotionPart1.MC_SetPos(AxisRef axis, double pos)
+        {
+            mc.GT_SetPrfPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
+            mc.GT_SetEncPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
+            mc.GT_SynchAxisPos(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
+            return 0;
+        }
         int IMotionPart1.MC_Home(ref AxisRef axis)
         {
             mc.THomePrm prm = new mc.THomePrm();
@@ -67,12 +99,12 @@ namespace MotionWrapper
             }
             prm.indexDir = 1;
             prm.edge = 0;
-            prm.homeOffset = (int)axis.Prm.mm2pls(axis.Prm.homeoffset);
-            prm.velHigh = axis.Prm.mmpers2plsperms(axis.Prm.homeVel1);
-            prm.velLow = axis.Prm.mmpers2plsperms(axis.Prm.homeVel2);
+            prm.homeOffset = (int)axis.Prm.mm2pls(axis.Prm.Homeoffset);
+            prm.velHigh = axis.Prm.mmpers2plsperms(axis.Prm.HomeVelHigh);
+            prm.velLow = axis.Prm.mmpers2plsperms(axis.Prm.HomeVelLow);
             prm.searchHomeDistance = Math.Abs((int)axis.Prm.mm2pls(axis.Prm.homeSearch));
             prm.searchIndexDistance = prm.searchHomeDistance;
-            prm.escapeStep = (int)axis.Prm.mm2pls(axis.Prm.homeLeave);
+            prm.escapeStep = (int)axis.Prm.mm2pls(axis.Prm.HomeLeave);
             rtn += mc.GT_GoHome(axis.Prm.CardNum, axis.Prm.AxisNum, ref prm);
             if (rtn == 0) axis.IsHoming = true;
             else axis.IsHoming = false;
@@ -198,10 +230,88 @@ namespace MotionWrapper
             return 0;
         }
 
-        void IIoPart1.setDO(IoRef output, bool value)
+        public int MC_AxisRef(ref AxisRef axisref)
         {
-            mc.GT_SetDoBit(cardNum, (short)output.prm.IoType, output.prm.Index, (short)(value ? 1 : 0));
+            short rtn = 0;
+            uint clock = 0;
+            double[] prfpos = new double[1];
+            double[] encpos = new double[1];
+            double[] encvel = new double[1];
+            int[] sts = new int[1];
+            rtn += mc.GT_GetPrfPos(0, 1, out prfpos[0], 1, out clock);
+            rtn += mc.GT_GetEncPos(0, 1, out encpos[0], 1, out clock);
+            rtn += mc.GT_GetEncVel(0, 1, out encvel[0], 1, out clock);
+            rtn += mc.GT_GetSts(0, 1, out sts[0], 1, out clock);
+            //解析
+            axisref.Alarm = (sts[0] & 0x2) != 0;
+            axisref.ServoOn = (sts[0] & 0x200) != 0;
+            axisref.LimitN = (sts[0] & 0x40) != 0;
+            axisref.LimitP = (sts[0] & 0x20) != 0;
+            axisref.Moving = (sts[0] & 0x400) != 0;
+
+            axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
+            axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
+            axisref.RelVel = (float)axisref.Prm.plsperms2mmpers(encvel[0]);
+
+            return rtn;
         }
+
+        int IMotionPart1.MC_PowerOff(AxisRef axis)
+        {
+            return mc.GT_AxisOff(axis.Prm.CardNum, axis.Prm.AxisNum);
+        }
+
+        int IMotionPart1.MC_EStop(AxisRef axis)
+        {
+            axis.IsHoming = false;
+            mc.GT_Stop(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1), 1 << (axis.Prm.AxisNum - 1));
+            return 0;
+        }
+
+        /// <summary>
+        /// 启动坐标系
+        /// </summary>
+        /// <param name="crdNum"></param>
+        /// <returns></returns>
+        int IMotionPart5.MC_CrdStart(int crdNum)
+        {
+            short rtn = mc.GT_CrdStart((short)configManager.Get().CrdParameters[crdNum].CardNum, (short)configManager.Get().CrdParameters[crdNum].CrdNum, 0);
+            return rtn;
+        }
+
+        int IMotionPart5.MC_CamStatus(AxisRef slaver, ref CCamStatus status)
+        {
+            return 0;
+        }
+
+        int IMotionPart5.MC_CrdSetOrigin(int crdNum, List<double> origionData)
+        {
+            throw new NotImplementedException();
+        }
+
+        int IMotionPart5.MC_CrdOverride(int crdNum, float BeiLv)
+        {
+            throw new NotImplementedException();
+        }
+
+        int IMotionPart5.MC_CrdStatus(int crdNum)
+        {
+            CCrdPrm prm = configManager.Get().CrdParameters[crdNum];
+            short crdRun = 0;
+            int segment = 0;
+            short rtn = mc.GT_CrdStatus((short)prm.CardNum, (short)prm.CrdNum, out crdRun, out segment, 0);
+            if (crdRun <= 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        #endregion
+
+
         private void subStatusData()
         {
             short rtn = 0;
@@ -242,43 +352,7 @@ namespace MotionWrapper
             }
         }
 
-        public int MC_AxisRef(ref AxisRef axisref)
-        {
-            short rtn = 0;
-            uint clock = 0;
-            double[] prfpos = new double[1];
-            double[] encpos = new double[1];
-            double[] encvel = new double[1];
-            int[] sts = new int[1];
-            rtn += mc.GT_GetPrfPos(0, 1, out prfpos[0], 1, out clock);
-            rtn += mc.GT_GetEncPos(0, 1, out encpos[0], 1, out clock);
-            rtn += mc.GT_GetEncVel(0, 1, out encvel[0], 1, out clock);
-            rtn += mc.GT_GetSts(0, 1, out sts[0], 1, out clock);
-            //解析
-            axisref.Alarm = (sts[0] & 0x2) != 0;
-            axisref.ServoOn = (sts[0] & 0x200) != 0;
-            axisref.LimitN = (sts[0] & 0x40) != 0;
-            axisref.LimitP = (sts[0] & 0x20) != 0;
-            axisref.Moving = (sts[0] & 0x400) != 0;
-
-            axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
-            axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
-            axisref.RelVel = (float)axisref.Prm.plsperms2mmpers(encvel[0]);
-
-            return rtn;
-        }
-
-        int IMotionPart1.MC_EStop(AxisRef axis)
-        {
-            axis.IsHoming = false;
-            mc.GT_Stop(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1), 1 << (axis.Prm.AxisNum - 1));
-            return 0;
-        }
-
-        int IMotionPart1.MC_PowerOff(AxisRef axis)
-        {
-            return mc.GT_AxisOff(axis.Prm.CardNum, axis.Prm.AxisNum);
-        }
+        #region IMotionPart5
 
         int IMotionPart5.MC_CrdData(string cmd, int crdNum)
         {
@@ -362,99 +436,6 @@ namespace MotionWrapper
             return rtn;
         }
 
-        /// <summary>
-        /// 获取指定范围的数组
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="lenth"></param>
-        /// <returns></returns>
-        public List<bool> getAllInput()
-        {
-            List<bool> tmp = new List<bool>();
-            for (int i = 0; i < usedInput; i++)
-            {
-                tmp.Add(Mdis[i]);
-            }
-            return tmp;
-        }
-        /// <summary>
-        /// 获取指定范围的数组
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="lenth"></param>
-        /// <returns></returns>
-        public List<bool> getAllOutput()
-        {
-            List<bool> tmp = new List<bool>();
-            for (int i = 0; i < usedOutput; i++)
-            {
-                tmp.Add(Mdos[i]);
-            }
-            return tmp;
-        }
-        /// <summary>
-        /// 获取指定范围的数组
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="lenth"></param>
-        /// <returns></returns>
-        public List<AxisRef> getAllAxis()
-        {
-            List<AxisRef> tmp = new List<AxisRef>();
-            for (int i = 0; i < usedAxis; i++)
-            {
-                tmp.Add(AxisRefs[i]);
-            }
-            return tmp;
-        }
-        public void Run()
-        {
-            IFreshable freshMd = this as IFreshable;
-            while (true)
-            {
-                freshMd.Fresh();
-                Thread.Sleep(1);
-            }
-        }
-        /// <summary>
-        /// 启动坐标系
-        /// </summary>
-        /// <param name="crdNum"></param>
-        /// <returns></returns>
-        int IMotionPart5.MC_CrdStart(int crdNum)
-        {
-            short rtn = mc.GT_CrdStart((short)configManager.Get().CrdParameters[crdNum].CardNum, (short)configManager.Get().CrdParameters[crdNum].CrdNum, 0);
-            return rtn;
-        }
-
-        int IMotionPart5.MC_CamStatus(AxisRef slaver, ref CCamStatus status)
-        {
-            return 0;
-        }
-
-        int IMotionPart5.MC_CrdStatus(int crdNum)
-        {
-            CCrdPrm prm = configManager.Get().CrdParameters[crdNum];
-            short crdRun = 0;
-            int segment = 0;
-            short rtn = mc.GT_CrdStatus((short)prm.CardNum, (short)prm.CrdNum, out crdRun, out segment, 0);
-            if (crdRun <= 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return 1;
-            }
-        }
-
-        int IMotionPart1.MC_SetPos(AxisRef axis, double pos)
-        {
-            mc.GT_SetPrfPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
-            mc.GT_SetEncPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
-            mc.GT_SynchAxisPos(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
-            return 0;
-        }
 
         int IMotionPart5.MC_StartCapture(AxisRef enc, CCapturePrm capturePrm)
         {
@@ -627,6 +608,66 @@ namespace MotionWrapper
             }
             return -1;
         }
+        #endregion
+
+        /// <summary>
+        /// 获取指定范围的数组
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="lenth"></param>
+        /// <returns></returns>
+        public List<bool> getAllInput()
+        {
+            List<bool> tmp = new List<bool>();
+            for (int i = 0; i < usedInput; i++)
+            {
+                tmp.Add(Mdis[i]);
+            }
+            return tmp;
+        }
+        /// <summary>
+        /// 获取指定范围的数组
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="lenth"></param>
+        /// <returns></returns>
+        public List<bool> getAllOutput()
+        {
+            List<bool> tmp = new List<bool>();
+            for (int i = 0; i < usedOutput; i++)
+            {
+                tmp.Add(Mdos[i]);
+            }
+            return tmp;
+        }
+        /// <summary>
+        /// 获取指定范围的数组
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="lenth"></param>
+        /// <returns></returns>
+        public List<AxisRef> getAllAxis()
+        {
+            List<AxisRef> tmp = new List<AxisRef>();
+            for (int i = 0; i < usedAxis; i++)
+            {
+                tmp.Add(AxisRefs[i]);
+            }
+            return tmp;
+        }
+        public void Run()
+        {
+            IFreshable freshMd = this as IFreshable;
+            while (true)
+            {
+                freshMd.Fresh();
+                Thread.Sleep(1);
+            }
+        }
+
+
+
+
 
         public void Fresh()
         {
@@ -690,31 +731,13 @@ namespace MotionWrapper
             }
         }
 
-        bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
-        {
-           
-            throw new NotImplementedException();
-        }
 
-        bool IIoPart1.getDo(int startIndex, int lenth, ref bool[] value)
-        {
-            throw new NotImplementedException();
-        }
 
         public int MC_AxisRef(int startIndex, int lenth, ref AxisRef[] axisS)
         {
             throw new NotImplementedException();
         }
 
-        int IMotionPart5.MC_CrdSetOrigin(int crdNum, List<double> origionData)
-        {
-            throw new NotImplementedException();
-        }
-
-        int IMotionPart5.MC_CrdOverride(int crdNum, float BeiLv)
-        {
-            throw new NotImplementedException();
-        }
 
         public int MC_HomeStatus(ref AxisRef axis)
         {
