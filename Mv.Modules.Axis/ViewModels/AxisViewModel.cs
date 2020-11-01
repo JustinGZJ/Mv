@@ -16,6 +16,124 @@ using Unity;
 
 namespace Mv.Modules.Axis.ViewModels
 {
+    public class P2PDataViewModel:BindableBase
+    {
+        ICMotionData motionData;
+        IMotionPart1 motionPart1;
+
+        public ObservableCollection<P2PPrm> P2PPrms { get => p2PPrms; set => p2PPrms = value; }
+        public P2PPrm SelectedP2P { get => selectedP2P; set => SetProperty(ref selectedP2P, value); }
+        AxisRef selectedAxisRef;
+        public AxisRef SelectedAxisRef
+        {
+            get => selectedAxisRef;
+            set
+            {
+                if (SetProperty(ref selectedAxisRef, value))
+                {
+                    P2PPrms.CollectionChanged -= P2PPrms_CollectionChanged;
+                    P2PPrms.Clear();
+                    var ms = config.Get().P2PPrameters.Where(x => x.AxisName == selectedAxisRef.Name);
+                    foreach (var item in ms)
+                    {
+                        P2PPrms.Add(item);
+                    }
+                    P2PPrms.CollectionChanged += P2PPrms_CollectionChanged;
+                }
+            }
+        }
+        P2PPrm selectedP2P;
+        ObservableCollection<P2PPrm> p2PPrms = new ObservableCollection<P2PPrm>();
+
+        public P2PDataViewModel(IUnityContainer container)
+        {
+            this.motion = container.Resolve<IGtsMotion>();
+            config = container.Resolve<IConfigManager<MotionConfig>>();
+            motionPart1 = motion;
+            motionData = motion;
+        }
+
+        #region 示教
+        private DelegateCommand cmdTeach;
+        public DelegateCommand CmdTeach =>
+            cmdTeach ?? (cmdTeach = new DelegateCommand(ExecuteTeach, () => SelectedAxisRef != null));
+
+        void ExecuteTeach()
+        {
+            if (selectedAxisRef == null)
+                return;
+            if (SelectedP2P == null)
+            {
+                P2PPrms.Add(new P2PPrm()
+                {
+                    Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
+                    Acceleration = 100,
+                    AxisName = selectedAxisRef.Name,
+                    Position = selectedAxisRef.RelPos,
+                    Velocity = 100
+                });
+            }
+            else
+            {
+                SelectedP2P.Position = selectedAxisRef.RelPos;
+            }
+
+        }
+        #endregion
+
+        #region 重现
+        private DelegateCommand cmdReappear;
+        public DelegateCommand CmdReappear =>
+            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null && selectedP2P != null));
+
+        void ExecuteReappear()
+        {
+            motionPart1.MC_MoveAbs(selectedAxisRef, selectedP2P.Position);
+        }
+        #endregion
+
+        #region 保存点位
+        private DelegateCommand cmdSavePoint;
+        public DelegateCommand CmdSaePoint =>
+            cmdSavePoint ?? (cmdSavePoint = new DelegateCommand(ExecuteSaePoint));
+
+        void ExecuteSaePoint()
+        {
+            config.Set(config.Get());
+        }
+        #endregion
+
+        #region 删除点位
+        private DelegateCommand cmdRemovePoint;
+        private IGtsMotion motion;
+        private IConfigManager<MotionConfig> config;
+
+        public DelegateCommand CmdRemovePoint =>
+            cmdRemovePoint ?? (cmdRemovePoint = new DelegateCommand(ExecuteCmdRemovePoint, () => SelectedAxisRef != null));
+
+        void ExecuteCmdRemovePoint()
+        {
+            if (selectedP2P != null)
+                P2PPrms.Remove(SelectedP2P);
+        }
+        #endregion
+
+        private void P2PPrms_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                config.Get().P2PPrameters.AddRange(e.NewItems.Cast<P2PPrm>());
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+            {
+                var paras = config.Get().P2PPrameters;
+                foreach (var item in e.OldItems.Cast<P2PPrm>())
+                {
+                    paras.Remove(item);
+                }
+            }
+        }
+    }
     public class AxisViewModel : BindableBase
     {
 
@@ -62,11 +180,11 @@ namespace Mv.Modules.Axis.ViewModels
         }
         #endregion
 
-        #region commands    
+        #region commands                                                                
 
         private DelegateCommand cmdPower;
         public DelegateCommand CmdPower =>
-            cmdPower ?? (cmdPower = new DelegateCommand(ExecuteCmdPower));
+            cmdPower ?? (cmdPower = new DelegateCommand(ExecuteCmdPower,()=>SelectedAxisRef!=null));
 
         void ExecuteCmdPower()
         {
@@ -74,12 +192,12 @@ namespace Mv.Modules.Axis.ViewModels
                 motionPart1.MC_Power(SelectedAxisRef);
             else
                 motionPart1.MC_PowerOff(SelectedAxisRef);
-            motionPart1.MC_SetPos
+          //  motionPart1.MC_SetPos
         }
 
         #region 正向移动
         private DelegateCommand cmdMoveForward;
-        public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward);
+        public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward, () => SelectedAxisRef != null);
         void ExecuteMoveForward()
         {
             if (jogMove)
@@ -99,12 +217,12 @@ namespace Mv.Modules.Axis.ViewModels
 
         }
 
-        #endregion
+
 
         #region 负向移动
 
         private DelegateCommand cmdMoveBackward;
-        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward);
+        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward, () => SelectedAxisRef != null);
 
         void ExecuteMoveBackward()
         {
@@ -129,8 +247,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 停止移动
         private DelegateCommand cmdStopMove;
         public DelegateCommand CmdStopMove =>
-            cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove));
-
+            cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove, () => SelectedAxisRef != null));
         void ExecuteStopMove()
         {
             motionPart1.MC_EStop(SelectedAxisRef);
@@ -139,7 +256,8 @@ namespace Mv.Modules.Axis.ViewModels
         #region 设置命令
         private DelegateCommand<AxisRef> cmdSetAxis;
         public DelegateCommand<AxisRef> CmdSetAxis =>
-            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis));
+            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis,(axis)=>
+            SelectedAxisRef != null));
 
         async void ExecuteCmdSetAxis(AxisRef axis)
         {
@@ -157,11 +275,12 @@ namespace Mv.Modules.Axis.ViewModels
         #region 添加位置命令
         private DelegateCommand cmdAdd;
         public DelegateCommand CmdAdd =>
-            cmdAdd ?? (cmdAdd = new DelegateCommand(ExecutecmdAdd));
+            cmdAdd ?? (cmdAdd = new DelegateCommand(ExecutecmdAdd, () => SelectedAxisRef != null));
         void ExecutecmdAdd()
         {
             if (selectedAxisRef == null)
                 return;
+            motionPart1.MC_AxisRef(ref selectedAxisRef);
             P2PPrms.Add(new P2PPrm()
             {
                 Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
@@ -176,7 +295,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 回零运动
         private DelegateCommand cmdHome;
         public DelegateCommand CmdHome =>
-            cmdHome ?? (cmdHome = new DelegateCommand(ExecuteHome));
+            cmdHome ?? (cmdHome = new DelegateCommand(ExecuteHome, () => SelectedAxisRef != null));
 
         void ExecuteHome()
         {
@@ -187,7 +306,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 示教
         private DelegateCommand cmdTeach;
         public DelegateCommand CmdTeach =>
-            cmdTeach ?? (cmdTeach = new DelegateCommand(ExecuteTeach));
+            cmdTeach ?? (cmdTeach = new DelegateCommand(ExecuteTeach, () => SelectedAxisRef != null));
 
         void ExecuteTeach()
         {
@@ -215,7 +334,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 重现
         private DelegateCommand cmdReappear;
         public DelegateCommand CmdReappear =>
-            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear));
+            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null&& selectedP2P!=null));
 
         void ExecuteReappear()
         {
@@ -237,7 +356,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 删除点位
         private DelegateCommand cmdRemovePoint;
         public DelegateCommand CmdRemovePoint =>
-            cmdRemovePoint ?? (cmdRemovePoint = new DelegateCommand(ExecuteCmdRemovePoint));
+            cmdRemovePoint ?? (cmdRemovePoint = new DelegateCommand(ExecuteCmdRemovePoint, () => SelectedAxisRef != null));
 
         void ExecuteCmdRemovePoint()
         {
@@ -249,11 +368,12 @@ namespace Mv.Modules.Axis.ViewModels
         #region 前往目标位置
         private DelegateCommand cmdGoTargetPos;
         public DelegateCommand CmdGoTargetPos =>
-            cmdGoTargetPos ?? (cmdGoTargetPos = new DelegateCommand(ExecuteGoTargetPos));
+            cmdGoTargetPos ?? (cmdGoTargetPos = new DelegateCommand(ExecuteGoTargetPos, () => SelectedAxisRef != null));
         void ExecuteGoTargetPos()
         {
 
         }
+        #endregion
         #endregion
 
         #endregion
@@ -287,11 +407,6 @@ namespace Mv.Modules.Axis.ViewModels
             iopart1 = motion;
             AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
             SelectedAxisRef = AxisRefs.FirstOrDefault();
-
-        }
-        public AxisViewModel()
-        {
-
 
         }
         #endregion

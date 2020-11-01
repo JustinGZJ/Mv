@@ -68,6 +68,10 @@ namespace MotionWrapper
         {
             throw new NotImplementedException();
         }
+        public bool getDiCounter(IoRef input, ref long counter)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region IMotionPart1
@@ -268,11 +272,43 @@ namespace MotionWrapper
             return 0;
         }
 
+        public int MC_AxisRef(int startIndex, int lenth, ref AxisRef[] axisS)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int MC_SetAxis(AxisRef axis, CAxisSetPrm prm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int MC_HomeStatus(ref AxisRef axis)
+        {
+            short rtn = 0;
+            mc.THomeStatus tmpHomeSts = new mc.THomeStatus();
+            rtn = mc.GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tmpHomeSts);
+            if (tmpHomeSts.run == 0 && tmpHomeSts.error == mc.HOME_ERROR_NONE)//回零完成
+            {
+                axis.Homed = 1;
+                mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+                axis.IsHoming = false;
+            }
+            if (tmpHomeSts.run == 0 && tmpHomeSts.error != mc.HOME_ERROR_NONE)//回零完成
+            {
+                axis.Homed = -1;
+                axis.IsHoming = false;
+            }
+            return rtn;
+        }
+        #endregion
+
         /// <summary>
         /// 启动坐标系
         /// </summary>
         /// <param name="crdNum"></param>
         /// <returns></returns>
+
+        #region IMotionPart5
         int IMotionPart5.MC_CrdStart(int crdNum)
         {
             short rtn = mc.GT_CrdStart((short)configManager.Get().CrdParameters[crdNum].CardNum, (short)configManager.Get().CrdParameters[crdNum].CrdNum, 0);
@@ -309,51 +345,6 @@ namespace MotionWrapper
                 return 1;
             }
         }
-        #endregion
-
-
-        private void subStatusData()
-        {
-            short rtn = 0;
-            int inValue = 0, outValue = 0;
-            double[] prfpos = new double[8];
-            double[] encpos = new double[8];
-            double[] encvel = new double[8];
-            //辅助编码器
-            double[] fzencpos = new double[2];
-            double[] fzencvel = new double[2];
-            int[] sts = new int[8];
-            rtn = mc.GT_GetDi(0, mc.MC_GPI, out inValue);
-            rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
-            rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 4, out _);
-            rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 4, out _);
-            rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 4, out _);
-            rtn = mc.GT_GetSts(0, 1, out sts[0], 4, out _);
-            //辅助编码器
-            rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
-            rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
-            //解析
-            for (int i = 0; i < 16; i++)
-            {
-                Mdis[i] = ((1 << i) & inValue) == 0;
-                Mdos[i] = ((1 << i) & outValue) == 0;
-                if (i < 8)//轴状态分解
-                {
-                    AxisRefs[i].Alarm = (sts[i] & 0x2) != 0;
-                    AxisRefs[i].ServoOn = (sts[i] & 0x200) != 0;
-                    AxisRefs[i].LimitN = (sts[i] & 0x40) != 0;
-                    AxisRefs[i].LimitP = (sts[i] & 0x20) != 0;
-                    AxisRefs[i].Moving = (sts[i] & 0x400) != 0;
-
-                    AxisRefs[i].CmdPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)prfpos[i]);
-                    AxisRefs[i].RelPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)encpos[i]);
-                    AxisRefs[i].RelVel = (float)configManager.Get().AxisParameters[i].plsperms2mmpers(encvel[i]);
-                }
-            }
-        }
-
-        #region IMotionPart5
-
         int IMotionPart5.MC_CrdData(string cmd, int crdNum)
         {
             throw new NotImplementedException();
@@ -608,7 +599,130 @@ namespace MotionWrapper
             }
             return -1;
         }
+
+        public int MC_Compare(AxisRef axis, double posMM, IoRef cmpInput)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
+
+
+        public void Run()
+        {
+            IFreshable freshMd = this as IFreshable;
+            while (true)
+            {
+                freshMd.Fresh();
+                Thread.Sleep(1);
+            }
+        }
+
+        #region IInitable
+        public void Fresh()
+        {
+            subStatusData();
+        }
+
+        void IFreshable.Run()
+        {
+            IFreshable fresh = this as IFreshable;
+            while (true)
+            {
+                fresh.Fresh();
+                Thread.Sleep(1);
+            }
+        }
+        #endregion
+
+        #region IInitable
+        bool IInitable.Init()
+        {
+            try
+            {
+                short rtn = 0;
+                rtn += mc.GT_Open(cardNum, 0, 0);
+                rtn += mc.GT_Reset(cardNum);
+                rtn += mc.GT_LoadConfig(cardNum, @"GTS800.cfg");
+                rtn += mc.GT_ClrSts(cardNum, 1, 8);
+                rtn += mc.GT_ZeroPos(cardNum, 1, 8);
+                if (rtn == 0)
+                {
+                    runThread = new Thread(Run);
+                    runThread.IsBackground = true;
+                    runThread.Start();
+                    return initOk = true;
+                }
+                return initOk = false;
+            }
+            catch (Exception)
+            {
+                return initOk = false;
+            }
+        }
+
+        bool IInitable.UnInit()
+        {
+            try
+            {
+                //停止刷新
+                if (runThread != null && runThread.IsAlive)
+                {
+                    runThread.Abort();
+                    Thread.Sleep(5);
+                    runThread = null;
+                }
+                short rtn = 0;
+                rtn += mc.GT_Reset(cardNum);
+                rtn += mc.GT_Close(cardNum);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        #endregion
+
+
+        private void subStatusData()
+        {
+            short rtn = 0;
+            int inValue = 0, outValue = 0;
+            double[] prfpos = new double[8];
+            double[] encpos = new double[8];
+            double[] encvel = new double[8];
+            //辅助编码器
+            double[] fzencpos = new double[2];
+            double[] fzencvel = new double[2];
+            int[] sts = new int[8];
+            rtn = mc.GT_GetDi(0, mc.MC_GPI, out inValue);
+            rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
+            rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 4, out _);
+            rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 4, out _);
+            rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 4, out _);
+            rtn = mc.GT_GetSts(0, 1, out sts[0], 4, out _);
+            //辅助编码器
+            rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
+            rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
+            //解析
+            for (int i = 0; i < 16; i++)
+            {
+                Mdis[i] = ((1 << i) & inValue) == 0;
+                Mdos[i] = ((1 << i) & outValue) == 0;
+                if (i < 8)//轴状态分解
+                {
+                    AxisRefs[i].Alarm = (sts[i] & 0x2) != 0;
+                    AxisRefs[i].ServoOn = (sts[i] & 0x200) != 0;
+                    AxisRefs[i].LimitN = (sts[i] & 0x40) != 0;
+                    AxisRefs[i].LimitP = (sts[i] & 0x20) != 0;
+                    AxisRefs[i].Moving = (sts[i] & 0x400) != 0;
+
+                    AxisRefs[i].CmdPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)prfpos[i]);
+                    AxisRefs[i].RelPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)encpos[i]);
+                    AxisRefs[i].RelVel = (float)configManager.Get().AxisParameters[i].plsperms2mmpers(encvel[i]);
+                }
+            }
+        }
 
         /// <summary>
         /// 获取指定范围的数组
@@ -655,122 +769,9 @@ namespace MotionWrapper
             }
             return tmp;
         }
-        public void Run()
-        {
-            IFreshable freshMd = this as IFreshable;
-            while (true)
-            {
-                freshMd.Fresh();
-                Thread.Sleep(1);
-            }
-        }
 
 
 
 
-
-        public void Fresh()
-        {
-            subStatusData();
-        }
-
-        void IFreshable.Run()
-        {
-            IFreshable fresh = this as IFreshable;
-            while (true)
-            {
-                fresh.Fresh();
-                Thread.Sleep(1);
-            }
-        }
-
-        bool IInitable.Init()
-        {
-            try
-            {
-                short rtn = 0;
-                rtn += mc.GT_Open(cardNum, 0, 0);
-                rtn += mc.GT_Reset(cardNum);
-                rtn += mc.GT_LoadConfig(cardNum, @"GTS800.cfg");
-                rtn += mc.GT_ClrSts(cardNum, 1, 8);
-                rtn += mc.GT_ZeroPos(cardNum, 1, 8);
-                if (rtn == 0)
-                {
-                    runThread =new Thread(Run);
-                    runThread.IsBackground = true;
-                    runThread.Start();
-                    return initOk = true;
-                }
-                return initOk = false;
-            }
-            catch (Exception)
-            {
-                return initOk = false;
-            }
-        }
-
-        bool IInitable.UnInit()
-        {
-            try
-            {
-                //停止刷新
-                if (runThread != null && runThread.IsAlive)
-                {
-                    runThread.Abort();
-                    Thread.Sleep(5);
-                    runThread = null;
-                }
-                short rtn = 0;
-                rtn += mc.GT_Reset(cardNum);
-                rtn += mc.GT_Close(cardNum);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-
-
-        public int MC_AxisRef(int startIndex, int lenth, ref AxisRef[] axisS)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public int MC_HomeStatus(ref AxisRef axis)
-        {
-            short rtn = 0;
-            mc.THomeStatus tmpHomeSts = new mc.THomeStatus();
-            rtn = mc.GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tmpHomeSts);
-            if (tmpHomeSts.run == 0 && tmpHomeSts.error == mc.HOME_ERROR_NONE)//回零完成
-            {
-                axis.Homed = 1;
-                mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
-                axis.IsHoming = false;
-            }
-            if (tmpHomeSts.run == 0 && tmpHomeSts.error != mc.HOME_ERROR_NONE)//回零完成
-            {
-                axis.Homed = -1;
-                axis.IsHoming = false;
-            }
-            return rtn;
-        }
-
-        public int MC_SetAxis(AxisRef axis, CAxisSetPrm prm)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool getDiCounter(IoRef input, ref long counter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int MC_Compare(AxisRef axis, double posMM, IoRef cmpInput)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
