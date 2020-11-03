@@ -11,7 +11,6 @@
             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:axis="clr-namespace:Mv.Modules.Axis"
              xmlns:pt="http://propertytools.org/wpf"
-             d:DataContext="{d:DesignInstance local:AxisViewModel, IsDesignTimeCreatable=True}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
@@ -26,11 +25,7 @@
             <RowDefinition Height="178*"/>
         </Grid.RowDefinitions>
         <Grid x:Name="toolbar" Grid.Column="0" Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock VerticalAlignment="Center" Text="速度"/>
-                <TextBlock x:Name="Speed" Width="60" VerticalAlignment="Center" Text="{Binding SelectedAxisRef.RelPos}" />
-                <TextBlock VerticalAlignment="Center" Text="mm/s"/>
-            </StackPanel>
+
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">

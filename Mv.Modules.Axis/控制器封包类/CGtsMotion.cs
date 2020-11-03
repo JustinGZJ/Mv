@@ -404,7 +404,7 @@ namespace MotionWrapper
             //判断是否是跟随模式
             foreach (var item in data)
             {
-                rtn += mc.GT_FollowData(slaver.Prm.CardNum, slaver.Prm.AxisNum, (int)item.master, item.slaver, (short)item.moveType, 0);
+                rtn += mc.GT_FollowData(slaver.Prm.CardNum, slaver.Prm.AxisNum, (int)item.Master, item.Slaver, (short)item.MoveType, 0);
             }
             if (passpos != 0)
             {
@@ -617,7 +617,7 @@ namespace MotionWrapper
             }
         }
 
-        #region IInitable
+        #region IFreshable
         public void Fresh()
         {
             subStatusData();

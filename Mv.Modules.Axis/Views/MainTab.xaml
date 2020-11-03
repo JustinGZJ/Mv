@@ -10,6 +10,14 @@
             Header="轴控制"
              prism:ViewModelLocator.AutoWireViewModel="True" >
     <Grid>
-        <local:Axis/>
+        <TabControl>
+            <TabItem Header="P2P">
+                <local:Axis/>
+            </TabItem>
+            <TabItem Header="Follow">
+                <local:FollowAxis></local:FollowAxis>
+            </TabItem>
+        </TabControl>
+   
     </Grid>
 </TabItem>
