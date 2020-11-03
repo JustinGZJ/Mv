@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using gts;
+using static gts.mc;
 using Mv.Core;
 
 namespace MotionWrapper
@@ -37,6 +38,7 @@ namespace MotionWrapper
                 };
             }
             this.configManager = configManager;
+          
         }
         #endregion
         //局部变量
@@ -704,22 +706,22 @@ namespace MotionWrapper
             //辅助编码器
             rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
             rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
+            List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
             //解析
             for (int i = 0; i < 16; i++)
             {
                 Mdis[i] = ((1 << i) & inValue) == 0;
                 Mdos[i] = ((1 << i) & outValue) == 0;
-                if (i < 8)//轴状态分解
+                if (i < axisParameters.Count)//轴状态分解
                 {
                     AxisRefs[i].Alarm = (sts[i] & 0x2) != 0;
                     AxisRefs[i].ServoOn = (sts[i] & 0x200) != 0;
                     AxisRefs[i].LimitN = (sts[i] & 0x40) != 0;
                     AxisRefs[i].LimitP = (sts[i] & 0x20) != 0;
                     AxisRefs[i].Moving = (sts[i] & 0x400) != 0;
-
-                    AxisRefs[i].CmdPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)prfpos[i]);
-                    AxisRefs[i].RelPos = (float)configManager.Get().AxisParameters[i].pls2mm((long)encpos[i]);
-                    AxisRefs[i].RelVel = (float)configManager.Get().AxisParameters[i].plsperms2mmpers(encvel[i]);
+                    AxisRefs[i].CmdPos = (float)axisParameters[i].pls2mm((long)prfpos[i]);
+                    AxisRefs[i].RelPos = (float)axisParameters[i].pls2mm((long)encpos[i]);
+                    AxisRefs[i].RelVel = (float)axisParameters[i].plsperms2mmpers(encvel[i]);
                 }
             }
         }

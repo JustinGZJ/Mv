@@ -10,11 +10,15 @@
              mc:Ignorable="d" 
             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:axis="clr-namespace:Mv.Modules.Axis"
+            xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels"
              xmlns:pt="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
     </UserControl.Resources>
+    <!--<UserControl.DataContext>
+        <vm:AxisViewModel/>
+    </UserControl.DataContext>-->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="43*"/>
@@ -202,23 +206,35 @@
                     <Button  Command="{Binding CmdPower}" ToolTip="轴设置"  axis:ControlEx.AttachedState="{Binding  SelectedAxisRef.ServoOn}">
                         <materialDesign:PackIcon Width="24" Height="24" Kind="Power" />
                     </Button>
-                    <Button   Command="{Binding CmdMoveForward}" Content="+">
+                    <Button x:Name="forward"  Content="+"  >
+                        
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <i:CallMethodAction TargetObject="{Binding RelativeSource={RelativeSource       Mode=FindAncestor, AncestorType=Window}}" MethodName="Close" />
+                            <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=forward}">
+                                <i:InvokeCommandAction   Command="{Binding CmdMoveForward}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseUp">
+                                <i:InvokeCommandAction   Command="{Binding CmdStopMove}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button  Command="{Binding CmdMoveBackward}" FontSize="18" >-</Button>
-                    <Button   Command="{Binding CmdStopMove}" >停止</Button>
-                    <UniformGrid >
-                        <Button   Command="{Binding CmdHome}" ToolTip="回零">
-                            <materialDesign:PackIcon Width="24" Height="24" Kind="House"/>
-                        </Button>
-                        <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
-                            <materialDesign:PackIcon Width="24" Height="24" Kind="Settings"/>
-                        </Button>
-                    </UniformGrid>
+                    <Button  x:Name="backward" Content="-"  >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown"  SourceObject="{Binding ElementName=backward}">
+                                <i:InvokeCommandAction   Command="{Binding CmdMoveBackward}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseUp">
+                                <i:InvokeCommandAction   Command="{Binding CmdStopMove}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+
+                    <Button   Command="{Binding CmdHome}" ToolTip="回零">
+                        <materialDesign:PackIcon Width="24" Height="24" Kind="House"/>
+                    </Button>
+                    <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
+                        <materialDesign:PackIcon Width="24" Height="24" Kind="Settings"/>
+                    </Button>
+
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">

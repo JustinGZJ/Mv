@@ -10,6 +10,9 @@
     <RootNamespace>Mv.Shell</RootNamespace>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Modules\**" />
     <EmbeddedResource Remove="Modules\**" />

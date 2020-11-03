@@ -67,7 +67,7 @@ namespace Mv.Modules.Axis.ViewModels
 
         private DelegateCommand cmdPower;
         public DelegateCommand CmdPower =>
-            cmdPower ?? (cmdPower = new DelegateCommand(ExecuteCmdPower,()=>SelectedAxisRef!=null));
+            cmdPower ?? (cmdPower = new DelegateCommand(ExecuteCmdPower, () => SelectedAxisRef != null));
 
         void ExecuteCmdPower()
         {
@@ -75,27 +75,26 @@ namespace Mv.Modules.Axis.ViewModels
                 motionPart1.MC_Power(SelectedAxisRef);
             else
                 motionPart1.MC_PowerOff(SelectedAxisRef);
-          //  motionPart1.MC_SetPos
+            //  motionPart1.MC_SetPos
         }
+
+
+
 
         #region 正向移动
         private DelegateCommand cmdMoveForward;
         public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward, () => SelectedAxisRef != null);
-        void ExecuteMoveForward()
+       public  void ExecuteMoveForward()
         {
             if (jogMove)
             {
-                Task.Run(() =>
-                {
-                    motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
-                });
+                motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
             }
             else
             {
-                Task.Run(() =>
-                {
-                    motionPart1.MC_MoveAdd(SelectedAxisRef, 10d, SelectedAxisRef.Rate);
-                });
+
+                motionPart1.MC_MoveAdd(SelectedAxisRef, JogDistance, SelectedAxisRef.Rate);
+
             }
 
         }
@@ -105,24 +104,20 @@ namespace Mv.Modules.Axis.ViewModels
         #region 负向移动
 
         private DelegateCommand cmdMoveBackward;
-        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward, () => SelectedAxisRef != null);
+        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward, () => SelectedAxisRef != null );
 
-        void ExecuteMoveBackward()
+      public  void ExecuteMoveBackward()
         {
-            if (jogMove)
+            if (!jogMove)
             {
-                Task.Run(() =>
-                {
-                    selectedAxisRef.Prm.MaxVel = JogSpeed;
-                    motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
-                });
+
+                selectedAxisRef.Prm.MaxVel = JogSpeed;
+                motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
+
             }
             else
             {
-                Task.Run(() =>
-                {
-                    motionPart1.MC_MoveAdd(SelectedAxisRef, -jogDistance, SelectedAxisRef.Rate);
-                });
+                motionPart1.MC_MoveAdd(SelectedAxisRef, -jogDistance, SelectedAxisRef.Rate);
             }
         }
         #endregion
@@ -131,16 +126,19 @@ namespace Mv.Modules.Axis.ViewModels
         private DelegateCommand cmdStopMove;
         public DelegateCommand CmdStopMove =>
             cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove, () => SelectedAxisRef != null));
-        void ExecuteStopMove()
+        public void ExecuteStopMove()
         {
-            motionPart1.MC_EStop(SelectedAxisRef);
+            if (Continuous)
+            {
+                motionPart1.MC_EStop(SelectedAxisRef);
+            }
         }
         #endregion
         #region 设置命令
         private DelegateCommand<AxisRef> cmdSetAxis;
         public DelegateCommand<AxisRef> CmdSetAxis =>
-            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis,(axis)=>
-            SelectedAxisRef != null));
+            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis, (axis) =>
+             SelectedAxisRef != null));
 
         async void ExecuteCmdSetAxis(AxisRef axis)
         {
@@ -217,7 +215,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 重现
         private DelegateCommand cmdReappear;
         public DelegateCommand CmdReappear =>
-            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null&& selectedP2P!=null));
+            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null && selectedP2P != null));
 
         void ExecuteReappear()
         {
@@ -292,6 +290,11 @@ namespace Mv.Modules.Axis.ViewModels
             SelectedAxisRef = AxisRefs.FirstOrDefault();
 
         }
+
+        //public AxisViewModel()
+        //{
+
+        //}
         #endregion
 
         #region EventHandler
