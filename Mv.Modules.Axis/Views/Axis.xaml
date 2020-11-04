@@ -8,10 +8,12 @@
              prism:ViewModelLocator.AutoWireViewModel="True"
              xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
              mc:Ignorable="d" 
-            xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:axis="clr-namespace:Mv.Modules.Axis"
             xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels"
              xmlns:pt="http://propertytools.org/wpf"
+
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
@@ -197,32 +199,34 @@
             <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5">
                 <StackPanel>
                     <StackPanel.Resources>
+                        <!--BasedOn="{StaticResource MaterialDesignOutlinedButton}"-->
                         <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
                             <Setter Property="Margin" Value="10"/>
                             <Setter Property="FontSize" Value="18"/>
-                            <Setter Property="Cursor" Value="Hand"/>
+
                         </Style>
                     </StackPanel.Resources>
                     <Button  Command="{Binding CmdPower}" ToolTip="轴设置"  axis:ControlEx.AttachedState="{Binding  SelectedAxisRef.ServoOn}">
                         <materialDesign:PackIcon Width="24" Height="24" Kind="Power" />
                     </Button>
-                    <Button x:Name="forward"  Content="+"  >
-                        
+                    <Button x:Name="forward"  Content="+" >
+
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDown" SourceObject="{Binding ElementName=forward}">
-                                <i:InvokeCommandAction   Command="{Binding CmdMoveForward}" />
+                            <i:EventTrigger EventName="PreviewMouseDown">
+                                <prism:InvokeCommandAction  Command="{Binding CmdMoveForward}" />
                             </i:EventTrigger>
-                            <i:EventTrigger EventName="MouseUp">
-                                <i:InvokeCommandAction   Command="{Binding CmdStopMove}" />
+                            <i:EventTrigger EventName="forward_MouseUp">
+                                <prism:InvokeCommandAction  Command="{Binding CmdStopMove}" />
                             </i:EventTrigger>
+
                         </i:Interaction.Triggers>
                     </Button>
-                    <Button  x:Name="backward" Content="-"  >
+                    <Button  x:Name="backward" Content="-">
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDown"  SourceObject="{Binding ElementName=backward}">
+                            <i:EventTrigger EventName="PreviewMouseDown"  SourceObject="{Binding ElementName=backward}">
                                 <i:InvokeCommandAction   Command="{Binding CmdMoveBackward}" />
                             </i:EventTrigger>
-                            <i:EventTrigger EventName="MouseUp">
+                            <i:EventTrigger EventName="PreviewMouseUp">
                                 <i:InvokeCommandAction   Command="{Binding CmdStopMove}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>

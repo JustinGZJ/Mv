@@ -83,8 +83,8 @@ namespace Mv.Modules.Axis.ViewModels
 
         #region 正向移动
         private DelegateCommand cmdMoveForward;
-        public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward, () => SelectedAxisRef != null);
-       public  void ExecuteMoveForward()
+        public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward);
+       private  void ExecuteMoveForward()
         {
             if (jogMove)
             {
