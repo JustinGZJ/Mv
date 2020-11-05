@@ -17,6 +17,9 @@
             <TabItem Header="Follow">
                 <local:FollowAxis></local:FollowAxis>
             </TabItem>
+            <TabItem Header="IO">
+                <local:InOut></local:InOut>
+            </TabItem>
         </TabControl>
    
     </Grid>

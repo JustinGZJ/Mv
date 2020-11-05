@@ -26,28 +26,6 @@ namespace Mv.Modules.Axis.Views
             
         }
 
-        //private void forward_MouseDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    vm =(AxisViewModel)DataContext;
-        //    vm.CmdMoveForward.Execute();
-        //}
 
-        //private void forward_MouseUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    vm = (AxisViewModel)DataContext;
-        //    vm.CmdStopMove.Execute();
-        //}
-
-        //private void backward_MouseDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    vm = (AxisViewModel)DataContext;
-        //    vm.CmdMoveBackward.Execute();
-        //}
-
-        //private void backward_MouseUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    vm = (AxisViewModel)DataContext;
-        //    vm.CmdStopMove.Execute();
-        //}
     }
 }

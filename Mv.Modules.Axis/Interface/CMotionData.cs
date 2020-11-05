@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Xml;
 using Mv.Core.Interfaces;
+using System.Reactive.Linq;
 
 namespace MotionWrapper
 {
@@ -35,6 +36,8 @@ namespace MotionWrapper
                 Dos[i] = new IoRef("");
             }
         }
+
+
         public AxisRef[] AxisRefs { get => axisRefs;  }
         public bool[] Mdos { get => mdos; set => mdos = value; }
         public bool[] Mdis { get => mdis; set => mdis = value; }
