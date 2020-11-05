@@ -18,9 +18,6 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
     </UserControl.Resources>
-    <!--<UserControl.DataContext>
-        <vm:AxisViewModel/>
-    </UserControl.DataContext>-->
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="43*"/>
@@ -88,8 +85,8 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <Grid>
-                <RadioButton x:Name="点动" Content="点动" IsChecked="{Binding JogMove}" Margin="20 5 10 5"/>
-                <RadioButton x:Name="连续" Content="连续" IsChecked="{Binding Continuous}" Margin="10 5 20 5" HorizontalAlignment="Right"/>
+                <RadioButton x:Name="点动" Content="点动" IsChecked="{Binding ContinueMove}" Margin="20 5 10 5"/>
+                <RadioButton x:Name="连续" Content="连续"  Margin="10 5 20 5" HorizontalAlignment="Right"/>
             </Grid>
             <Grid Grid.Row="1" Grid.Column="0">
                 <Grid.ColumnDefinitions>
@@ -124,7 +121,7 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                 <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
                     <WrapPanel  Orientation="Horizontal" >
                         <WrapPanel.Resources>
-                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type     controls:SimpleLed}}">
+                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type  controls:SimpleLed}}">
                                 <Setter Property="OnColor" Value="Lime"/>
                                 <Setter Property="OffColor" Value="Gray"/>
                                 <Setter Property="Margin" Value="10 0"/>
@@ -215,7 +212,7 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                             <i:EventTrigger EventName="PreviewMouseDown">
                                 <prism:InvokeCommandAction  Command="{Binding CmdMoveForward}" />
                             </i:EventTrigger>
-                            <i:EventTrigger EventName="forward_MouseUp">
+                            <i:EventTrigger EventName="PreviewMouseUp">
                                 <prism:InvokeCommandAction  Command="{Binding CmdStopMove}" />
                             </i:EventTrigger>
 

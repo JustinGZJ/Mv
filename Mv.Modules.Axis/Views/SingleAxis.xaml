@@ -15,114 +15,130 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition  Width="100"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Row="1" Grid.Column="0" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="15*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
-            <Label Content="轴名称:"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding SelectedAxisRef}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Label Content="点动距离:" Grid.Row="1" Grid.Column="0" />
-            <Grid Grid.Row="1" Grid.Column="1">
-                <pt:SpinControl Value="{Binding JogDistance}">
-                    <TextBox Text="{Binding JogDistance}" BorderThickness="0" />
-                </pt:SpinControl>
+        <StackPanel  Grid.Row="1" Grid.Column="0" Margin="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="15*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="运动模式"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Label>寸动</Label>
+                    <ToggleButton IsChecked="{Binding ContinueMove}" ></ToggleButton>
+                    <Label>点动</Label>
+                </StackPanel>
+          
             </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="15*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="轴名称:"/>
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding SelectedAxisRef}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Label Content="点动距离:" Grid.Row="1" Grid.Column="0" />
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <pt:SpinControl Value="{Binding JogDistance}">
+                        <TextBox Text="{Binding JogDistance}" BorderThickness="0" />
+                    </pt:SpinControl>
+                </Grid>
 
-            <Label Grid.Column="0" Grid.Row="2" Content="Jog速度："/>
-            <pt:SpinControl Grid.Column="1" Grid.Row="2" Value="{Binding JogSpeed}" Maximum="50000" Minimum="0" >
-                <TextBox Text="{Binding JogSpeed}" BorderThickness="0" />
-            </pt:SpinControl>
-            <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
-                <WrapPanel  Orientation="Horizontal" >
-                    <WrapPanel.Resources>
-                        <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type     controls:SimpleLed}}">
-                            <Setter Property="OnColor" Value="Lime"/>
-                            <Setter Property="OffColor" Value="Gray"/>
-                            <Setter Property="Margin" Value="10 0"/>
-                        </Style>
-                    </WrapPanel.Resources>
-                    <StackPanel>
-                        <controls:SimpleLed   State="{Binding  SelectedAxisRef.ServoOn}" ></controls:SimpleLed>
-                        <Label Content="伺服使能"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed State="{ Binding SelectedAxisRef.LimitP}"></controls:SimpleLed>
-                        <Label Content="正向限位"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.LimitN}"></controls:SimpleLed>
-                        <Label Content="负向限位"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.IsHoming}"></controls:SimpleLed>
-                        <Label Content="伺服回零"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.Moving}"></controls:SimpleLed>
-                        <Label Content="伺服停止"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.InPos}"></controls:SimpleLed>
-                        <Label Content="伺服到位"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.Alarm}"></controls:SimpleLed>
-                        <Label Content="伺服报警"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <controls:SimpleLed  State="{Binding SelectedAxisRef.HomeSwitch}"></controls:SimpleLed>
-                        <Label Content="回零开关"/>
-                    </StackPanel>
-                </WrapPanel>
-                <UniformGrid Columns="3">
-                    <UniformGrid.Resources>
-                        <Style TargetType="Label">
-                            <Setter Property="FontSize" Value="20"/>
-                            <Setter Property="Margin" Value="0 2.5"/>
-                            <Setter Property="HorizontalAlignment" Value="Center"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        </Style>
-                    </UniformGrid.Resources>
-                    <StackPanel>
-                        <Label Content="{Binding SelectedAxisRef.RelVel}"></Label>
-                        <TextBlock HorizontalAlignment="Center" Text="实际速度"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <Label Content="{Binding SelectedAxisRef.CmdVel}"></Label>
-                        <TextBlock HorizontalAlignment="Center" Text="命令速度"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <Label Content="{Binding SelectedAxisRef.CmdPos}"></Label>
-                        <TextBlock HorizontalAlignment="Center" Text="命令位置"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <Label Content="{Binding SelectedAxisRef.RelPos}"></Label>
-                        <TextBlock HorizontalAlignment="Center" Text="实际位置"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <Label Content="{Binding SelectedAxisRef.Homed}"></Label>
-                        <TextBlock HorizontalAlignment="Center" Text="Home状态"/>
-                    </StackPanel>
-                </UniformGrid>
-            </StackPanel>
+                <Label Grid.Column="0" Grid.Row="2" Content="Jog速度："/>
+                <pt:SpinControl Grid.Column="1" Grid.Row="2" Value="{Binding JogSpeed}" Maximum="50000" Minimum="0" >
+                    <TextBox Text="{Binding JogSpeed}" BorderThickness="0" />
+                </pt:SpinControl>
+                <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
+                    <WrapPanel  Orientation="Horizontal" >
+                        <WrapPanel.Resources>
+                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type     controls:SimpleLed}}">
+                                <Setter Property="OnColor" Value="Lime"/>
+                                <Setter Property="OffColor" Value="Gray"/>
+                                <Setter Property="Margin" Value="10 0"/>
+                            </Style>
+                        </WrapPanel.Resources>
+                        <StackPanel>
+                            <controls:SimpleLed   State="{Binding  SelectedAxisRef.ServoOn}" ></controls:SimpleLed>
+                            <Label Content="伺服使能"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed State="{ Binding SelectedAxisRef.LimitP}"></controls:SimpleLed>
+                            <Label Content="正向限位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.LimitN}"></controls:SimpleLed>
+                            <Label Content="负向限位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.IsHoming}"></controls:SimpleLed>
+                            <Label Content="伺服回零"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.Moving}"></controls:SimpleLed>
+                            <Label Content="伺服停止"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.InPos}"></controls:SimpleLed>
+                            <Label Content="伺服到位"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.Alarm}"></controls:SimpleLed>
+                            <Label Content="伺服报警"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <controls:SimpleLed  State="{Binding SelectedAxisRef.HomeSwitch}"></controls:SimpleLed>
+                            <Label Content="回零开关"/>
+                        </StackPanel>
+                    </WrapPanel>
+                    <UniformGrid Columns="3">
+                        <UniformGrid.Resources>
+                            <Style TargetType="Label">
+                                <Setter Property="FontSize" Value="20"/>
+                                <Setter Property="Margin" Value="0 2.5"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                        </UniformGrid.Resources>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.RelVel}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="实际速度"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.CmdVel}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="命令速度"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.CmdPos}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="命令位置"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.RelPos}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="实际位置"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <Label Content="{Binding SelectedAxisRef.Homed}"></Label>
+                            <TextBlock HorizontalAlignment="Center" Text="Home状态"/>
+                        </StackPanel>
+                    </UniformGrid>
+                </StackPanel>
 
-        </Grid>
+            </Grid>
+        </StackPanel>
+  
 
         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5">
             <StackPanel>
@@ -136,14 +152,28 @@
                 <Button  Command="{Binding CmdPower}" ToolTip="轴设置"  axis:ControlEx.AttachedState="{Binding  SelectedAxisRef.ServoOn}">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="Power" />
                 </Button>
-                <Button   Command="{Binding CmdMoveForward}" Content="+">
+                <Button x:Name="forward"  Content="+" >
+
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <i:CallMethodAction TargetObject="{Binding RelativeSource={RelativeSource       Mode=FindAncestor, AncestorType=Window}}" MethodName="Close" />
+                        <i:EventTrigger EventName="PreviewMouseDown">
+                            <i:InvokeCommandAction  Command="{Binding CmdMoveForward}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseUp">
+                            <i:InvokeCommandAction  Command="{Binding CmdStopMove}" />
+                        </i:EventTrigger>
+
+                    </i:Interaction.Triggers>
+                </Button>
+                <Button  x:Name="backward" Content="-">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="PreviewMouseDown"  SourceObject="{Binding ElementName=backward}">
+                            <i:InvokeCommandAction   Command="{Binding CmdMoveBackward}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="PreviewMouseUp">
+                            <i:InvokeCommandAction   Command="{Binding CmdStopMove}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </Button>
-                <Button  Command="{Binding CmdMoveBackward}" FontSize="18" >-</Button>
                 <Button   Command="{Binding CmdStopMove}" >停止</Button>
 
                 <Button   Command="{Binding CmdHome}" ToolTip="回零">

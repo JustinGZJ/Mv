@@ -1,23 +1,26 @@
-﻿using System.Collections.Generic;
+﻿using PropertyChanged;
+using System.Collections.Generic;
 
 namespace MotionWrapper
 {
     /// <summary>
     /// IO的一个映射 程序中所有都用这个
     /// </summary>
+    /// 
+    [AddINotifyPropertyChangedInterface]
     public class IoRef
     {
-        public bool value = false;
-        public string Name = "";
-        public IoRef(string id)
+        private bool value = false;
+        private string name = "";
+        public IoRef(string name)
         {
-            this.Name = id;
+            this.Name = name;
         }
         /// <summary>
         /// 通过ID来指定IO表中的
         /// </summary>
         /// <param name="id"></param>
-        public bool setIoPrm(List<CInputOutputPrm> io)
+        public bool setIoPrm(List<CInOutPrm> io)
         {
             foreach (var item in io)
             {
@@ -29,6 +32,9 @@ namespace MotionWrapper
             }
             return false;
         }
-        public CInputOutputPrm prm = new CInputOutputPrm();
+        public CInOutPrm prm = new CInOutPrm();
+
+        public bool Value { get => value; set => this.value = value; }
+        public string Name { get => name; set => name = value; }
     }
 }

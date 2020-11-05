@@ -4,6 +4,7 @@ using System.Threading;
 using gts;
 using static gts.mc;
 using Mv.Core;
+using Mv.Modules.Axis.Views;
 
 namespace MotionWrapper
 {
@@ -29,7 +30,10 @@ namespace MotionWrapper
         #region Ctors
         public CGtsMotion(IConfigManager<MotionConfig> configManager)
         {
-            List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
+            MotionConfig motionConfig = configManager.Get();
+            List<AxisParameter> axisParameters = motionConfig.AxisParameters;
+            var inputs = motionConfig.Inputs;
+            var outputs = motionConfig.Outputs;
             for (int i = 0; i < axisParameters.Count; i++)
             {
                 AxisRefs[i] = new AxisRef(axisParameters[i].Name)
@@ -37,8 +41,20 @@ namespace MotionWrapper
                     Prm = axisParameters[i]
                 };
             }
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                var index = inputs[i].Index;
+                Dis[index] = new IoRef(inputs[i].Name);
+                Dis[index].prm = inputs[i];
+            }
+            for (int i = 0; i < outputs.Count; i++)
+            {
+                var index = outputs[i].Index;
+                Dos[index] = new IoRef(outputs[i].Name);
+                Dos[index].prm = outputs[i];
+            }
+
             this.configManager = configManager;
-          
         }
         #endregion
         //局部变量
@@ -62,7 +78,7 @@ namespace MotionWrapper
         }
         bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
         {
-
+            //  mc.GT_GetDi(cardNum,mc.MC_GPI, )
             throw new NotImplementedException();
         }
 
@@ -72,7 +88,12 @@ namespace MotionWrapper
         }
         public bool getDiCounter(IoRef input, ref long counter)
         {
-            throw new NotImplementedException();
+            if (mc.GT_GetDiReverseCount(cardNum, (short)input.prm.IoType, input.prm.Index, out var cnt, 1) != 0)
+            {
+                return false;
+            }
+            counter = cnt;
+            return true;
         }
         #endregion
 
@@ -313,7 +334,8 @@ namespace MotionWrapper
         #region IMotionPart5
         int IMotionPart5.MC_CrdStart(int crdNum)
         {
-            short rtn = mc.GT_CrdStart((short)configManager.Get().CrdParameters[crdNum].CardNum, (short)configManager.Get().CrdParameters[crdNum].CrdNum, 0);
+            CCrdPrm cCrdPrm = configManager.Get().CrdParameters[crdNum];
+            short rtn = mc.GT_CrdStart((short)cCrdPrm.CardNum, (short)cCrdPrm.CrdNum, 0);
             return rtn;
         }
 
@@ -631,7 +653,7 @@ namespace MotionWrapper
             while (true)
             {
                 fresh.Fresh();
-                Thread.Sleep(1);
+                Thread.Sleep(100);
             }
         }
         #endregion
@@ -699,10 +721,10 @@ namespace MotionWrapper
             int[] sts = new int[8];
             rtn = mc.GT_GetDi(0, mc.MC_GPI, out inValue);
             rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
-            rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 4, out _);
-            rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 4, out _);
-            rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 4, out _);
-            rtn = mc.GT_GetSts(0, 1, out sts[0], 4, out _);
+            rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 8, out _);
+            rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 8, out _);
+            rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 8, out _);
+            rtn = mc.GT_GetSts(0, 1, out sts[0], 8, out _);
             //辅助编码器
             rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
             rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
@@ -714,14 +736,16 @@ namespace MotionWrapper
                 Mdos[i] = ((1 << i) & outValue) == 0;
                 if (i < axisParameters.Count)//轴状态分解
                 {
-                    AxisRefs[i].Alarm = (sts[i] & 0x2) != 0;
-                    AxisRefs[i].ServoOn = (sts[i] & 0x200) != 0;
-                    AxisRefs[i].LimitN = (sts[i] & 0x40) != 0;
-                    AxisRefs[i].LimitP = (sts[i] & 0x20) != 0;
-                    AxisRefs[i].Moving = (sts[i] & 0x400) != 0;
-                    AxisRefs[i].CmdPos = (float)axisParameters[i].pls2mm((long)prfpos[i]);
-                    AxisRefs[i].RelPos = (float)axisParameters[i].pls2mm((long)encpos[i]);
-                    AxisRefs[i].RelVel = (float)axisParameters[i].plsperms2mmpers(encvel[i]);
+                    AxisRef axisRef = AxisRefs[i];
+                    int status = sts[axisRef.Prm.AxisNum - 1];
+                    axisRef.Alarm = (status & 0x2) != 0;
+                    axisRef.ServoOn = (status & 0x200) != 0;
+                    axisRef.LimitN = (status & 0x40) != 0;
+                    axisRef.LimitP = (status & 0x20) != 0;
+                    axisRef.Moving = (status & 0x400) != 0;
+                    axisRef.CmdPos = (float)axisRef.Prm.pls2mm((long)prfpos[axisRef.Prm.AxisNum - 1]);
+                    axisRef.RelPos = (float)axisRef.Prm.pls2mm((long)encpos[axisRef.Prm.AxisNum - 1]);
+                    axisRef.RelVel = (float)axisRef.Prm.plsperms2mmpers(encvel[axisRef.Prm.AxisNum - 1]);
                 }
             }
         }

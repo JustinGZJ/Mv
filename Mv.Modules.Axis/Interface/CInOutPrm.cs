@@ -3,7 +3,7 @@
     /// <summary>
     /// 这个是一个IO的参数表,可以从文件中读取到
     /// </summary>
-    public class CInputOutputPrm
+    public class CInOutPrm
     {
         //public int dataindex = 0;//这个IO点数据处于控制器类的数据列表中的哪一个
         private string name = "";//唯一的ID号

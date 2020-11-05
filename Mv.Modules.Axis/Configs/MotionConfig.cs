@@ -8,11 +8,11 @@ namespace MotionWrapper
     {
         [Category("输入")]
         [HeaderPlacement(HeaderPlacement.Collapsed)]
-        public List<CInputOutputPrm> Inputs { get; private set; } = new List<CInputOutputPrm>();
+        public List<CInOutPrm> Inputs { get; private set; } = new List<CInOutPrm>();
 
         [Category("输出")]
         [HeaderPlacement(HeaderPlacement.Collapsed)]
-        public List<CInputOutputPrm> Outputs { get;private set; } = new List<CInputOutputPrm>();
+        public List<CInOutPrm> Outputs { get;private set; } = new List<CInOutPrm>();
 
         [Category("轴参数")]
         [HeaderPlacement(HeaderPlacement.Collapsed)]

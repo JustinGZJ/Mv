@@ -19,21 +19,12 @@
     </TabItem.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <!--<ColumnDefinition Width="200"/>-->
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Visible"  >
             <ptgrid:PropertyGrid   TabVisibility="Collapsed" CategoryControlType="Expander"
                 SelectedObject="{Binding SelectedObject}" Margin="8" >
             </ptgrid:PropertyGrid>
-            <!--<ptgrid:PropertyGrid 
-                CategoryControlTemplate="{StaticResource CategoryControlTemplate1}"
-                CategoryHeaderTemplate="{StaticResource HeaderTemplate1}"
-                TabHeaderTemplate="{StaticResource HeaderTemplate2}"
-                 CategoryControlType="Expander"     
-                TabPageHeaderTemplate="{StaticResource PageHeaderTemplate1}"
-                SelectedObject="{Binding SelectedObject.Value}" Margin="8" >
-            </ptgrid:PropertyGrid>-->
         </ScrollViewer>
     </Grid>
 

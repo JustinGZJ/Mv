@@ -46,17 +46,9 @@ namespace Mv.Modules.Axis.ViewModels
         public ObservableCollection<P2PPrm> P2PPrms { get => p2PPrms; set => p2PPrms = value; }
         public P2PPrm SelectedP2P { get => selectedP2P; set => SetProperty(ref selectedP2P, value); }
         /// <summary>
-        /// 连动
-        /// </summary>
-        public bool Continuous
-        {
-            get { return continuous; }
-            set { SetProperty(ref continuous, value); }
-        }
-        /// <summary>
         /// 点动
         /// </summary>
-        public bool JogMove
+        public bool ContinueMove
         {
             get { return jogMove; }
             set { SetProperty(ref jogMove, value); }
@@ -86,7 +78,7 @@ namespace Mv.Modules.Axis.ViewModels
         public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward);
        private  void ExecuteMoveForward()
         {
-            if (jogMove)
+            if (ContinueMove)
             {
                 motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
             }
@@ -108,7 +100,7 @@ namespace Mv.Modules.Axis.ViewModels
 
       public  void ExecuteMoveBackward()
         {
-            if (!jogMove)
+            if (ContinueMove)
             {
 
                 selectedAxisRef.Prm.MaxVel = JogSpeed;
@@ -128,7 +120,7 @@ namespace Mv.Modules.Axis.ViewModels
             cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove, () => SelectedAxisRef != null));
         public void ExecuteStopMove()
         {
-            if (Continuous)
+            if (ContinueMove)
             {
                 motionPart1.MC_EStop(SelectedAxisRef);
             }
@@ -288,13 +280,8 @@ namespace Mv.Modules.Axis.ViewModels
             iopart1 = motion;
             AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
             SelectedAxisRef = AxisRefs.FirstOrDefault();
-
         }
 
-        //public AxisViewModel()
-        //{
-
-        //}
         #endregion
 
         #region EventHandler
