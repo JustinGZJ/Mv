@@ -53,7 +53,7 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                         <TextBlock Text="重现"/>
                     </StackPanel>
                 </Button>
-                <Button  Command="{Binding CmdSaePoint}">
+                <Button  Command="{Binding CmdSavePoint}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="ContentSave"/>
                         <TextBlock Text="保存"/>

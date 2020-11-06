@@ -43,7 +43,7 @@ namespace Mv.Modules.Axis.ViewModels
         public List<AxisRef> AxisRefs { get => axisRefs; set => SetProperty(ref axisRefs, value); }
         public double JogDistance { get => jogDistance; set => SetProperty(ref jogDistance, value); }
         public int JogSpeed { get => jogSpeed; set => SetProperty(ref jogSpeed, value); }
-        public ObservableCollection<P2PPrm> P2PPrms { get => p2PPrms; set => p2PPrms = value; }
+        public ObservableCollection<P2PPrm> P2PPrms { get; set; } = new ObservableCollection<P2PPrm>();
         public P2PPrm SelectedP2P { get => selectedP2P; set => SetProperty(ref selectedP2P, value); }
         /// <summary>
         /// 点动
@@ -67,7 +67,6 @@ namespace Mv.Modules.Axis.ViewModels
                 motionPart1.MC_Power(SelectedAxisRef);
             else
                 motionPart1.MC_PowerOff(SelectedAxisRef);
-            //  motionPart1.MC_SetPos
         }
 
 
@@ -76,7 +75,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 正向移动
         private DelegateCommand cmdMoveForward;
         public DelegateCommand CmdMoveForward => cmdMoveForward ??= new DelegateCommand(ExecuteMoveForward);
-       private  void ExecuteMoveForward()
+        private void ExecuteMoveForward()
         {
             if (ContinueMove)
             {
@@ -96,14 +95,14 @@ namespace Mv.Modules.Axis.ViewModels
         #region 负向移动
 
         private DelegateCommand cmdMoveBackward;
-        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward, () => SelectedAxisRef != null );
+        public DelegateCommand CmdMoveBackward => cmdMoveBackward ??= new DelegateCommand(ExecuteMoveBackward, () => SelectedAxisRef != null);
 
-      public  void ExecuteMoveBackward()
+        public void ExecuteMoveBackward()
         {
             if (ContinueMove)
             {
 
-                selectedAxisRef.Prm.MaxVel = JogSpeed;
+                selectedAxisRef.Prm.MaxVel = -JogSpeed;
                 motionPart1.MC_MoveJog(SelectedAxisRef, SelectedAxisRef.Rate);
 
             }
@@ -156,7 +155,7 @@ namespace Mv.Modules.Axis.ViewModels
             motionPart1.MC_AxisRef(ref selectedAxisRef);
             P2PPrms.Add(new P2PPrm()
             {
-                Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
+                Name = $"{selectedAxisRef.Name}-{P2PPrms.Count()}",
                 Acceleration = 100,
                 AxisName = selectedAxisRef.Name,
                 Position = selectedAxisRef.RelPos,
@@ -189,7 +188,7 @@ namespace Mv.Modules.Axis.ViewModels
             {
                 P2PPrms.Add(new P2PPrm()
                 {
-                    Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
+                    Name = $"{selectedAxisRef.Name}-{P2PPrms.Count()}",
                     Acceleration = 100,
                     AxisName = selectedAxisRef.Name,
                     Position = selectedAxisRef.RelPos,
@@ -207,10 +206,12 @@ namespace Mv.Modules.Axis.ViewModels
         #region 重现
         private DelegateCommand cmdReappear;
         public DelegateCommand CmdReappear =>
-            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null && selectedP2P != null));
+cmdReappear ??= new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null);
 
         void ExecuteReappear()
         {
+            if (SelectedAxisRef == null || SelectedP2P == null)
+                return;
             motionPart1.MC_MoveAbs(selectedAxisRef, selectedP2P.Position);
         }
         #endregion
@@ -261,9 +262,7 @@ namespace Mv.Modules.Axis.ViewModels
         IMotionPart5 motionPart5;
         IIoPart1 iopart1;
         AxisRef selectedAxisRef;
-        ObservableCollection<P2PPrm> p2PPrms = new ObservableCollection<P2PPrm>();
         P2PPrm selectedP2P;
-        bool continuous;
         int jogSpeed = 10;
         bool jogMove = true;
         private double jogDistance;

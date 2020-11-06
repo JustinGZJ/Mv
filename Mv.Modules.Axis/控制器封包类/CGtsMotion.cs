@@ -5,6 +5,7 @@ using gts;
 using static gts.mc;
 using Mv.Core;
 using Mv.Modules.Axis.Views;
+using System.Windows.Documents;
 
 namespace MotionWrapper
 {
@@ -43,15 +44,13 @@ namespace MotionWrapper
             }
             for (int i = 0; i < inputs.Count; i++)
             {
-                var index = inputs[i].Index;
-                Dis[index] = new IoRef(inputs[i].Name);
-                Dis[index].Prm = inputs[i];
+                Dis[i] = new IoRef(inputs[i].Name);
+                Dis[i].Prm = inputs[i];
             }
             for (int i = 0; i < outputs.Count; i++)
             {
-                var index = outputs[i].Index;
-                Dos[index] = new IoRef(outputs[i].Name);
-                Dos[index].Prm = outputs[i];
+                Dos[i] = new IoRef(outputs[i].Name);
+                Dos[i].Prm = outputs[i];
             }
             this.configManager = configManager;
         }
@@ -77,15 +76,26 @@ namespace MotionWrapper
                 case EIoType.NomalOutput:
                     mc.GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
                     break;
+                case EIoType.ExtIn:
+                    mc.GT_GetExtIoValue(cardNum, 0, out var m);
+                    v = m;
+                    break;
                 default:
                     v = 0;
                     break;
-            } 
-            return (v&(1<<input.Prm.Index)) > 0;
+            }
+            return (v & (1 << input.Prm.Index)) > 0;
         }
+        public ushort extval;
         void IIoPart1.setDO(IoRef output, bool value)
         {
-            mc.GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)(value ? 1 : 0));
+            if (EIoType.ExtOut == output.Prm.IoType)
+            {
+                extval |= (ushort)(1 << output.Prm.Index);
+                mc.GT_SetExtIoBit(cardNum, 0, output.Prm.Index, (ushort)(value ? 1 : 0));
+            }
+            else
+                mc.GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)(value ? 1 : 0));
         }
 
         bool IIoPart1.getDo(IoRef output)
@@ -105,6 +115,9 @@ namespace MotionWrapper
                 case EIoType.ServoOn:
                 case EIoType.NomalOutput:
                     mc.GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
+                    break;
+                case EIoType.ExtOut:
+                    v = extval;
                     break;
                 default:
                     v = 0;
@@ -702,8 +715,11 @@ namespace MotionWrapper
                 rtn += mc.GT_Open(cardNum, 0, 0);
                 rtn += mc.GT_Reset(cardNum);
                 rtn += mc.GT_LoadConfig(cardNum, @"GTS800.cfg");
+                rtn += mc.GT_OpenExtMdl(cardNum, null);
+                rtn += mc.GT_LoadExtConfig(cardNum, @"EXTIO.cfg");
                 rtn += mc.GT_ClrSts(cardNum, 1, 8);
                 rtn += mc.GT_ZeroPos(cardNum, 1, 8);
+
                 if (rtn == 0)
                 {
                     runThread = new Thread(Run);
@@ -731,6 +747,7 @@ namespace MotionWrapper
                     runThread = null;
                 }
                 short rtn = 0;
+                rtn += mc.GT_CloseExtMdl(cardNum);
                 rtn += mc.GT_Reset(cardNum);
                 rtn += mc.GT_Close(cardNum);
                 return true;

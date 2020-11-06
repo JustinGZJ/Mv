@@ -60,10 +60,10 @@ namespace Mv.Modules.Axis.ViewModels
                 P2PPrms.Add(new P2PPrm()
                 {
                     Name = $"{selectedAxisRef.Name}-{p2PPrms.Count()}",
-                    Acceleration = 100,
+                    Acceleration = selectedAxisRef.Prm.MaxAcc,
                     AxisName = selectedAxisRef.Name,
                     Position = selectedAxisRef.RelPos,
-                    Velocity = 100
+                    Velocity = selectedAxisRef.Prm.MaxVel
                 });
             }
             else
@@ -77,7 +77,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 重现
         private DelegateCommand cmdReappear;
         public DelegateCommand CmdReappear =>
-            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null && selectedP2P != null));
+            cmdReappear ?? (cmdReappear = new DelegateCommand(ExecuteReappear, () => SelectedAxisRef != null && SelectedP2P != null));
 
         void ExecuteReappear()
         {
@@ -87,10 +87,10 @@ namespace Mv.Modules.Axis.ViewModels
 
         #region 保存点位
         private DelegateCommand cmdSavePoint;
-        public DelegateCommand CmdSaePoint =>
-            cmdSavePoint ?? (cmdSavePoint = new DelegateCommand(ExecuteSaePoint));
+        public DelegateCommand CmdSavePoint =>
+            cmdSavePoint ?? (cmdSavePoint = new DelegateCommand(ExecuteSavePoint));
 
-        void ExecuteSaePoint()
+        void ExecuteSavePoint()
         {
             config.Set(config.Get());
         }

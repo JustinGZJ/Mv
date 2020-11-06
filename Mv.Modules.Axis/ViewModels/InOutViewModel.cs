@@ -33,7 +33,20 @@ namespace Mv.Modules.Axis.ViewModels
             });
 
         }
-        public ObservableCollection<IoRef> DO => new ObservableCollection<IoRef>(data.Dos.Where(x => !string.IsNullOrEmpty(x.Name)));
-        public ObservableCollection<IoRef> DI => new ObservableCollection<IoRef>(data.Dis.Where(x => !string.IsNullOrEmpty(x.Name)));
+        public ObservableCollection<IoRef> DO
+        {
+            get
+            {
+                return new ObservableCollection<IoRef>(data.Dos.Where(x => !string.IsNullOrEmpty(x.Name)));
+            }
+        }
+
+        public ObservableCollection<IoRef> DI
+        {
+            get
+            {
+                return new ObservableCollection<IoRef>(data.Dis.Where(x => !string.IsNullOrEmpty(x.Name)));
+            }
+        }
     }
 }
