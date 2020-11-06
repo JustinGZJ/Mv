@@ -22,8 +22,8 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Visible"  >
-            <ptgrid:PropertyGrid   TabVisibility="Collapsed" CategoryControlType="Expander"
-                SelectedObject="{Binding SelectedObject}" Margin="8" >
+            <ptgrid:PropertyGrid   
+                SelectedObject="{Binding SelectedObject}" Margin="8" TabStripPlacement="Left"  TabVisibility="VisibleIfMoreThanOne"  >
             </ptgrid:PropertyGrid>
         </ScrollViewer>
     </Grid>
