@@ -45,14 +45,15 @@ namespace MotionWrapper
             {
                 var index = inputs[i].Index;
                 Dis[index] = new IoRef(inputs[i].Name);
-                Dis[index].Prm = inputs[i];
+                Dis[index].prm = inputs[i];
             }
             for (int i = 0; i < outputs.Count; i++)
             {
                 var index = outputs[i].Index;
                 Dos[index] = new IoRef(outputs[i].Name);
-                Dos[index].Prm = outputs[i];
+                Dos[index].prm = outputs[i];
             }
+
             this.configManager = configManager;
         }
         #endregion
@@ -61,59 +62,23 @@ namespace MotionWrapper
         #region IIoPart1
         bool IIoPart1.getDi(IoRef input)
         {
-            int v;
-            switch (input.Prm.IoType)
-            {
-                case EIoType.NoamlInput:
-                case EIoType.Alarm:
-                case EIoType.LimitP:
-                case EIoType.LimitN:
-                case EIoType.Home:
-                case EIoType.Arrive:
-                    mc.GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
-                    break;
-                case EIoType.clrSts:
-                case EIoType.ServoOn:
-                case EIoType.NomalOutput:
-                    mc.GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
-                    break;
-                default:
-                    v = 0;
-                    break;
-            } 
-            return (v&(1<<input.Prm.Index)) > 0;
+            mc.GT_GetDi(cardNum, (short)input.prm.IoType, out var v);
+            return v > 0;
+            //  return false;
         }
         void IIoPart1.setDO(IoRef output, bool value)
         {
-            mc.GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)(value ? 1 : 0));
+            mc.GT_SetDoBit(cardNum, (short)output.prm.IoType, output.prm.Index, (short)(value ? 1 : 0));
         }
 
         bool IIoPart1.getDo(IoRef output)
         {
-            int v;
-            switch (output.Prm.IoType)
-            {
-                case EIoType.NoamlInput:
-                case EIoType.Alarm:
-                case EIoType.LimitP:
-                case EIoType.LimitN:
-                case EIoType.Home:
-                case EIoType.Arrive:
-                    mc.GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
-                    break;
-                case EIoType.clrSts:
-                case EIoType.ServoOn:
-                case EIoType.NomalOutput:
-                    mc.GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
-                    break;
-                default:
-                    v = 0;
-                    break;
-            }
-            return (v & (1 << output.Prm.Index)) > 0;
+            mc.GT_GetDi(cardNum, (short)output.prm.IoType, out var v);
+            return v > 0;
         }
         bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
         {
+            //  mc.GT_GetDi(cardNum,mc.MC_GPI, )
             throw new NotImplementedException();
         }
 
@@ -123,7 +88,7 @@ namespace MotionWrapper
         }
         public bool getDiCounter(IoRef input, ref long counter)
         {
-            if (mc.GT_GetDiReverseCount(cardNum, (short)input.Prm.IoType, input.Prm.Index, out var cnt, 1) != 0)
+            if (mc.GT_GetDiReverseCount(cardNum, (short)input.prm.IoType, input.prm.Index, out var cnt, 1) != 0)
             {
                 return false;
             }
