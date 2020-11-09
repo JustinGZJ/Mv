@@ -8,6 +8,8 @@ using Unity;
 using System.Collections.ObjectModel;
 using System.Windows.Threading;
 using System.Reactive.Linq;
+using System.Windows;
+using HandyControl.Data;
 
 namespace Mv.Modules.Axis.ViewModels
 {
@@ -15,38 +17,82 @@ namespace Mv.Modules.Axis.ViewModels
     {
         private readonly ICMotionData data;
 
+        IIoPart1 part1;
+        /// <summary>
+        ///     页码
+        /// </summary>
+        private int _pageIndex = 1;
+
+        /// <summary>
+        ///     页码
+        /// </summary>
+        public int PageIndex
+        {
+            get => _pageIndex;
+            set => SetProperty(ref _pageIndex, value);
+        }
+
+        private EIoType ioType;
+        public EIoType IoType
+        {
+            get => ioType;
+            set
+            {
+                if (SetProperty(ref ioType, value))
+                {
+                    PageIndex = 1;
+                    MaxPageCount = (int)Math.Ceiling((totalList.Count / (double)DataCountPerPage));
+                    UpdatePage(PageIndex);
+                }
+            }
+        }
+
+        public int MaxPageCount
+        {
+            get => maxPageCount;
+            set => SetProperty(ref maxPageCount, value);
+        }
+
+        private int maxPageCount;
+
+        List<IoRef> totalList => data.Dis.Concat(data.Dos).Where(io => io.Name != "").Where(io => io.Prm.IoType == ioType).ToList();
+        private DelegateCommand<FunctionEventArgs<int>> pageUpdatedCmd;
+        public DelegateCommand<FunctionEventArgs<int>> PageUpdatedCmd =>
+pageUpdatedCmd ??= new DelegateCommand<FunctionEventArgs<int>>(PageUpdated);
+
 
         public InOutViewModel(IUnityContainer container)
         {
             data = container.Resolve<IGtsMotion>();
-            IIoPart1 part1 = container.Resolve<IGtsMotion>();
-            Observable.Interval(TimeSpan.FromMilliseconds(100)).ObserveOnDispatcher().Subscribe(x =>
-            {
-                foreach (var item in data.Dos.Where(x => !string.IsNullOrEmpty(x.Name)))
-                {
-                    item.Value = part1.getDi(item);
-                }
-                foreach (var item in data.Dis.Where(x => !string.IsNullOrEmpty(x.Name)))
-                {
-                    item.Value = part1.getDo(item);
-                }
-            });
-
+            part1 = container.Resolve<IGtsMotion>();
+            IoType = EIoType.NoamlInput;
         }
-        public ObservableCollection<IoRef> DO
+        private int dataCountPerPage = 16;
+        public int DataCountPerPage
         {
-            get
-            {
-                return new ObservableCollection<IoRef>(data.Dos.Where(x => !string.IsNullOrEmpty(x.Name)));
-            }
+            get { return dataCountPerPage; }
+            set { SetProperty(ref dataCountPerPage, value); }
+        }
+        //  List<IoRef> totalList
+        public ObservableCollection<IoRef> DataList { get; set; } = new ObservableCollection<IoRef>();
+
+        private void PageUpdated(FunctionEventArgs<int> info)
+        {
+            UpdatePage(info.Info);
         }
 
-        public ObservableCollection<IoRef> DI
+        private void UpdatePage(int page)
         {
-            get
-            {
-                return new ObservableCollection<IoRef>(data.Dis.Where(x => !string.IsNullOrEmpty(x.Name)));
-            }
+            DataList = new ObservableCollection<IoRef>(totalList.Skip((page - 1) * DataCountPerPage).Take(DataCountPerPage));
+        }
+
+        private DelegateCommand<IoRef> reverseOutput;
+        public DelegateCommand<IoRef> CmdReverseOutput =>
+reverseOutput ??= new DelegateCommand<IoRef>(ExecuteCmdReverseOutput);
+
+        void ExecuteCmdReverseOutput(IoRef oldvalue)
+        {
+            part1.setDO(oldvalue, !oldvalue.Value);
         }
     }
 }

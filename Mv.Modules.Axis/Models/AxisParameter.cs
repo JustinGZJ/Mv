@@ -1,5 +1,5 @@
 ﻿
-using PropertyTools.DataAnnotations;
+using System.ComponentModel;
 using System.Windows.Documents;
 
 namespace MotionWrapper

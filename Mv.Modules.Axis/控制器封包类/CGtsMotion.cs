@@ -6,6 +6,7 @@ using static gts.mc;
 using Mv.Core;
 using Mv.Modules.Axis.Views;
 using System.Windows.Documents;
+using System.Linq;
 
 namespace MotionWrapper
 {
@@ -58,12 +59,20 @@ namespace MotionWrapper
         //局部变量
 
         #region IIoPart1
-        bool IIoPart1.getDi(IoRef input)
+        public bool getDi(IoRef input)
         {
             int v;
             switch (input.Prm.IoType)
             {
                 case EIoType.NoamlInput:
+                    if (input.Prm.Model == 0)
+                        mc.GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
+                    else
+                    {
+                        mc.GT_GetExtIoValue(cardNum, 0, out var m);
+                        v = m;
+                    }
+                    break;
                 case EIoType.Alarm:
                 case EIoType.LimitP:
                 case EIoType.LimitN:
@@ -74,11 +83,10 @@ namespace MotionWrapper
                 case EIoType.clrSts:
                 case EIoType.ServoOn:
                 case EIoType.NomalOutput:
-                    mc.GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
-                    break;
-                case EIoType.ExtIn:
-                    mc.GT_GetExtIoValue(cardNum, 0, out var m);
-                    v = m;
+                    if (input.Prm.Model > 0)
+                        v = extval[input.Prm.Model - 1];
+                    else
+                        mc.GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
                     break;
                 default:
                     v = 0;
@@ -86,24 +94,35 @@ namespace MotionWrapper
             }
             return (v & (1 << input.Prm.Index)) > 0;
         }
-        public ushort extval;
-        void IIoPart1.setDO(IoRef output, bool value)
+        public ushort[] extval = new ushort[32];
+        public void setDO(IoRef output, bool value)
         {
-            if (EIoType.ExtOut == output.Prm.IoType)
+            if (output.Prm.Model > 0 && output.Prm.IoType == EIoType.NomalOutput)
             {
-                extval |= (ushort)(1 << output.Prm.Index);
-                mc.GT_SetExtIoBit(cardNum, 0, output.Prm.Index, (ushort)(value ? 1 : 0));
+                if (value)
+                    extval[output.Prm.Model - 1] |= (ushort)(1 << output.Prm.Index);
+                else
+                    extval[output.Prm.Model - 1] &= ((ushort)(~(1 << output.Prm.Index)));
+                mc.GT_SetExtIoBit(cardNum, (short)(output.Prm.Model - 1), output.Prm.Index, (ushort)(value ? 1 : 0));
             }
             else
                 mc.GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)(value ? 1 : 0));
         }
 
-        bool IIoPart1.getDo(IoRef output)
+        public bool getDo(IoRef output)
         {
             int v;
             switch (output.Prm.IoType)
             {
                 case EIoType.NoamlInput:
+                    if (output.Prm.Model == 0)
+                        mc.GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
+                    else
+                    {
+                        mc.GT_GetExtIoValue(cardNum, 0, out var m);
+                        v = m;
+                    }
+                    break;
                 case EIoType.Alarm:
                 case EIoType.LimitP:
                 case EIoType.LimitN:
@@ -114,10 +133,10 @@ namespace MotionWrapper
                 case EIoType.clrSts:
                 case EIoType.ServoOn:
                 case EIoType.NomalOutput:
-                    mc.GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
-                    break;
-                case EIoType.ExtOut:
-                    v = extval;
+                    if (output.Prm.Model > 0)
+                        v = extval[output.Prm.Model - 1];
+                    else
+                        mc.GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
                     break;
                 default:
                     v = 0;
@@ -125,12 +144,12 @@ namespace MotionWrapper
             }
             return (v & (1 << output.Prm.Index)) > 0;
         }
-        bool IIoPart1.getDi(int startIndex, int lenth, ref bool[] value)
+        public bool getDi(int startIndex, int lenth, ref bool[] value)
         {
             throw new NotImplementedException();
         }
 
-        bool IIoPart1.getDo(int startIndex, int lenth, ref bool[] value)
+        public bool getDo(int startIndex, int lenth, ref bool[] value)
         {
             throw new NotImplementedException();
         }
@@ -146,14 +165,14 @@ namespace MotionWrapper
         #endregion
 
         #region IMotionPart1
-        int IMotionPart1.MC_SetPos(AxisRef axis, double pos)
+        public int MC_SetPos(AxisRef axis, double pos)
         {
             mc.GT_SetPrfPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
             mc.GT_SetEncPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)pos);
             mc.GT_SynchAxisPos(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             return 0;
         }
-        int IMotionPart1.MC_Home(ref AxisRef axis)
+        public int MC_Home(ref AxisRef axis)
         {
             mc.THomePrm prm = new mc.THomePrm();
             axis.Homed = 0;
@@ -186,7 +205,7 @@ namespace MotionWrapper
             return rtn;
         }
 
-        int IMotionPart1.MC_MoveAbs(AxisRef axis, double tpos, double beilv)
+        public int MC_MoveAbs(AxisRef axis, double tpos, double beilv)
         {
             short rtn = 0;
             int pmode;
@@ -222,7 +241,7 @@ namespace MotionWrapper
             return rtn;
         }
 
-        int IMotionPart1.MC_MoveAdd(AxisRef axis, double dist, double beilv)
+        public int MC_MoveAdd(AxisRef axis, double dist, double beilv)
         {
             short rtn = 0;
             int pmode;
@@ -251,7 +270,7 @@ namespace MotionWrapper
             return rtn;
         }
 
-        int IMotionPart1.MC_MoveJog(AxisRef axis, double beilv)
+        public int MC_MoveJog(AxisRef axis, double beilv)
         {
             try
             {
@@ -290,12 +309,12 @@ namespace MotionWrapper
             }
         }
 
-        int IMotionPart1.MC_Power(AxisRef axis)
+        public int MC_Power(AxisRef axis)
         {
             return mc.GT_AxisOn(axis.Prm.CardNum, axis.Prm.AxisNum);
         }
 
-        int IMotionPart1.MC_Reset(AxisRef axis)
+        public int MC_Reset(AxisRef axis)
         {
             mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
             if (axis.Alarm)
@@ -331,12 +350,12 @@ namespace MotionWrapper
             return rtn;
         }
 
-        int IMotionPart1.MC_PowerOff(AxisRef axis)
+        public int MC_PowerOff(AxisRef axis)
         {
             return mc.GT_AxisOff(axis.Prm.CardNum, axis.Prm.AxisNum);
         }
 
-        int IMotionPart1.MC_EStop(AxisRef axis)
+        public int MC_EStop(AxisRef axis)
         {
             axis.IsHoming = false;
             mc.GT_Stop(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1), 1 << (axis.Prm.AxisNum - 1));
@@ -350,7 +369,14 @@ namespace MotionWrapper
 
         public int MC_SetAxis(AxisRef axis, CAxisSetPrm prm)
         {
-            throw new NotImplementedException();
+            short rtn = 0;
+            rtn += mc.GT_SetSoftLimit(cardNum, axis.Prm.AxisNum, prm.EnableLmtP ? 1 : 0, prm.EnableLmtN ? 1 : 0);
+            rtn += prm.EnableAlm
+                ? mc.GT_AlarmOn(cardNum, axis.Prm.AxisNum)
+                : mc.GT_AlarmOff(cardNum, axis.Prm.AxisNum);
+            rtn += mc.GT_SetSoftLimit(cardNum, axis.Prm.AxisNum, (int)axis.Prm.mm2pls(prm.SoftLmtP),
+                (int)axis.Prm.mm2pls(prm.SoftLmtN));
+            return rtn;
         }
 
         public int MC_HomeStatus(ref AxisRef axis)
@@ -380,29 +406,29 @@ namespace MotionWrapper
         /// <returns></returns>
 
         #region IMotionPart5
-        int IMotionPart5.MC_CrdStart(int crdNum)
+        public int MC_CrdStart(int crdNum)
         {
             CCrdPrm cCrdPrm = configManager.Get().CrdParameters[crdNum];
             short rtn = mc.GT_CrdStart((short)cCrdPrm.CardNum, (short)cCrdPrm.CrdNum, 0);
             return rtn;
         }
 
-        int IMotionPart5.MC_CamStatus(AxisRef slaver, ref CCamStatus status)
+        public int MC_CamStatus(AxisRef slaver, ref CCamStatus status)
         {
             return 0;
         }
 
-        int IMotionPart5.MC_CrdSetOrigin(int crdNum, List<double> origionData)
+        public int MC_CrdSetOrigin(int crdNum, List<double> origionData)
         {
             throw new NotImplementedException();
         }
 
-        int IMotionPart5.MC_CrdOverride(int crdNum, float BeiLv)
+        public int MC_CrdOverride(int crdNum, float BeiLv)
         {
             throw new NotImplementedException();
         }
 
-        int IMotionPart5.MC_CrdStatus(int crdNum)
+        public int MC_CrdStatus(int crdNum)
         {
             CCrdPrm prm = configManager.Get().CrdParameters[crdNum];
             short crdRun = 0;
@@ -417,16 +443,74 @@ namespace MotionWrapper
                 return 1;
             }
         }
-        int IMotionPart5.MC_CrdData(string cmd, int crdNum)
+        public int MC_CrdData(string cmd, int crdNum)
         {
-            throw new NotImplementedException();
+            int[] tpos = new int[3];
+            float[] tmpPos = new float[3];
+            short rtn = 0;
+            if (crdNum < 0 || crdNum >= configManager.Get().CrdParameters.Count) return -1;
+            CCrdPrm crdPrm = configManager.Get().CrdParameters[crdNum];
+
+         //   ushort crd = crdHandle[crdPrm.CrdNum - 1];
+
+            string tmpCmd = cmd.ToUpper();
+            string tmpStr = "";
+
+            CompileUserCode compiler = new CompileUserCode();
+       //     rtn += CNMCLib20.NMC_CrdBufClr(crdHandle[crdPrm.CrdNum - 1]);
+            if (tmpCmd.IndexOf("G00") >= 0)
+            {
+                //X
+                tmpStr = compiler.getFloatOrLong("X", tmpCmd);
+                if (tmpStr != "")
+                {
+                    tmpPos[0] = float.Parse(tmpStr);
+                    float targetX = tmpPos[0];
+                }
+                else
+                {
+                    return -1;
+                }
+                //Y
+                tmpStr = compiler.getFloatOrLong("Y", tmpCmd);
+                if (tmpStr != "")
+                {
+                    tmpPos[1] = float.Parse(tmpStr);
+                    float targetY = tmpPos[1];
+                }
+                else
+                {
+                    return -1;
+                }
+                tmpPos[2] = 0.0f;
+                tmpStr = compiler.getFloatOrLong("Z", tmpCmd);
+                if (tmpStr != "")
+                {
+                    tmpPos[2] = float.Parse(tmpStr);
+                    float targetY = tmpPos[2];
+                }
+                else
+                {
+                    return -2;
+                }
+                //转换
+                tpos[0] = crdPrm.mm2pls(tmpPos[0]);
+                tpos[1] = crdPrm.mm2pls(tmpPos[1]);
+                tpos[2] = crdPrm.mm2pls(tmpPos[2]);
+                rtn += GT_LnXYZ(cardNum, (short)crdNum, tpos[0], tpos[1], tpos[2], crdPrm.SynAccMax, crdPrm.SynVelMax, 0, 0);
+            }
+            else
+            {
+                return -1;
+            }
+            return rtn;
         }
-        int IMotionPart5.MC_CrdData(List<string> gcode, int crdNum)
+        public int MC_CrdData(List<string> gcode, int crdNum)
         {
             throw new NotImplementedException();
         }
 
-        int IMotionPart5.MC_Cam(string camlist)
+        public int MC_Cam(string camlist)
         {
             throw new NotImplementedException();
         }
@@ -436,7 +520,7 @@ namespace MotionWrapper
         /// <param name="master"></param>
         /// <param name="slaver"></param>
         /// <returns></returns>
-        int IMotionPart5.preMC_CamModel(AxisRef master, AxisRef slaver)
+        public int preMC_CamModel(AxisRef master, AxisRef slaver)
         {
             int model = 0;
             uint clock = 0;
@@ -469,7 +553,7 @@ namespace MotionWrapper
         /// <param name="data"></param>
         /// <param name="relPasspos">是否使用增量穿越点</param>
         /// <returns></returns>
-        int IMotionPart5.MC_Cam(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos)
+        public int MC_Cam(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos)
         {
             short rtn = 0;
             uint clock = 0;
@@ -500,7 +584,7 @@ namespace MotionWrapper
         }
 
 
-        int IMotionPart5.MC_StartCapture(AxisRef enc, CCapturePrm capturePrm)
+        public int MC_StartCapture(AxisRef enc, CCapturePrm capturePrm)
         {
             //CAPTURE_HOME(该宏定义为 1) Home 捕获
             //CAPTURE_INDEX(该宏定义为 2) Index 捕获
@@ -512,7 +596,7 @@ namespace MotionWrapper
             return rtn;
         }
 
-        int IMotionPart5.MC_CaptureStatus(AxisRef enc, ref double capturePos)
+        public int MC_CaptureStatus(AxisRef enc, ref double capturePos)
         {
             short cptSts = 0;
             int value = 0;
@@ -529,7 +613,7 @@ namespace MotionWrapper
             }
         }
 
-        int IMotionPart5.MC_CrdCreate(int crdNum)
+        public int MC_CrdCreate(int crdNum)
         {
             if (cardNum < 0 || cardNum >= configManager.Get().CrdParameters.Count) return -1;
             short rtn = 0;
@@ -542,131 +626,19 @@ namespace MotionWrapper
             rtn += mc.GT_GetSts((short)crdPrm.CardNum, (short)crdPrm.X, out psts, 1, out pclock);
             if ((psts & 0x400) == 0)
             {
-                mc.TCrdPrm prm = new mc.TCrdPrm();
+                TCrdPrm prm = new TCrdPrm();
                 prm.dimension = (short)crdPrm.Dimension;
                 prm.evenTime = 5;
                 prm.setOriginFlag = 1;
                 prm.synVelMax = crdPrm.getCrdMaxVelPlsPerMs();
                 prm.synAccMax = crdPrm.getCrdMaxAccPlsPerMs2();
-                switch (crdPrm.X)
-                {
-                    case 1:
-                        prm.profile1 = 1;
-                        break;
-                    case 2:
-                        prm.profile2 = 1;
-                        break;
-                    case 3:
-                        prm.profile3 = 1;
-                        break;
-                    case 4:
-                        prm.profile4 = 1;
-                        break;
-                    case 5:
-                        prm.profile5 = 1;
-                        break;
-                    case 6:
-                        prm.profile6 = 1;
-                        break;
-                    case 7:
-                        prm.profile7 = 1;
-                        break;
-                    case 8:
-                        prm.profile8 = 1;
-                        break;
-                    default:
-                        break;
-                }
-                switch (crdPrm.Y)
-                {
-                    case 1:
-                        prm.profile1 = 2;
-                        break;
-                    case 2:
-                        prm.profile2 = 2;
-                        break;
-                    case 3:
-                        prm.profile3 = 2;
-                        break;
-                    case 4:
-                        prm.profile4 = 2;
-                        break;
-                    case 5:
-                        prm.profile5 = 2;
-                        break;
-                    case 6:
-                        prm.profile6 = 2;
-                        break;
-                    case 7:
-                        prm.profile7 = 2;
-                        break;
-                    case 8:
-                        prm.profile8 = 2;
-                        break;
-                    default:
-                        break;
-                }
-                switch (crdPrm.Z)
-                {
-                    case 1:
-                        prm.profile1 = 3;
-                        break;
-                    case 2:
-                        prm.profile2 = 3;
-                        break;
-                    case 3:
-                        prm.profile3 = 3;
-                        break;
-                    case 4:
-                        prm.profile4 = 3;
-                        break;
-                    case 5:
-                        prm.profile5 = 3;
-                        break;
-                    case 6:
-                        prm.profile6 = 3;
-                        break;
-                    case 7:
-                        prm.profile7 = 3;
-                        break;
-                    case 8:
-                        prm.profile8 = 3;
-                        break;
-                    default:
-                        break;
-                }
-                switch (crdPrm.A)
-                {
-                    case 1:
-                        prm.profile1 = 4;
-                        break;
-                    case 2:
-                        prm.profile2 = 4;
-                        break;
-                    case 3:
-                        prm.profile3 = 4;
-                        break;
-                    case 4:
-                        prm.profile4 = 4;
-                        break;
-                    case 5:
-                        prm.profile5 = 4;
-                        break;
-                    case 6:
-                        prm.profile6 = 4;
-                        break;
-                    case 7:
-                        prm.profile7 = 4;
-                        break;
-                    case 8:
-                        prm.profile8 = 4;
-                        break;
-                    default:
-                        break;
-                }
-                rtn += mc.GT_SetCrdPrm((short)crdPrm.CardNum, (short)crdPrm.CrdNum, ref prm);
-                rtn += mc.GT_CrdClear((short)crdPrm.CardNum, (short)crdPrm.CrdNum, 0);
-                rtn += mc.GT_CrdClear((short)crdPrm.CardNum, (short)crdPrm.CrdNum, 1);
+                prm.profile1 = (short)crdPrm.X;
+                prm.profile2 = (short)crdPrm.Y;
+                prm.profile3 = (short)crdPrm.Z;
+                prm.profile4 = (short)crdPrm.A;
+                rtn += GT_SetCrdPrm((short)crdPrm.CardNum, (short)crdPrm.CrdNum, ref prm);
+                rtn += GT_CrdClear((short)crdPrm.CardNum, (short)crdPrm.CrdNum, 0);
+                rtn += GT_CrdClear((short)crdPrm.CardNum, (short)crdPrm.CrdNum, 1);
                 return rtn;
             }
             return -1;
@@ -679,15 +651,6 @@ namespace MotionWrapper
         #endregion
 
 
-        public void Run()
-        {
-            IFreshable freshMd = this as IFreshable;
-            while (true)
-            {
-                freshMd.Fresh();
-                Thread.Sleep(1);
-            }
-        }
 
         #region IFreshable
         public void Fresh()
@@ -695,19 +658,19 @@ namespace MotionWrapper
             subStatusData();
         }
 
-        void IFreshable.Run()
+       public void Run()
         {
             IFreshable fresh = this as IFreshable;
             while (true)
             {
                 fresh.Fresh();
-                Thread.Sleep(100);
+                Thread.Sleep(1);
             }
         }
         #endregion
 
         #region IInitable
-        bool IInitable.Init()
+       public bool Init()
         {
             try
             {
@@ -735,7 +698,7 @@ namespace MotionWrapper
             }
         }
 
-        bool IInitable.UnInit()
+       public bool UnInit()
         {
             try
             {
@@ -768,8 +731,8 @@ namespace MotionWrapper
             double[] encpos = new double[8];
             double[] encvel = new double[8];
             //辅助编码器
-            double[] fzencpos = new double[2];
-            double[] fzencvel = new double[2];
+            //double[] fzencpos = new double[2];
+            //double[] fzencvel = new double[2];
             int[] sts = new int[8];
             rtn = mc.GT_GetDi(0, mc.MC_GPI, out inValue);
             rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
@@ -777,15 +740,18 @@ namespace MotionWrapper
             rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 8, out _);
             rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 8, out _);
             rtn = mc.GT_GetSts(0, 1, out sts[0], 8, out _);
-            //辅助编码器
-            rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
-            rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
+            ////辅助编码器
+            //rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
+            //rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
             List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
+
+
             //解析
             for (int i = 0; i < 16; i++)
             {
                 Mdis[i] = ((1 << i) & inValue) == 0;
                 Mdos[i] = ((1 << i) & outValue) == 0;
+
                 if (i < axisParameters.Count)//轴状态分解
                 {
                     AxisRef axisRef = AxisRefs[i];
@@ -799,6 +765,16 @@ namespace MotionWrapper
                     axisRef.RelPos = (float)axisRef.Prm.pls2mm((long)encpos[axisRef.Prm.AxisNum - 1]);
                     axisRef.RelVel = (float)axisRef.Prm.plsperms2mmpers(encvel[axisRef.Prm.AxisNum - 1]);
                 }
+            }
+            var dis = Dis.Where(x => x.Name != "");
+            foreach (var item in dis)
+            {
+              item.Value=getDi(item);
+            }
+            var dos = Dos.Where(x => x.Name != "");
+            foreach (var item in dos)
+            {
+                item.Value = getDo(item);
             }
         }
 
