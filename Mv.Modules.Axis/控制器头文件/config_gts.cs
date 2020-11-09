@@ -486,18 +486,18 @@ namespace gts
 			
 			public struct TWatchInfo
 			{
-                public short enable;						// ²É¼¯Ê¹ÄÜ
-                public short run;							// ²É¼¯×´Ì¬
-                public uint time;					// ²É¼¯´ÎÊý
-                public uint head;					// Í·Ö¸Õë
-                public uint threshold;			// ×î¶àÈÝÄÉ²É¼¯´ÎÊý
+                public short enable;						// ï¿½É¼ï¿½Ê¹ï¿½ï¿½
+                public short run;							// ï¿½É¼ï¿½×´Ì¬
+                public uint time;					// ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½
+                public uint head;					// Í·Ö¸ï¿½ï¿½
+                public uint threshold;			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É²É¼ï¿½ï¿½ï¿½ï¿½ï¿½
 
-                public short interval;						// ²É¼¯¼ä¸ô
-                public short mode;							// ²É¼¯Ä£Ê½
-                public ushort countBeforeEvent;	// ÊÂ¼þ´¥·¢Ö®Ç°µÄ²É¼¯ÊýÁ¿
-                public ushort countAfterEvent;		// ÊÂ¼þ´¥·¢ÒÔºóµÄ²É¼¯ÊýÁ¿
-                public ushort varCount;			// ²É¼¯±äÁ¿ÊýÁ¿
-                public ushort eventCount;			// ²É¼¯ÊÂ¼þÊýÁ¿
+                public short interval;						// ï¿½É¼ï¿½ï¿½ï¿½ï¿½
+                public short mode;							// ï¿½É¼ï¿½Ä£Ê½
+                public ushort countBeforeEvent;	// ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½Ä²É¼ï¿½ï¿½ï¿½ï¿½ï¿½
+                public ushort countAfterEvent;		// ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôºï¿½Ä²É¼ï¿½ï¿½ï¿½ï¿½ï¿½
+                public ushort varCount;			// ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                public ushort eventCount;			// ï¿½É¼ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½
 			}
 			
 			public struct TWatchVarInfo

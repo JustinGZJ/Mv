@@ -10,6 +10,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="AxisModule.cs~RFab02fbe.TMP" />
+    <None Remove="PropertyTools.dll" />
+    <None Remove="PropertyTools.Wpf.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />

@@ -203,7 +203,7 @@ namespace GXN
             public UInt16 portACrcErrorCnt;
             public UInt32 portBCrcOkCnt;
             public UInt16 portBCrcErrorCnt;
-            public UInt32 reserve;//目前用于读取FLASH总数据长度
+            public UInt32 reserve;//目前锟斤拷锟节讹拷取FLASH锟斤拷锟斤拷锟捷筹拷锟斤拷
         }
 
         public struct TTerminalError

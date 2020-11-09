@@ -1382,28 +1382,28 @@ namespace GTN
 
         public struct THomePrm
         {
-	        public short mode;						// »ØÁãÄ£Ê½
-	        public short moveDir;					// ÉèÖÃÆô¶¯ËÑË÷Ê±µÄÔË¶¯·½Ïò
-	        public short indexDir;					// ÉèÖÃIndexËÑË÷·½Ïò
-	        public short edge;						// ÉèÖÃ²¶»ñÑØ
-	        public short triggerIndex;				// ÓÃÓÚÉèÖÃ´¥·¢Æ÷
-	        public short pad10;					// ±£Áô1
-            public short pad11;					// ±£Áô1
-            public short pad12;					// ±£Áô1
-	        public double velHigh;					// HomeËÑË÷ËÙ¶È
-	        public double velLow;					// IndexËÑË÷ËÙ¶È
+	        public short mode;						// ï¿½ï¿½ï¿½ï¿½Ä£Ê½
+	        public short moveDir;					// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short indexDir;					// ï¿½ï¿½ï¿½ï¿½Indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short edge;						// ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short triggerIndex;				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short pad10;					// ï¿½ï¿½ï¿½ï¿½1
+            public short pad11;					// ï¿½ï¿½ï¿½ï¿½1
+            public short pad12;					// ï¿½ï¿½ï¿½ï¿½1
+	        public double velHigh;					// Homeï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+	        public double velLow;					// Indexï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
 	        public double acc;
 	        public double dec;
 	        public short smoothTime;
-	        public short pad20;					// ±£Áô2
-            public short pad21;					// ±£Áô2
-            public short pad22;					// ±£Áô2
-	        public Int32 homeOffset;				// Ô­µãÆ«ÒÆ
-	        public Int32 searchHomeDistance;		// Home×î´óËÑË÷¾àÀë£¬Îª0±íÊ¾²»ÏÞÖÆ
-	        public Int32 searchIndexDistance;		// Index×î´óËÑË÷¾àÀë£¬Îª0±íÊ¾²»ÏÞÖÆ
-	        public Int32 escapeStep;				// ÍÑÀë²½³¤
-	        public Int32 pad31;					// ±£Áô3
-            public Int32 pad32;					// ±£Áô3
+	        public short pad20;					// ï¿½ï¿½ï¿½ï¿½2
+            public short pad21;					// ï¿½ï¿½ï¿½ï¿½2
+            public short pad22;					// ï¿½ï¿½ï¿½ï¿½2
+	        public Int32 homeOffset;				// Ô­ï¿½ï¿½Æ«ï¿½ï¿½
+	        public Int32 searchHomeDistance;		// Homeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£¬Îª0ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public Int32 searchIndexDistance;		// Indexï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë£¬Îª0ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public Int32 escapeStep;				// ï¿½ï¿½ï¿½ë²½ï¿½ï¿½
+	        public Int32 pad31;					// ï¿½ï¿½ï¿½ï¿½3
+            public Int32 pad32;					// ï¿½ï¿½ï¿½ï¿½3
         } 
 
         public struct THomeStatus
@@ -1753,73 +1753,73 @@ namespace GTN
 
         public struct TCrdPrm
         {
-	        public short dimension;                              // ×ø±êÏµÎ¬Êý
-	        public short profile1;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile2;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile3;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile4;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile5;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile6;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile7;                             // ¹ØÁªprofileºÍ×ø±êÖá
-            public short profile8;                             // ¹ØÁªprofileºÍ×ø±êÖá
-	        public double synVelMax;                             // ×î´óºÏ³ÉËÙ¶È
-	        public double synAccMax;                             // ×î´óºÏ³É¼ÓËÙ¶È
-	        public short evenTime;                               // ×îÐ¡ÔÈËÙÊ±¼ä
-	        public short setOriginFlag;                          // ÉèÖÃÔ­µã×ø±êÖµ±êÖ¾,0:Ä¬ÈÏµ±Ç°¹æ»®Î»ÖÃÎªÔ­µãÎ»ÖÃ;1:ÓÃ»§Ö¸¶¨Ô­µãÎ»ÖÃ
-	        public Int32 originPos1;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos2;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos3;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos4;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos5;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos6;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos7;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
-            public Int32 originPos8;                            // ÓÃ»§Ö¸¶¨µÄÔ­µãÎ»ÖÃ
+	        public short dimension;                              // ï¿½ï¿½ï¿½ï¿½ÏµÎ¬ï¿½ï¿½
+	        public short profile1;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile2;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile3;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile4;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile5;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile6;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile7;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short profile8;                             // ï¿½ï¿½ï¿½ï¿½profileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public double synVelMax;                             // ï¿½ï¿½ï¿½Ï³ï¿½ï¿½Ù¶ï¿½
+	        public double synAccMax;                             // ï¿½ï¿½ï¿½Ï³É¼ï¿½ï¿½Ù¶ï¿½
+	        public short evenTime;                               // ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+	        public short setOriginFlag;                          // ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ö¾,0:Ä¬ï¿½Ïµï¿½Ç°ï¿½æ»®Î»ï¿½ï¿½ÎªÔ­ï¿½ï¿½Î»ï¿½ï¿½;1:ï¿½Ã»ï¿½Ö¸ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+	        public Int32 originPos1;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos2;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos3;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos4;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos5;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos6;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos7;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 originPos8;                            // ï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½
         }
 
         public struct TCrdBufOperation
         {
-	        public short flag;                                   // ±êÖ¾¸Ã²å²¹¶ÎÊÇ·ñº¬ÓÐIOºÍÑÓÊ±
-	        public ushort delay;                         // ÑÓÊ±Ê±¼ä
-	        public short doType;                                 // »º´æÇøIOµÄÀàÐÍ,0:²»Êä³öIO
-            public ushort doMask;                        // »º´æÇøIOµÄÊä³ö¿ØÖÆÑÚÂë
-            public ushort doValue;                       // »º´æÇøIOµÄÊä³öÖµ
-            public ushort dataExt1;     // ¸¨Öú²Ù×÷À©Õ¹Êý¾Ý
-            public ushort dataExt2;     // ¸¨Öú²Ù×÷À©Õ¹Êý¾Ý
+	        public short flag;                                   // ï¿½ï¿½Ö¾ï¿½Ã²å²¹ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½IOï¿½ï¿½ï¿½ï¿½Ê±
+	        public ushort delay;                         // ï¿½ï¿½Ê±Ê±ï¿½ï¿½
+	        public short doType;                                 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,0:ï¿½ï¿½ï¿½ï¿½ï¿½IO
+            public ushort doMask;                        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public ushort doValue;                       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½IOï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public ushort dataExt1;     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½
+            public ushort dataExt2;     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹ï¿½ï¿½ï¿½ï¿½
         }
          
         public struct TCrdData
         {
-	        public short motionType;                             // ÔË¶¯ÀàÐÍ,0:Ö±Ïß²å²¹,1:Ô²»¡²å²¹
-	        public short circlePlat;                             // Ô²»¡²å²¹µÄÆ½Ãæ
-	        public Int32 pos1;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos2;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos3;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos4;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos5;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos6;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos7;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-            public Int32 pos8;             // µ±Ç°¶Î¸÷ÖáÖÕµãÎ»ÖÃ
-	        public double radius;                                  // Ô²»¡²å²¹µÄ°ë¾¶
-	        public short circleDir;                              // Ô²»¡Ðý×ª·½Ïò,0:Ë³Ê±Õë;1:ÄæÊ±Õë
-	        public double center1;                               // Ô²»¡²å²¹µÄÔ²ÐÄ×ø±ê
-            public double center2;                               // Ô²»¡²å²¹µÄÔ²ÐÄ×ø±ê
-            public double center3;                               // Ô²»¡²å²¹µÄÔ²ÐÄ×ø±ê
-            public double vel;                                   // µ±Ç°¶ÎºÏ³ÉÄ¿±êËÙ¶È
-	        public double acc;                                   // µ±Ç°¶ÎºÏ³É¼ÓËÙ¶È
-	        public short velEndZero;                             // ±êÖ¾µ±Ç°¶ÎµÄÖÕµãËÙ¶ÈÊÇ·ñÇ¿ÖÆÎª0,0:²»Ç¿ÖÆÎª0;1:Ç¿ÖÆÎª0
-	        public TCrdBufOperation operation;                   // »º´æÇøÑÓÊ±ºÍIO½á¹¹Ìå
+	        public short motionType;                             // ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½,0:Ö±ï¿½ß²å²¹,1:Ô²ï¿½ï¿½ï¿½å²¹
+	        public short circlePlat;                             // Ô²ï¿½ï¿½ï¿½å²¹ï¿½ï¿½Æ½ï¿½ï¿½
+	        public Int32 pos1;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos2;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos3;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos4;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos5;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos6;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos7;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+            public Int32 pos8;             // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Õµï¿½Î»ï¿½ï¿½
+	        public double radius;                                  // Ô²ï¿½ï¿½ï¿½å²¹ï¿½Ä°ë¾¶
+	        public short circleDir;                              // Ô²ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½,0:Ë³Ê±ï¿½ï¿½;1:ï¿½ï¿½Ê±ï¿½ï¿½
+	        public double center1;                               // Ô²ï¿½ï¿½ï¿½å²¹ï¿½ï¿½Ô²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public double center2;                               // Ô²ï¿½ï¿½ï¿½å²¹ï¿½ï¿½Ô²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public double center3;                               // Ô²ï¿½ï¿½ï¿½å²¹ï¿½ï¿½Ô²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public double vel;                                   // ï¿½ï¿½Ç°ï¿½ÎºÏ³ï¿½Ä¿ï¿½ï¿½ï¿½Ù¶ï¿½
+	        public double acc;                                   // ï¿½ï¿½Ç°ï¿½ÎºÏ³É¼ï¿½ï¿½Ù¶ï¿½
+	        public short velEndZero;                             // ï¿½ï¿½Ö¾ï¿½ï¿½Ç°ï¿½Îµï¿½ï¿½Õµï¿½ï¿½Ù¶ï¿½ï¿½Ç·ï¿½Ç¿ï¿½ï¿½Îª0,0:ï¿½ï¿½Ç¿ï¿½ï¿½Îª0;1:Ç¿ï¿½ï¿½Îª0
+	        public TCrdBufOperation operation;                   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½IOï¿½á¹¹ï¿½ï¿½
 
-	        public double cos1;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos2;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos3;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos4;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos5;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos6;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos7;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-            public double cos8;           // µ±Ç°¶Î¸÷Öá¶ÔÓ¦µÄÓàÏÒÖµ
-	        public double velEnd;                                // µ±Ç°¶ÎºÏ³ÉÖÕµãËÙ¶È
-	        public double velEndAdjust;                          // µ÷ÕûÖÕµãËÙ¶ÈÊ±ÓÃµ½µÄ±äÁ¿(Ç°Õ°Ä£¿é)
-	        public double r;                                     // µ±Ç°¶ÎºÏ³ÉÎ»ÒÆÁ¿
+	        public double cos1;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos2;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos3;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos4;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos5;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos6;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos7;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+            public double cos8;           // ï¿½ï¿½Ç°ï¿½Î¸ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	        public double velEnd;                                // ï¿½ï¿½Ç°ï¿½ÎºÏ³ï¿½ï¿½Õµï¿½ï¿½Ù¶ï¿½
+	        public double velEndAdjust;                          // ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½ï¿½Ù¶ï¿½Ê±ï¿½Ãµï¿½ï¿½Ä±ï¿½ï¿½ï¿½(Ç°Õ°Ä£ï¿½ï¿½)
+	        public double r;                                     // ï¿½ï¿½Ç°ï¿½ÎºÏ³ï¿½Î»ï¿½ï¿½ï¿½ï¿½
         }
 
         public struct  TCrdTime
@@ -2570,22 +2570,22 @@ namespace GTN
 
         public struct TCompensate2DTable
         {
-	        public short count1;                               // ÐÐÊýºÍÁÐÊý£¬×îÐ¡ÖµÎª2
-            public short count2;                               // ÐÐÊýºÍÁÐÊý£¬×îÐ¡ÖµÎª2
-	        public Int32 posBegin1;                             // ÆðµãÎ»ÖÃ
-            public Int32 posBegin2;                             // ÆðµãÎ»ÖÃ
-	        public Int32 step1;                                 // ²½³¤
-            public Int32 step2;                                 // ²½³¤
+	        public short count1;                               // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ÖµÎª2
+            public short count2;                               // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ÖµÎª2
+	        public Int32 posBegin1;                             // ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+            public Int32 posBegin2;                             // ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	        public Int32 step1;                                 // ï¿½ï¿½ï¿½ï¿½
+            public Int32 step2;                                 // ï¿½ï¿½ï¿½ï¿½
         } 
 
         public struct TCompensate2D
         {
-	        public short enable;                                  // 2D²¹³¥Ê¹ÄÜ±êÖ¾
-	        public short tableIndex;                              // ËùÊ¹ÓÃµÄ2D²¹³¥±í
-	        public short axisType1;                             // ²é±íÖáÀàÐÍ
-            public short axisType2;                             // ²é±íÖáÀàÐÍ
-	        public short axisIndex1;                            // ²é±íÖáË÷Òý
-            public short axisIndex2;                            // ²é±íÖáË÷Òý
+	        public short enable;                                  // 2Dï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ü±ï¿½Ö¾
+	        public short tableIndex;                              // ï¿½ï¿½Ê¹ï¿½Ãµï¿½2Dï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short axisType1;                             // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short axisType2;                             // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	        public short axisIndex1;                            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short axisIndex2;                            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         } 
         [DllImport("gts.dll")]
         public static extern short GT_SetCompensate2DTable(short tableIndex,ref TCompensate2DTable pTable,ref Int32  pData,short extend);
@@ -3044,9 +3044,9 @@ namespace GTN
 
         public struct TScanInit
         {
-	        public int lookAheadNum;             //Ç°Õ°¶ÎÊý
-	        public double time;                  //Ê±¼ä³£Êý
-	        public double radiusRatio;           //ÇúÂÊÏÞÖÆµ÷½Ú²ÎÊý
+	        public int lookAheadNum;             //Ç°Õ°ï¿½ï¿½ï¿½ï¿½
+	        public double time;                  //Ê±ï¿½ä³£ï¿½ï¿½
+	        public double radiusRatio;           //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½Ú²ï¿½ï¿½ï¿½
         }
 
         public struct TScanInfo
@@ -3918,50 +3918,50 @@ namespace GTN
         //Standard Home
         //////////////////////////////////////////////////////////////////////////
         
-        public const short STANDARD_HOME_STAGE_IDLE = 0; //Î´Æô¶¯»ØÔ­µã
-        public const short STANDARD_HOME_STAGE_START = 1; //Æô¶¯»ØÔ­µã
-        public const short STANDARD_HOME_STAGE_SEARCH_HOME = 20; //ÕýÔÚËÑË÷Home
-        public const short STANDARD_HOME_STAGE_SEARCH_INDEX   = 30; //ÕýÔÚËÑË÷Index
-        public const short STANDARD_HOME_STAGE_GO_HOME = 80; //ÕýÔÚÔË¶¯µ½Ô­µã
-        public const short STANDARD_HOME_STAGE_END = 100; //»ØÔ­µã½áÊø
-        public const short STANDARD_HOME_STAGE_START_CHECK = -1; //Æô¶¯»ØÔ­µãÇ°×Ô¼ì
-        public const short STANDARD_HOME_STAGE_CHECKING = -2; //×Ô¼ìÖÐ
+        public const short STANDARD_HOME_STAGE_IDLE = 0; //Î´ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½
+        public const short STANDARD_HOME_STAGE_START = 1; //ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½
+        public const short STANDARD_HOME_STAGE_SEARCH_HOME = 20; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Home
+        public const short STANDARD_HOME_STAGE_SEARCH_INDEX   = 30; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Index
+        public const short STANDARD_HOME_STAGE_GO_HOME = 80; //ï¿½ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½Ô­ï¿½ï¿½
+        public const short STANDARD_HOME_STAGE_END = 100; //ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½
+        public const short STANDARD_HOME_STAGE_START_CHECK = -1; //ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Ç°ï¿½Ô¼ï¿½
+        public const short STANDARD_HOME_STAGE_CHECKING = -2; //ï¿½Ô¼ï¿½ï¿½ï¿½
 
-        public const short STANDARD_HOME_ERROR_NONE = 0; //Î´·¢Éú´íÎó
-        public const short STANDARD_HOME_ERROR_DISABLE = 10; //Ö´ÐÐ»ØÔ­µãµÄÖáÎ´Ê¹ÄÜ
-        public const short STANDARD_HOME_ERROR_ALARM = 20; //Ö´ÐÐ»ØÔ­µãµÄÖá±¨¾¯
-        public const short STANDARD_HOME_ERROR_STOP = 30; //Î´Íê³É»ØÔ­µã£¬±»Í£Ö¹ÔË¶¯
-        public const short STANDARD_HOME_ERROR_ON_LIMIT = 40; //´¥·¢ÁËÏÞÎ»ÎÞ·¨¼ÌÐø
-        public const short STANDARD_HOME_ERROR_NO_HOME = 50; //Î´ÕÒµ½Home
-        public const short STANDARD_HOME_ERROR_NO_INDEX = 60; //Î´ÕÒµ½Index
-        public const short STANDARD_HOME_ERROR_NO_LIMIT = 70; //Î´ÕÒµ½ÏÞÎ»
-        public const short STANDARD_HOME_ERROR_ENCODER_DIR_SCALE = -1; //¹æ»®Æ÷Óë±àÂëÆ÷·½Ïò·½ÏòÏà·´»òÕßµ±Á¿²»Ò»ÖÂ
+        public const short STANDARD_HOME_ERROR_NONE = 0; //Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        public const short STANDARD_HOME_ERROR_DISABLE = 10; //Ö´ï¿½Ð»ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ï¿½Î´Ê¹ï¿½ï¿½
+        public const short STANDARD_HOME_ERROR_ALARM = 20; //Ö´ï¿½Ð»ï¿½Ô­ï¿½ï¿½ï¿½ï¿½á±¨ï¿½ï¿½
+        public const short STANDARD_HOME_ERROR_STOP = 30; //Î´ï¿½ï¿½É»ï¿½Ô­ï¿½ã£¬ï¿½ï¿½Í£Ö¹ï¿½Ë¶ï¿½
+        public const short STANDARD_HOME_ERROR_ON_LIMIT = 40; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Þ·ï¿½ï¿½ï¿½ï¿½ï¿½
+        public const short STANDARD_HOME_ERROR_NO_HOME = 50; //Î´ï¿½Òµï¿½Home
+        public const short STANDARD_HOME_ERROR_NO_INDEX = 60; //Î´ï¿½Òµï¿½Index
+        public const short STANDARD_HOME_ERROR_NO_LIMIT = 70; //Î´ï¿½Òµï¿½ï¿½ï¿½Î»
+        public const short STANDARD_HOME_ERROR_ENCODER_DIR_SCALE = -1; //ï¿½æ»®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à·´ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
         
         public struct TStandardHomePrm
         {
-            public short mode;		 // »ØÔ­µãÄ£Ê½È¡Öµ·¶Î§1~36
-            public double highSpeed; // ËÑË÷HomeµÄËÙ¶È£¬µ¥Î»pulse/ms
-            public double lowSpeed;	 // ËÑË÷IndexµÄËÙ¶È£¬µ¥Î»pulse/ms
-            public double acc;		 // »ØÁã¼ÓËÙ¶È£¬µ¥Î»pulse/ms^2
-            public Int32 offset;       // »ØÁãÆ«ÒÆÁ¿£¬µ¥Î»pulse
-            public short check; // ÊÇ·ñÆôÓÃ×Ô¼ì¹¦ÄÜ£¬1-ÆôÓÃ£¬ÆäËüÖµ-²»ÆôÓÃ
-            public short autoZeroPos; // »ØÁãÍê±ÏÊÇ·ñ×Ô¶¯ÇåÁã£¬1-×Ô¶¯ÇåÁã£¬ÆäËüÖµ-²»ÇåÁã
-            public Int32 motorStopDelay; //µç»úµ½Î»ÑÓÊ±£¬µ¥Î»£º¿ØÖÆÖÜÆÚ
-            public short pad10;	 // ±£Áô£¨²»ÐèÒªÉèÖÃ£©
-            public short pad11;	 // ±£Áô£¨²»ÐèÒªÉèÖÃ£©
-            public short pad12;	 // ±£Áô£¨²»ÐèÒªÉèÖÃ£©
+            public short mode;		 // ï¿½ï¿½Ô­ï¿½ï¿½Ä£Ê½È¡Öµï¿½ï¿½Î§1~36
+            public double highSpeed; // ï¿½ï¿½ï¿½ï¿½Homeï¿½ï¿½ï¿½Ù¶È£ï¿½ï¿½ï¿½Î»pulse/ms
+            public double lowSpeed;	 // ï¿½ï¿½ï¿½ï¿½Indexï¿½ï¿½ï¿½Ù¶È£ï¿½ï¿½ï¿½Î»pulse/ms
+            public double acc;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È£ï¿½ï¿½ï¿½Î»pulse/ms^2
+            public Int32 offset;       // ï¿½ï¿½ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»pulse
+            public short check; // ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ì¹¦ï¿½Ü£ï¿½1-ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½Öµ-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short autoZeroPos; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ã£¬1-ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ã£¬ï¿½ï¿½ï¿½ï¿½Öµ-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public Int32 motorStopDelay; //ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+            public short pad10;	 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ã£ï¿½
+            public short pad11;	 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ã£ï¿½
+            public short pad12;	 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ã£ï¿½
         }
         
         public struct TStandardHomeStatus
         {
-	        public short run;     // ÊÇÕýÔÚ½øÐÐ»ØÔ­µã£¬0¡ªÒÑÍ£Ö¹ÔË¶¯£¬1-ÕýÔÚ»ØÔ­µã
-	        public short stage;   // »ØÔ­µãÔË¶¯µÄ½×¶Î
-	        public short error;    // »ØÔ­µã¹ý³ÌµÄ·¢ÉúµÄ´íÎó
-	        public short pad10;       // ±£Áô£¨ÎÞ¾ßÌåº¬Òå£©
-            public short pad11;       // ±£Áô£¨ÎÞ¾ßÌåº¬Òå£©
-            public short pad12;       // ±£Áô£¨ÎÞ¾ßÌåº¬Òå£©
-            public Int32 capturePos;  // ²¶»ñµ½Home»òIndexÊ±¿ÌµÄ±àÂëÆ÷Î»ÖÃ
-	        public Int32 targetPos;    // ÐèÒªÔË¶¯µ½µÄÄ¿±êÎ»ÖÃ£¨Ô­µãÎ»ÖÃ»òÕßÔ­µãÎ»ÖÃ+Æ«ÒÆÁ¿£©£¬ÔÚËÑË÷LimitÊ±»òÕßËÑË÷Home»òIndexÊ±£¬ÉèÖÃµÄËÑË÷¾àÀëÎª0£¬ÄÇÃ´¸ÃÖµÏÔÊ¾Îª805306368
+	        public short run;     // ï¿½ï¿½ï¿½ï¿½ï¿½Ú½ï¿½ï¿½Ð»ï¿½Ô­ï¿½ã£¬0ï¿½ï¿½ï¿½ï¿½Í£Ö¹ï¿½Ë¶ï¿½ï¿½ï¿½1-ï¿½ï¿½ï¿½Ú»ï¿½Ô­ï¿½ï¿½
+	        public short stage;   // ï¿½ï¿½Ô­ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½Ä½×¶ï¿½
+	        public short error;    // ï¿½ï¿½Ô­ï¿½ï¿½ï¿½ï¿½ÌµÄ·ï¿½ï¿½ï¿½ï¿½Ä´ï¿½ï¿½ï¿½
+	        public short pad10;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¾ï¿½ï¿½åº¬ï¿½å£©
+            public short pad11;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¾ï¿½ï¿½åº¬ï¿½å£©
+            public short pad12;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¾ï¿½ï¿½åº¬ï¿½å£©
+            public Int32 capturePos;  // ï¿½ï¿½ï¿½ï¿½Homeï¿½ï¿½IndexÊ±ï¿½ÌµÄ±ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	        public Int32 targetPos;    // ï¿½ï¿½Òªï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Î»ï¿½Ã£ï¿½Ô­ï¿½ï¿½Î»ï¿½Ã»ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Î»ï¿½ï¿½+Æ«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LimitÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Homeï¿½ï¿½IndexÊ±ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0ï¿½ï¿½ï¿½ï¿½Ã´ï¿½ï¿½Öµï¿½ï¿½Ê¾Îª805306368
         }
 
         [DllImport("gts.dll")]

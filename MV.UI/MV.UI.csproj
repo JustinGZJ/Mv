@@ -23,4 +23,21 @@
       <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="PropertyTools.Wpf.dll" />
+    <None Remove="PropertyTools.dll" />
+    <None Remove="TransferService.WpfInteractions\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="TransferService.WpfInteractions\BindableDownloader.cs" />
+    <Compile Remove="TransferService.WpfInteractions\BindableProgress.cs" />
+    <Compile Remove="TransferService.WpfInteractions\**" />
+    <Compile Remove="Converters\NumberToDisplayDataSizeConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="TransferService.WpfInteractions\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="TransferService.WpfInteractions\**" />
+  </ItemGroup>
 </Project>

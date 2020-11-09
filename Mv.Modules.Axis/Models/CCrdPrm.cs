@@ -33,8 +33,17 @@
        /// 每圈移动距离
        /// </summary>
         public double Pith { get => pith; set => pith = value; }
+        /// <summary>
+        /// 分辨率
+        /// </summary>
         public double Resolution { get => resolution; set => resolution = value; }
+        /// <summary>
+        /// 卡号
+        /// </summary>
         public int CardNum { get => cardNum; set => cardNum = value; }
+        /// <summary>
+        /// 坐标系编号
+        /// </summary>
         public int CrdNum { get => crdNum; set => crdNum = value; }
         public int X { get => x; set => x = value; }
         public int Y { get => y; set => y = value; }

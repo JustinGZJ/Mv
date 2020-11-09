@@ -2,6 +2,17 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Notification.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Animations.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Brushes.Navy.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Badged.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Button.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Led.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Text.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.Window.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.ListBox.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.ProgressBar.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.TabControl.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/Mv.Controls;component/Styles/Mv.Styles.UserControl.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
