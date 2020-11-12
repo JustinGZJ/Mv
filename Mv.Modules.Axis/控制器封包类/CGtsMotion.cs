@@ -10,54 +10,11 @@ using System.Linq;
 
 namespace MotionWrapper
 {
-
-
-
     /// <summary>
-    /// 固高卡的封装  都在这里
-    /// 数据区域都在这个类里面
-    /// 每次项目  这个类需要重写的
+    /// IO部分
     /// </summary>
-    public class CGtsMotion : CMotionData, IGtsMotion
+    public partial class CGtsMotion
     {
-        #region Fields
-        public const int usedInput = 16, usedOutput = 16, usedAxis = 5;//必须外部指定
-        private readonly IConfigManager<MotionConfig> configManager;
-        public bool initOk = false;
-        private Thread runThread = null;       //用来刷新IO的
-        //私有变量
-        private short cardNum = 0;
-        #endregion
-        //局部变量
-        #region Ctors
-        public CGtsMotion(IConfigManager<MotionConfig> configManager)
-        {
-            MotionConfig motionConfig = configManager.Get();
-            List<AxisParameter> axisParameters = motionConfig.AxisParameters;
-            var inputs = motionConfig.Inputs;
-            var outputs = motionConfig.Outputs;
-            for (int i = 0; i < axisParameters.Count; i++)
-            {
-                AxisRefs[i] = new AxisRef(axisParameters[i].Name)
-                {
-                    Prm = axisParameters[i]
-                };
-            }
-            for (int i = 0; i < inputs.Count; i++)
-            {
-                Dis[i] = new IoRef(inputs[i].Name);
-                Dis[i].Prm = inputs[i];
-            }
-            for (int i = 0; i < outputs.Count; i++)
-            {
-                Dos[i] = new IoRef(outputs[i].Name);
-                Dos[i].Prm = outputs[i];
-            }
-            this.configManager = configManager;
-        }
-        #endregion
-        //局部变量
-
         #region IIoPart1
         public bool getDi(IoRef input)
         {
@@ -65,20 +22,20 @@ namespace MotionWrapper
             switch (input.Prm.IoType)
             {
                 case EIoType.NoamlInput:
-                    if (input.Prm.Model == 0)
-                        mc.GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
+                    if (input.Prm.Model > 0)
+                        if (input.Prm.NC)
+                            v = ~extval[input.Prm.Model - 1];
+                        else
+                            v = extval[input.Prm.Model - 1];
                     else
-                    {
-                        mc.GT_GetExtIoValue(cardNum, 0, out var m);
-                        v = m;
-                    }
+                        GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
                     break;
                 case EIoType.Alarm:
                 case EIoType.LimitP:
                 case EIoType.LimitN:
                 case EIoType.Home:
                 case EIoType.Arrive:
-                    mc.GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
+                    GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
                     break;
                 case EIoType.clrSts:
                 case EIoType.ServoOn:
@@ -86,13 +43,13 @@ namespace MotionWrapper
                     if (input.Prm.Model > 0)
                         v = extval[input.Prm.Model - 1];
                     else
-                        mc.GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
+                        GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
                     break;
                 default:
                     v = 0;
                     break;
             }
-            return (v & (1 << input.Prm.Index)) > 0;
+            return ((v & (1 << input.Prm.Index)) > 0) ^ (input.Prm.NC);
         }
         public ushort[] extval = new ushort[32];
         public void setDO(IoRef output, bool value)
@@ -103,10 +60,15 @@ namespace MotionWrapper
                     extval[output.Prm.Model - 1] |= (ushort)(1 << output.Prm.Index);
                 else
                     extval[output.Prm.Model - 1] &= ((ushort)(~(1 << output.Prm.Index)));
-                mc.GT_SetExtIoBit(cardNum, (short)(output.Prm.Model - 1), output.Prm.Index, (ushort)(value ? 1 : 0));
+               var  v = (output.Prm.NC) ^ value;
+                GT_SetExtIoBit(cardNum, (short)(output.Prm.Model - 1), output.Prm.Index, (ushort)((v) ? 1 : 0));
             }
             else
-                mc.GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)(value ? 1 : 0));
+            {
+             //   value = (output.Prm.NC) ^ value;
+                GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)((value) ? 1 : 0));
+            }
+             
         }
 
         public bool getDo(IoRef output)
@@ -116,10 +78,10 @@ namespace MotionWrapper
             {
                 case EIoType.NoamlInput:
                     if (output.Prm.Model == 0)
-                        mc.GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
+                        GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
                     else
                     {
-                        mc.GT_GetExtIoValue(cardNum, 0, out var m);
+                        GT_GetExtIoValue(cardNum, 0, out var m);
                         v = m;
                     }
                     break;
@@ -128,21 +90,25 @@ namespace MotionWrapper
                 case EIoType.LimitN:
                 case EIoType.Home:
                 case EIoType.Arrive:
-                    mc.GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
+                    GT_GetDi(cardNum, (short)output.Prm.IoType, out v);
                     break;
                 case EIoType.clrSts:
                 case EIoType.ServoOn:
                 case EIoType.NomalOutput:
                     if (output.Prm.Model > 0)
-                        v = extval[output.Prm.Model - 1];
+                        if (output.Prm.NC)
+                            v = ~extval[output.Prm.Model - 1];
+                        else
+                            v = extval[output.Prm.Model - 1];
                     else
-                        mc.GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
+                        GT_GetDo(cardNum, (short)output.Prm.IoType, out v);
                     break;
                 default:
                     v = 0;
                     break;
             }
-            return (v & (1 << output.Prm.Index)) > 0;
+
+            return ((v & (1 << output.Prm.Index)) > 0)^(output.Prm.NC);
         }
         public bool getDi(int startIndex, int lenth, ref bool[] value)
         {
@@ -163,7 +129,9 @@ namespace MotionWrapper
             return true;
         }
         #endregion
-
+    }
+    public partial class CGtsMotion
+    {
         #region IMotionPart1
         public int MC_SetPos(AxisRef axis, double pos)
         {
@@ -174,12 +142,12 @@ namespace MotionWrapper
         }
         public int MC_Home(ref AxisRef axis)
         {
-            mc.THomePrm prm = new mc.THomePrm();
+            THomePrm prm = new THomePrm();
             axis.Homed = 0;
             axis.IsHoming = false;
-            short rtn = mc.GT_GetHomePrm(axis.Prm.CardNum, axis.Prm.AxisNum, out prm);
-            rtn = mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
-            rtn = mc.GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+            short rtn = GT_GetHomePrm(axis.Prm.CardNum, axis.Prm.AxisNum, out prm);
+            rtn = GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+            rtn = GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
             prm.mode = axis.Prm.homeType;
             prm.acc = axis.Prm.getAccPlsPerMs2();
             prm.dec = prm.acc;
@@ -398,6 +366,57 @@ namespace MotionWrapper
             return rtn;
         }
         #endregion
+    }
+
+    /// <summary>
+    /// 固高卡的封装  都在这里
+    /// 数据区域都在这个类里面
+    /// 每次项目  这个类需要重写的
+    /// </summary>
+    public partial class CGtsMotion : CMotionData, IGtsMotion
+    {
+        #region Fields
+        public const int usedInput = 16, usedOutput = 16, usedAxis = 5;//必须外部指定
+        private readonly IConfigManager<MotionConfig> configManager;
+        public bool initOk = false;
+        private Thread runThread = null;       //用来刷新IO的
+        //私有变量
+        private short cardNum = 0;
+        #endregion
+        //局部变量
+        #region Ctors
+        public CGtsMotion(IConfigManager<MotionConfig> configManager)
+        {
+            MotionConfig motionConfig = configManager.Get();
+            List<AxisParameter> axisParameters = motionConfig.AxisParameters;
+            var inputs = motionConfig.Inputs;
+            var outputs = motionConfig.Outputs;
+            for (int i = 0; i < axisParameters.Count; i++)
+            {
+                AxisRefs[i] = new AxisRef(axisParameters[i].Name)
+                {
+                    Prm = axisParameters[i]
+                };
+            }
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                Dis[i] = new IoRef(inputs[i].Name);
+                Dis[i].Prm = inputs[i];
+            }
+            for (int i = 0; i < outputs.Count; i++)
+            {
+                Dos[i] = new IoRef(outputs[i].Name);
+                Dos[i].Prm = outputs[i];
+            }
+
+            this.configManager = configManager;
+        }
+        #endregion
+        //局部变量
+
+
+
+
 
         /// <summary>
         /// 启动坐标系
@@ -451,13 +470,13 @@ namespace MotionWrapper
             if (crdNum < 0 || crdNum >= configManager.Get().CrdParameters.Count) return -1;
             CCrdPrm crdPrm = configManager.Get().CrdParameters[crdNum];
 
-         //   ushort crd = crdHandle[crdPrm.CrdNum - 1];
+            //   ushort crd = crdHandle[crdPrm.CrdNum - 1];
 
             string tmpCmd = cmd.ToUpper();
             string tmpStr = "";
 
             CompileUserCode compiler = new CompileUserCode();
-       //     rtn += CNMCLib20.NMC_CrdBufClr(crdHandle[crdPrm.CrdNum - 1]);
+            //     rtn += CNMCLib20.NMC_CrdBufClr(crdHandle[crdPrm.CrdNum - 1]);
             if (tmpCmd.IndexOf("G00") >= 0)
             {
                 //X
@@ -658,7 +677,7 @@ namespace MotionWrapper
             subStatusData();
         }
 
-       public void Run()
+        public void Run()
         {
             IFreshable fresh = this as IFreshable;
             while (true)
@@ -670,7 +689,7 @@ namespace MotionWrapper
         #endregion
 
         #region IInitable
-       public bool Init()
+        public bool Init()
         {
             try
             {
@@ -698,7 +717,7 @@ namespace MotionWrapper
             }
         }
 
-       public bool UnInit()
+        public bool UnInit()
         {
             try
             {
@@ -734,7 +753,7 @@ namespace MotionWrapper
             //double[] fzencpos = new double[2];
             //double[] fzencvel = new double[2];
             int[] sts = new int[8];
-            rtn = mc.GT_GetDi(0, mc.MC_GPI, out inValue);
+            rtn = GT_GetDi(0, mc.MC_GPI, out inValue);
             rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
             rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 8, out _);
             rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 8, out _);
@@ -769,7 +788,7 @@ namespace MotionWrapper
             var dis = Dis.Where(x => x.Name != "");
             foreach (var item in dis)
             {
-              item.Value=getDi(item);
+                item.Value = getDi(item);
             }
             var dos = Dos.Where(x => x.Name != "");
             foreach (var item in dos)

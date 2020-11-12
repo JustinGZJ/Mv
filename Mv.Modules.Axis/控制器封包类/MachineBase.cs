@@ -7,7 +7,7 @@ namespace MotionWrapper
     /// 所有的可运行组件都要继承自这里
     /// 不同的卡 要在这里添加
     /// </summary>
-    public abstract class CMachBase
+    public abstract class MachineBase
     {
         public Thread runThread = null;//内部使用的线程
         public Thread homeThread = null;//回零用的传感器

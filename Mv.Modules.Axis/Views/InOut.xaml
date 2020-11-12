@@ -6,6 +6,7 @@
              xmlns:axis="clr-namespace:Mv.Modules.Axis"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:ui="clr-namespace:Mv.Ui.Core;assembly=MV.UI"
              xmlns:mw="clr-namespace:MotionWrapper" xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -47,7 +48,7 @@
                             <Label Content="{Binding Name}"></Label>
                             <Label Grid.Column="1" Content="{Binding Prm.IoType}"></Label>
                             <Label Grid.Column="2" Content="{Binding Prm.Index}"></Label>
-                            <ToggleButton Grid.Column="3" IsChecked="{Binding Value}" Command="{Binding CmdReverseOutput,RelativeSource={RelativeSource AncestorType=local:InOut}}"/>
+                            <ToggleButton Grid.Column="3" IsChecked="{Binding Value,Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverseOutput,RelativeSource={RelativeSource AncestorType=local:InOut}}"/>
                             <Label Grid.Column="4" Content="{Binding Prm.ModelStr}"></Label>
                             <Label Grid.Column="5" Content="{Binding Prm.PinStr}"></Label>
                         </Grid>
@@ -56,7 +57,7 @@
                         ObjectType="{x:Type sys:Enum}"
                         x:Key="IoTypes">
                         <ObjectDataProvider.MethodParameters>
-                            <x:Type TypeName="mw:EIoType" />
+                            <x:Type TypeName="mw:EIoType"/>
                         </ObjectDataProvider.MethodParameters>
                     </ObjectDataProvider>
                     <Style x:Key="ListType" TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
@@ -155,8 +156,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label>数据分类</Label>
-                <ListBox ItemContainerStyle="{DynamicResource ListBoxItemContainerStyle}" Grid.Column="1" ItemsSource="{Binding Source={StaticResource IoTypes}}" Style="{StaticResource ListType}" ItemTemplate="{StaticResource TypeTemplate}" SelectedItem="{Binding IoType}"/>
+                <Label VerticalAlignment="Center">数据分类</Label>
+                <ListBox ItemContainerStyle="{DynamicResource ListBoxItemContainerStyle}" Grid.Column="1" ItemsSource="{ui:EnumBindingSource EnumType=mw:EIoType}" Style="{StaticResource ListType}" ItemTemplate="{StaticResource TypeTemplate}" SelectedItem="{Binding IoType}"/>
             </Grid>
             <Grid x:Name="数据" Grid.Row="1">
                 <ItemsControl ItemsSource="{Binding DataList}" ItemTemplateSelector="{StaticResource SelectInout}"></ItemsControl>

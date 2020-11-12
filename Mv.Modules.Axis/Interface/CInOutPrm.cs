@@ -10,7 +10,7 @@
         private short model = 0;//0-9是卡  10是别的模块 GSN的时候  1和2
         private short index = 0;//位置 GTS[0,15]  0-15 GSN[1,66]
         private EIoType ioType = EIoType.NoamlInput;
-        private bool nc = false;//常开常闭
+        private bool nc = true;//常闭
         //界面中显示  
         private string modelStr = "";//所属的模块
         private string pinStr = "";//所属的针脚

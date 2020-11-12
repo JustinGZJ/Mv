@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using GTN;
 using Mv.Ui.Core;
 
 namespace MotionWrapper
@@ -11,23 +12,23 @@ namespace MotionWrapper
     public enum EIoType
     {
         [Description("通用输入"),DefaultValue("通用输入")]
-        NoamlInput = 1,
+        NoamlInput = mc.MC_GPI,
         [Description("通用输出"),DefaultValue("通用输出")]
-        NomalOutput = 9,
+        NomalOutput = mc.MC_GPO,
         [Description("报警"),DefaultValue("报警")]
-        Alarm = 2,
+        Alarm = mc.MC_ALARM,
         [Description("正限位"),DefaultValue("正限位")]
-        LimitP = 3,
+        LimitP = mc.MC_LIMIT_POSITIVE,
         [Description("负限位"),DefaultValue("负限位")]
-        LimitN = 4,
+        LimitN = mc.MC_LIMIT_NEGATIVE,
         [Description("回零"),DefaultValue("回零")]
-        Home = 5,
+        Home = mc.MC_HOME,
         [Description("到位"),DefaultValue("到位")]
-        Arrive = 6,
+        Arrive = mc.MC_ARRIVE,
         [Description("伺服使能"),DefaultValue("伺服使能")]
-        ServoOn = 7,
+        ServoOn = mc.MC_ENABLE,
         [Description("清除状态"),DefaultValue("清除状态")]
-        clrSts = 8,
+        clrSts = mc.MC_CLEAR,
 
     }
 }
