@@ -11,6 +11,8 @@ using SimpleTCP;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace Mv.Modules.Schneider.Service
 {
@@ -19,7 +21,7 @@ namespace Mv.Modules.Schneider.Service
     public interface IServerOperations
     {
         int CheckCode(string refId);
-        int Upload(UploadDataCollection json);
+        int Upload(ProductDataCollection json);
     }
     public class ServerOperations : IServerOperations
     {
@@ -27,17 +29,25 @@ namespace Mv.Modules.Schneider.Service
         UserMessageEvent messageEvent;
         private readonly IDataServer dataServer;
         private readonly IConfigureFile configure;
-
-        public string Station  =>(configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig))??new ScheiderConfig()).Station;
+        private readonly ILoggerFacade logger;
+        ScheiderConfig scheiderConfig => configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig();
+        public string Station
+        {
+            get
+            {
+                return scheiderConfig.Station;
+            }
+        }
 
         bool serverDisable => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerDisable;
         public string Ip => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerIP;
         public int Port { get; set; } = 502;
-        public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure)
+        public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure, ILoggerFacade logger)
         {
             messageEvent = aggregator.GetEvent<UserMessageEvent>();
             this.dataServer = dataServer;
             this.configure = configure;
+            this.logger = logger;
         }
 
         public void OnMessage(string msg, Category level = Category.Debug)
@@ -87,7 +97,7 @@ namespace Mv.Modules.Schneider.Service
                 OnMessage("服务器验证已关闭");
                 return 0;
             }
-             
+
             return Read($"{Station}SC${refId}\n", (s) =>
             {
                 if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
@@ -96,25 +106,31 @@ namespace Mv.Modules.Schneider.Service
                     return -4;
             });
         }
-
-        public int Upload(UploadDataCollection uploaddataCollection)
+        ActionBlock<(string, ProductData)> SaveFileAction = new ActionBlock<(string, ProductData)>(x =>
+        {
+            var localdata = x.Item2;
+            var fileName = x.Item1;
+            string contents = JsonConvert.SerializeObject(localdata);
+            File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
+            File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+        });
+        public int Upload(ProductDataCollection uploaddataCollection)
         {
             if (serverDisable)
             {
                 OnMessage("服务器验证已关闭");
                 return 0;
-            }         
-            foreach (var localdata in uploaddataCollection.UploadDatas)
+            }
+            foreach (var localdata in uploaddataCollection.ProductDatas)
             {
                 localdata.Status = dataServer["R_STATUS"].Value.Int32;
                 localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
                 localdata.Quantity = dataServer["R_QTY"].Value.Int32;
                 localdata.Turns = dataServer["R_ROWS"].Value.Int32;
-     
+
                 localdata.Program = dataServer["PROGRAM"].ToString();
-         
-                File.WriteAllTextAsync(Path.Combine(Folders.TENSIONS, $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json"), JsonConvert.SerializeObject(localdata));
-                File.WriteAllTextAsync(Path.Combine(Folders.TENSIONSBACKUP, $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json"), JsonConvert.SerializeObject(localdata));
+                string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
+                SaveFileAction.Post((fileName, localdata));
             }
             var uploadData = new ServerData
             {
@@ -123,9 +139,22 @@ namespace Mv.Modules.Schneider.Service
                 Quantity = dataServer["R_QTY"].Value.Int32,
                 Turns = dataServer["R_ROWS"].Value.Int32,
                 Velocity = dataServer["R_Speed"].Value.Int32,
-                Program = dataServer["PROGRAM"].ToString()
+                Program = dataServer["PROGRAM"].ToString(),
+                BatchNumber = scheiderConfig.BatchNumber,
+                Customer = scheiderConfig.Customer,
+                GrossWeight = scheiderConfig.GrossWeight,
+                JobNumber = scheiderConfig.JobNumber,
+                Offline = scheiderConfig.Offline,
+                Online = scheiderConfig.Online,
+                SerialNumber = scheiderConfig.SerialNumber,
+                Size = scheiderConfig.Size,
+                Suttle = scheiderConfig.Suttle,
+                Date = scheiderConfig.Date,
+                Nose = scheiderConfig.Nose,
+                Type = scheiderConfig.Type
+
             };
-            uploadData.Codes.AddRange(uploaddataCollection.UploadDatas.Select(x => x.Code));
+            uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));
             var json = JsonConvert.SerializeObject(uploadData);
             return Read($"{Station}UL${json}\n", (s) =>
             {

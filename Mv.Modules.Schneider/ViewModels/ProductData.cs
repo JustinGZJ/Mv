@@ -9,18 +9,18 @@ namespace Mv.Modules.Schneider.ViewModels
         public const int AXISCNT= 4;
     }
    
-    public class UploadDataCollection
+    public class ProductDataCollection
     {
 
-        public UploadDataCollection()
+        public ProductDataCollection()
         {
-            UploadDatas = new List<UploadData>(AXISCNT);
+            ProductDatas = new List<ProductData>(AXISCNT);
             for (int i = 0; i < AXISCNT; i++)
             {
-                UploadDatas.Add(new UploadData(i));
+                ProductDatas.Add(new ProductData(i));
             }
         }
-        public List<UploadData> UploadDatas { get; set; }
+        public List<ProductData> ProductDatas { get; set; }
     }
     public class ServerData
     {
@@ -36,18 +36,42 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Angle { get; set; }
         public int Turns { get; set; }
         public string Program { get; set; } = "";
+
+        public string Type { get; set; }
+
+        public string Size { get; set; }
+        public string Customer { get; set; }
+        public string GrossWeight { get; set; }
+        public string Suttle { get; set; }
+
+        public string SerialNumber { get; set; }
+
+        public DateTime Date { get; set; }
+
+        public DateTime Nose { get; set; }
+
+
+        public DateTime JobNumber { get; set; }
+
+
+        public DateTime Online { get; set; }
+
+        public DateTime Offline { get; set; }
+
+        public string BatchNumber { get; set; }
     }
 
-    public class UploadData
+    public class ProductData
     {
-        public UploadData(int index)
+        public ProductData(int index)
         {
-            Tensions = new List<Group>();
+            TensionGroups = new List<TensionGroup>();
             for (int i = 0; i < 2; i++)
             {
-                Tensions.Add(new Group() { Name = $"tension{i*AXISCNT + 1+index}" });
+                TensionGroups.Add(new TensionGroup() { Name = $"tension{i*AXISCNT + 1+index}" });
             }
         }
+
         public string Code { get; set; } 
         public int Status { get; set; }
         public double LoopTime { get; set; }
@@ -56,20 +80,20 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Angle { get; set; }
         public int Turns { get; set; }
         public string Program { get; set; } = "";
-        public ICollection<Group> Tensions { get; set; }
+        public ICollection<TensionGroup> TensionGroups { get; set; }
 
-        public class Group
+        public class TensionGroup
         {
-            public Group()
+            public TensionGroup()
             {
-                Values = new List<Data>();
+                Values = new List<Tension>();
             }
             public string Name { get; set; }
             public double UpperLimit { get; set; }
             public double LowerLimit { get; set; }
-            public ICollection<Data> Values { get; set; }
+            public ICollection<Tension> Values { get; set; }
         }
-        public class Data
+        public class Tension
         {
             public DateTime Time { get; set; } = DateTime.Now;
             public short Value { get; set; }

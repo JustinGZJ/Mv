@@ -41,10 +41,18 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+           
+            
             <StackPanel  Margin="5">
                 <TextBlock Text="扫码信息"  Style="{StaticResource MaterialDesignSubtitle2TextBlock}" />
                 <Border BorderThickness="1" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}">
-                    <ItemsControl  ItemsSource="{Binding Barcodes}" Style="{StaticResource codesStyle}" />
+                    <ItemsControl  ItemsSource="{Binding Barcodes}" Style="{StaticResource codesStyle}" >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock MinWidth="150" Text="{Binding Value}" Margin="5"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Border>
             </StackPanel>
             <Grid Grid.Row="1">
