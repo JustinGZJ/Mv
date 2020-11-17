@@ -32,10 +32,12 @@ namespace Mv.Modules.Axis
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            regionManager.RegisterViewWithRegion("APPS", typeof(MainTab));
+            regionManager.RegisterViewWithRegion(RegionNames.AppsTabRegion, typeof(MainTab));
             regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(Setting));
+            regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Dashboard));
             containerRegistry.RegisterSingleton<IConfigManager<MotionConfig>, ConfigManager<MotionConfig>>();
             containerRegistry.RegisterSingleton<IGtsMotion, CGtsMotion>();
+            
         }
     }
 }

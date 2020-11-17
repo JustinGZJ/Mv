@@ -10,6 +10,27 @@ using System.Windows.Media;
 
 namespace Mv.Controls
 {
+
+    public class MvMainTabItem : TabItem
+    {
+        public static readonly DependencyProperty DisplayNameProperty = DependencyProperty.Register(
+            "DisplayName", typeof(string), typeof(MvMainTabItem), new PropertyMetadata(default(string)));
+
+        public string DisplayName
+        {
+            get => (string) GetValue(DisplayNameProperty);
+            set => SetValue(DisplayNameProperty, value);
+        }
+
+        public static readonly DependencyProperty PackIconKindProperty = DependencyProperty.Register(
+            "PackIconKind", typeof(object), typeof(MvMainTabItem), new PropertyMetadata(default(object)));
+
+        public object PackIconKind
+        {
+            get => (object) GetValue(PackIconKindProperty);
+            set => SetValue(PackIconKindProperty, value);
+        }
+    }
     public class HighlightTextBlock : TextBlock
     {
         public static readonly DependencyProperty SourceTextProperty = DependencyProperty.Register("SourceText", typeof(string), typeof(HighlightTextBlock), new PropertyMetadata(null, OnSourceTextChanged));

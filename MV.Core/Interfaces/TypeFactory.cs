@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Mv.Core.Interfaces
 {
+    public interface IFactory<TKey, TProduct>
+    {
+        TProduct Create(TKey value);
+    }
     public abstract class TypeFactory<TKey, TProduct> : IFactory<TKey, TProduct>
     {
         readonly Dictionary<Type, Func<TKey, TProduct>> _mapping;

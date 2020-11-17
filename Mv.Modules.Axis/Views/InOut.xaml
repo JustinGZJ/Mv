@@ -7,7 +7,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:ui="clr-namespace:Mv.Ui.Core;assembly=MV.UI"
-             xmlns:mw="clr-namespace:MotionWrapper" xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
+             xmlns:mw="clr-namespace:MotionWrapper" 
+             xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              prism:ViewModelLocator.AutoWireViewModel="True">

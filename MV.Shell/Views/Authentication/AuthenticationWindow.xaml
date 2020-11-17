@@ -4,7 +4,7 @@
         xmlns:mvvm="http://prismlibrary.com/"
         xmlns:controls="clr-namespace:Mv.Controls;assembly=MV.Controls"
         xmlns:authentication="clr-namespace:Mv.Shell.Views.Authentication"
-        xmlns:controls1="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
+        xmlns:controls1="clr-namespace:Mv.Controls;assembly=MV.Controls"
         mvvm:ViewModelLocator.AutoWireViewModel="True"
         WindowStartupLocation="CenterScreen"
        xmlns:i18N="clr-namespace:Mv.Core.I18n;assembly=MV.Core"

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:pt="http://propertytools.org/wpf"
-             xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
               xmlns:axis="clr-namespace:Mv.Modules.Axis"
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>

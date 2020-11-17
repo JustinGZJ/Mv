@@ -15,7 +15,7 @@
         <Grid>
             <views:SingleAxis></views:SingleAxis>
         </Grid>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Grid.Column="0">
             <views:SingleAxis></views:SingleAxis>
         </Grid>
     </Grid>
