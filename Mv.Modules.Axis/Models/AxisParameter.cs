@@ -40,7 +40,7 @@ namespace MotionWrapper
         //public short reverseHome = 0;
         //public short reverseLmtp = 0;
         //public short reverseLmtn = 0;//开关取反
-        public short homeType = 0;//<0表示不需要回零
+        public short homeType = gts.mc.HOME_MODE_HOME;//<0表示不需要回零
         public float homeSearch = 1000000.0f;//回零搜索距离
         private float homeLeave = 100;
         //public float homeTriger = 0;//GSN 1=上升沿 0=下降沿

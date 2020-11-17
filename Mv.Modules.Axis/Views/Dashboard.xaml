@@ -58,7 +58,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Availability"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0"
+                    <wpf:Gauge Grid.Row="1" Grid.Column="0" Value="20"
                            GaugeActiveFill="#BE54A3E9"/>
                 </Grid>
             </materialDesign:Card>
@@ -79,7 +79,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Quality"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0" 
+                    <wpf:Gauge Grid.Row="1" Grid.Column="0" Value="50"
                            GaugeActiveFill="DarkSeaGreen"/>
                 </Grid>
             </materialDesign:Card>
@@ -90,7 +90,7 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="OEE"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0" GaugeActiveFill="Red"/>
+                    <wpf:Gauge Grid.Row="1" Value="30" Grid.Column="0" GaugeActiveFill="Red"/>
                 </Grid>
             </materialDesign:Card>
         </UniformGrid>

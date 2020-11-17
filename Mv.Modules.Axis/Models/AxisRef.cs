@@ -75,6 +75,8 @@ namespace MotionWrapper
         public float RelVel { get => relVel; set => relVel = value; }
         public short Homed { get => homed; set => homed = value; }
         public bool HomeSwitch { get => homeSwitch; set => homeSwitch = value; }
+
+        public bool AtHome { get; set; }
         public string Name { get => name; set => name = value; }
         public AxisParameter Prm { get => prm; set => prm = value; }
         public float Rate { get => belif; set => belif = value; }

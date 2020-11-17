@@ -148,9 +148,10 @@ namespace MotionWrapper
             short rtn = GT_GetHomePrm(axis.Prm.CardNum, axis.Prm.AxisNum, out prm);
             rtn = GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
             rtn = GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
-            prm.mode = axis.Prm.homeType;
+            prm.mode =20;
             prm.acc = axis.Prm.getAccPlsPerMs2();
             prm.dec = prm.acc;
+            prm.pad2_1=1;
             if (axis.Prm.homeSearch >= 0)
             {
                 prm.moveDir = 1;
@@ -304,12 +305,16 @@ namespace MotionWrapper
             rtn += mc.GT_GetEncPos(0, 1, out encpos[0], 1, out clock);
             rtn += mc.GT_GetEncVel(0, 1, out encvel[0], 1, out clock);
             rtn += mc.GT_GetSts(0, 1, out sts[0], 1, out clock);
+            rtn += mc.GT_GetDi(cardNum, (short)EIoType.Home, out var home);
             //解析
             axisref.Alarm = (sts[0] & 0x2) != 0;
             axisref.ServoOn = (sts[0] & 0x200) != 0;
             axisref.LimitN = (sts[0] & 0x40) != 0;
             axisref.LimitP = (sts[0] & 0x20) != 0;
             axisref.Moving = (sts[0] & 0x400) != 0;
+            axisref.HomeSwitch = (home & (1 << (axisref.Prm.AxisNum - 1))) > 0;
+
+          //  axisref.AtHome=GT_GetDi(cardNum,)
 
             axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
             axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
@@ -753,8 +758,9 @@ namespace MotionWrapper
             //double[] fzencpos = new double[2];
             //double[] fzencvel = new double[2];
             int[] sts = new int[8];
-            rtn = GT_GetDi(0, mc.MC_GPI, out inValue);
-            rtn = mc.GT_GetDo(0, mc.MC_GPO, out outValue);
+            rtn += GT_GetDi(0, mc.MC_GPI, out inValue);
+            rtn += mc.GT_GetDo(0, mc.MC_GPO, out outValue);
+            rtn += GT_GetDi(cardNum, MC_HOME, out var homeVal); ;
             rtn = mc.GT_GetPrfPos(0, 1, out prfpos[0], 8, out _);
             rtn = mc.GT_GetEncPos(0, 1, out encpos[0], 8, out _);
             rtn = mc.GT_GetEncVel(0, 1, out encvel[0], 8, out _);
@@ -774,15 +780,17 @@ namespace MotionWrapper
                 if (i < axisParameters.Count)//轴状态分解
                 {
                     AxisRef axisRef = AxisRefs[i];
-                    int status = sts[axisRef.Prm.AxisNum - 1];
+                    int index = axisRef.Prm.AxisNum - 1;
+                    int status = sts[index];
                     axisRef.Alarm = (status & 0x2) != 0;
                     axisRef.ServoOn = (status & 0x200) != 0;
                     axisRef.LimitN = (status & 0x40) != 0;
                     axisRef.LimitP = (status & 0x20) != 0;
                     axisRef.Moving = (status & 0x400) != 0;
-                    axisRef.CmdPos = (float)axisRef.Prm.pls2mm((long)prfpos[axisRef.Prm.AxisNum - 1]);
-                    axisRef.RelPos = (float)axisRef.Prm.pls2mm((long)encpos[axisRef.Prm.AxisNum - 1]);
-                    axisRef.RelVel = (float)axisRef.Prm.plsperms2mmpers(encvel[axisRef.Prm.AxisNum - 1]);
+                    axisRef.HomeSwitch = (homeVal & (1 << index)) > 0;
+                    axisRef.CmdPos = (float)axisRef.Prm.pls2mm((long)prfpos[index]);
+                    axisRef.RelPos = (float)axisRef.Prm.pls2mm((long)encpos[index]);
+                    axisRef.RelVel = (float)axisRef.Prm.plsperms2mmpers(encvel[index]);
                 }
             }
             var dis = Dis.Where(x => x.Name != "");
