@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PropertyChanged;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,34 +8,40 @@ namespace MotionWrapper
     public interface ICylinder
     {
         TimeSpan TimeOut { get; set; }
+        IoRef[] Output { get; }
+        IoRef[] Input { get; }
+
         Task<bool> Set();
         Task<bool> Reset();
     }
-
+    [AddINotifyPropertyChangedInterface]
     public class Cylinder : ICylinder
     {
-        private readonly IoRef _output;
-        private readonly IoRef _input;
         private readonly IIoPart1 _ioPart1;
         public TimeSpan TimeOut { get; set; } = TimeSpan.FromSeconds(2);
 
-        public Cylinder(IoRef output,IoRef input,IIoPart1 ioPart1)
+        public IoRef[] Output { get; }
+        public IoRef[] Input { get; }
+
+        public Cylinder(IoRef[] output, IoRef[] input, IIoPart1 ioPart1)
         {
-            _output = output;
-            _input = input;
+            Output = output;
+            Input = input;
             _ioPart1 = ioPart1;
+
         }
 
         public Task<bool> Set()
         {
-            _ioPart1.setDO(_output,true);
-            return Task.Run(() => (SpinWait.SpinUntil(() => _input.Value, TimeOut)));
+            _ioPart1.setDO(Output[0], true);
+
+            return Task.Run(() => (SpinWait.SpinUntil(() => Input[0].Value && (!Input[1].Value), TimeOut)));
         }
 
         public Task<bool> Reset()
         {
-            _ioPart1.setDO(_output,false);
-            return Task.Run(() => (SpinWait.SpinUntil(() => !_input.Value, TimeOut)));         
+            _ioPart1.setDO(Output[0], false);
+            return Task.Run(() => (SpinWait.SpinUntil(() => (!Input[0].Value) && (Input[1].Value), TimeOut)));
         }
     }
 }
