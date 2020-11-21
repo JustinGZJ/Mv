@@ -9,7 +9,6 @@ using Mv.Shell.Views;
 using Mv.Shell.Views.Authentication;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
-using Refit;
 using Unity;
 using MvUser = Mv.Authentication.MvUserImpl;
 

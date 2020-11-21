@@ -6,7 +6,6 @@ using System.Linq;
 //using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Mv.Ui.TransferService;
 
 namespace Mv.Ui.Core.Upgrade
 {

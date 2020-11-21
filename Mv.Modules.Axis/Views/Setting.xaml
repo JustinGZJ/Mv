@@ -4,28 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+             xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels"
              mc:Ignorable="d" 
             xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
             Header="Axis"
-            xmlns:ptgrid="http://propertytools.org/wpf"
+          xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:pt="http://propertytools.org/wpf"
+         d:DataContext="{d:DesignInstance vm:SettingViewModel}"
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabItem.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="..\uiresources.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </TabItem.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Visible"  >
-            <ptgrid:PropertyGrid   TabVisibility="Collapsed" CategoryControlType="Expander"
-                SelectedObject="{Binding SelectedObject}" Margin="8" >
-            </ptgrid:PropertyGrid>
-        </ScrollViewer>
+        <pt:PropertyGrid SelectedObject="{Binding SelectedObject}"></pt:PropertyGrid>
     </Grid>
 
 </TabItem>

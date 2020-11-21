@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Mv.Controls.Controls
+namespace Mv.Controls
 {
 
     public class SimpleLed:Control

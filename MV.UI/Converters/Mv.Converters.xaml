@@ -8,7 +8,6 @@
     <converters:UriToImageSourceConverter x:Key="UriToImageSourceConverter"/>
     <converters:StringToImageConverter x:Key="StringToImageConverter"/>
     <converters:PlusConverter x:Key="PlusConverter"/>
-    <converters:NumberToDisplayDataSizeConverter x:Key="NumberToDisplayDataSizeConverter" />
     <converters:NotOperator x:Key="NotOperator" />
     <converters:RoleLimitConverter x:Key="RoleRootLimitConverter" Limit="Root"/>
     <converters:RoleLimitConverter x:Key="RoleLimitConverter" Limit="Admin" ></converters:RoleLimitConverter>

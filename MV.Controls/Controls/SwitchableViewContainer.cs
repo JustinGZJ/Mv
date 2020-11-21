@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace Mv.Controls.Controls
+namespace Mv.Controls
 {
     public class SwitchableViewContainer : UserControl
     {

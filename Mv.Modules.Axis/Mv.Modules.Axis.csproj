@@ -10,6 +10,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="AxisModule.cs~RFab02fbe.TMP" />
+    <None Remove="PropertyTools.dll" />
+    <None Remove="PropertyTools.Wpf.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.19" />
@@ -46,6 +48,11 @@
     <None Update="gts.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\Dashboard.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(TargetDir)*$(TargetExt)&quot; &quot;$(SolutionDir)$(SolutionName).Shell\bin\Debug\netcoreapp3.1\Modules&quot; /Y /S" />

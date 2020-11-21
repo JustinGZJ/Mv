@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace Mv.Core.Interfaces
 {
+
+
     public interface IMvUser : IRefreshable
     {
 

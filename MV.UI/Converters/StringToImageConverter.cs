@@ -28,4 +28,24 @@ namespace Mv.Ui.Converters
             throw new NotImplementedException();
         }
     }
+    [ValueConversion(typeof(bool), typeof(SolidColorBrush))]
+    public class BoolColorConverter : IValueConverter
+    {
+        public Color TrueColor { get; set; }
+        public Color FalseColor { get; set; }
+        public bool Invert { get; set; }
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var v = value != null && (bool)value;
+            if (Invert)
+                v = !v;
+            return v ? TrueColor : FalseColor;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

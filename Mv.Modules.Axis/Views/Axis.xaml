@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:Mv.Modules.Axis.ViewModels"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
-             xmlns:controls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
+             xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls"
              mc:Ignorable="d" 
 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
@@ -53,7 +53,7 @@ xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
                         <TextBlock Text="重现"/>
                     </StackPanel>
                 </Button>
-                <Button  Command="{Binding CmdSaePoint}">
+                <Button  Command="{Binding CmdSavePoint}">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon  Kind="ContentSave"/>
                         <TextBlock Text="保存"/>

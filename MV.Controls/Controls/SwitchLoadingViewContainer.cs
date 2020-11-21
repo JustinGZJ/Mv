@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace Mv.Controls.Controls
+namespace Mv.Controls
 {
     [ContentProperty("LoadedContent")]
     public class SwitchLoadingViewContainer : UserControl

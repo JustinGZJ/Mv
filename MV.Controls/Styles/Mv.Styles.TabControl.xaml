@@ -121,7 +121,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type TabItem}">
+    <Style x:Key="MvTabItem" TargetType="{x:Type TabItem}">
         <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>

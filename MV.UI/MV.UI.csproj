@@ -7,7 +7,7 @@
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="3.1.3" />
+    <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
     <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />
     <PackageReference Include="Unity" Version="5.11.7" />
@@ -22,5 +22,22 @@
     <Reference Include="PropertyTools.Wpf">
       <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="PropertyTools.Wpf.dll" />
+    <None Remove="PropertyTools.dll" />
+    <None Remove="TransferService.WpfInteractions\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="TransferService.WpfInteractions\BindableDownloader.cs" />
+    <Compile Remove="TransferService.WpfInteractions\BindableProgress.cs" />
+    <Compile Remove="TransferService.WpfInteractions\**" />
+    <Compile Remove="Converters\NumberToDisplayDataSizeConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="TransferService.WpfInteractions\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="TransferService.WpfInteractions\**" />
   </ItemGroup>
 </Project>

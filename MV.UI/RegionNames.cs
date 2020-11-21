@@ -11,5 +11,7 @@
         /// The region of the user setting interface.
         /// </summary>
         public const string SettingsTabRegion = "SettingsTabRegion";
+
+        public const string AppsTabRegion = "APPS";
     }
 }

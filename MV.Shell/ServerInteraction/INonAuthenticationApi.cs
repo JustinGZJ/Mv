@@ -1,4 +1,4 @@
-﻿using Refit;
+﻿
 using System.Threading.Tasks;
 
 namespace MV.Shell.ServerInteraction

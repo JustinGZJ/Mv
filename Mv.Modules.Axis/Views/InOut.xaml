@@ -2,20 +2,176 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"   
-             xmlns:mw="clr-namespace:MotionWrapper"
+             xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+             xmlns:axis="clr-namespace:Mv.Modules.Axis"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:ui="clr-namespace:Mv.Ui.Core;assembly=MV.UI"
+             xmlns:mw="clr-namespace:MotionWrapper" 
+             xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <!-- d:DataContext="{d:DesignInstance vm:InOutViewModel}" -->
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <DataTemplate DataType="{x:Type mw:IoRef}">
-                        <TextBlock Text="{Binding Name}"></TextBlock>
+                    <DataTemplate DataType="{x:Type mw:IoRef}" x:Key="Input">
+                        <Grid Margin="2.5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding Name}"></Label>
+                            <Label Grid.Column="1" Content="{Binding Prm.IoType}"></Label>
+                            <Label Grid.Column="2" Content="{Binding Prm.Index}"></Label>
+                            <controls:SimpleLed Grid.Column="3" State="{Binding Value}" OnColor="Lime" OffColor="Gray" />
+                            <Label Grid.Column="4" Content="{Binding Prm.ModelStr}"></Label>
+                            <Label Grid.Column="5" Content="{Binding Prm.PinStr}"></Label>
+                        </Grid>
                     </DataTemplate>
+
+                    <DataTemplate DataType="{x:Type mw:IoRef}" x:Key="Output">
+                        <Grid Margin="2.5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                                <ColumnDefinition Width="100*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="{Binding Name}"></Label>
+                            <Label Grid.Column="1" Content="{Binding Prm.IoType}"></Label>
+                            <Label Grid.Column="2" Content="{Binding Prm.Index}"></Label>
+                            <ToggleButton Grid.Column="3" IsChecked="{Binding Value,Mode=OneWay}" CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverseOutput,RelativeSource={RelativeSource AncestorType=local:InOut}}"/>
+                            <Label Grid.Column="4" Content="{Binding Prm.ModelStr}"></Label>
+                            <Label Grid.Column="5" Content="{Binding Prm.PinStr}"></Label>
+                        </Grid>
+                    </DataTemplate>
+                    <ObjectDataProvider MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}"
+                        x:Key="IoTypes">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="mw:EIoType"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                    <Style x:Key="ListType" TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+                        <Setter Property="ItemsPanel">
+                            <Setter.Value>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <DataTemplate x:Key="TypeTemplate" DataType="{x:Type mw:EIoType}">
+                        <TextBlock  Text="{Binding}"></TextBlock>
+                    </DataTemplate>
+                    <axis:InoutSelecter x:Key="SelectInout"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="FocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle Margin="2" StrokeDashArray="1 2" SnapsToDevicePixels="true" StrokeThickness="1" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <SolidColorBrush x:Key="Item.MouseOver.Background" Color="#3333"/>
+            <SolidColorBrush x:Key="Item.MouseOver.Border" Color="#3333"/>
+            <SolidColorBrush x:Key="Item.SelectedActive.Background" Color="#3F487F"/>
+            <SolidColorBrush x:Key="Item.SelectedActive.Border" Color="#3333"/>
+            <SolidColorBrush x:Key="Item.SelectedInactive.Background" Color="#3333"/>
+            <SolidColorBrush x:Key="Item.SelectedInactive.Border" Color="#3333"/>
+            <Style x:Key="ListBoxItemContainerStyle" TargetType="{x:Type ListBoxItem}">
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Padding" Value="4,1"/>
+                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#3F487F"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Border x:Name="Bd" CornerRadius="5" Margin="5" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.MouseOver.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.MouseOver.Border}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Background}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource Item.SelectedActive.Border}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </MultiTrigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-            
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="筛选">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label VerticalAlignment="Center">数据分类</Label>
+                <ListBox ItemContainerStyle="{DynamicResource ListBoxItemContainerStyle}" Grid.Column="1" ItemsSource="{ui:EnumBindingSource EnumType=mw:EIoType}" Style="{StaticResource ListType}" ItemTemplate="{StaticResource TypeTemplate}" SelectedItem="{Binding IoType}"/>
+            </Grid>
+            <Grid x:Name="数据" Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding DataList}" ItemTemplateSelector="{StaticResource SelectInout}"></ItemsControl>
+            </Grid>
+            <Grid x:Name="分页" Grid.Row="2">
+                <hc:Pagination MaxPageCount="{Binding MaxPageCount}" DataCountPerPage="{Binding DataCountPerPage}" >
+                    <i:Interaction.Triggers >
+                        <i:EventTrigger EventName="PageUpdated">
+                            <i:InvokeCommandAction Command="{Binding PageUpdatedCmd}" PassEventArgsToCommand="True"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </hc:Pagination>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

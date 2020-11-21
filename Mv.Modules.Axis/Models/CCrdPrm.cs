@@ -11,19 +11,14 @@
         private double resolution = 10000;//用来转换最大合成速度和最大合成加速度   
         private int cardNum = 0;//卡号
         private int crdNum = 0;//坐标系号 固高需要
-        private int w = 0;//轴号
         public double[] orgData = new double[9];//坐标系原点--可能需要动态修改
         private double pith;
-        private int x=1;
-        private int y=2;
-        private int z=3;
-        private int a=4;
-        private int b=5;
-        private int c=6;
-        private int u=7;
-        private int v=8;
+        private int x=2;
+        private int y=3;
+        private int z=4;
+        private int a=1;
         /// <summary>
-        /// 每圈脉冲数
+        /// 维数
         /// </summary>
         public int Dimension { get => dimension; set => dimension = value; }
         /// <summary>
@@ -38,18 +33,23 @@
        /// 每圈移动距离
        /// </summary>
         public double Pith { get => pith; set => pith = value; }
+        /// <summary>
+        /// 分辨率
+        /// </summary>
         public double Resolution { get => resolution; set => resolution = value; }
+        /// <summary>
+        /// 卡号
+        /// </summary>
         public int CardNum { get => cardNum; set => cardNum = value; }
+        /// <summary>
+        /// 坐标系编号
+        /// </summary>
         public int CrdNum { get => crdNum; set => crdNum = value; }
         public int X { get => x; set => x = value; }
         public int Y { get => y; set => y = value; }
         public int Z { get => z; set => z = value; }
         public int A { get => a; set => a = value; }
-        public int B { get => b; set => b = value; }
-        public int C { get => c; set => c = value; }
-        public int U { get => u; set => u = value; }
-        public int V { get => v; set => v = value; }
-        public int W { get => w; set => w = value; }
+
 
         public CCrdPrm()
         {
