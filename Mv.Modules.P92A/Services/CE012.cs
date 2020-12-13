@@ -21,6 +21,7 @@ namespace Mv.Modules.P92A.Service
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = data.Length;
+           
 
             using (var stream = request.GetRequestStream())
             {

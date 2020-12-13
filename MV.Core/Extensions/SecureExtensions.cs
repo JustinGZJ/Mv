@@ -85,16 +85,17 @@ namespace System
             string plainText;
             using (var rijndaelAlgorithm = new RijndaelManaged())
             {
-                rijndaelAlgorithm.Key = key ?? DefaultKey;
-                rijndaelAlgorithm.IV = iv ?? DefaultIv;
-                var decryptor = rijndaelAlgorithm.CreateDecryptor(rijndaelAlgorithm.Key, rijndaelAlgorithm.IV);
-                var cipherByte = new byte[text.Length / 2];
-                for (int i = 0; i < cipherByte.Length; i++)
-                {
-                    cipherByte[i] = Convert.ToByte(text.Substring(i * 2, 2), 16);
-                }
                 try
                 {
+                    rijndaelAlgorithm.Key = key ?? DefaultKey;
+                    rijndaelAlgorithm.IV = iv ?? DefaultIv;
+                    var decryptor = rijndaelAlgorithm.CreateDecryptor(rijndaelAlgorithm.Key, rijndaelAlgorithm.IV);
+                    var cipherByte = new byte[text.Length / 2];
+                    for (int i = 0; i < cipherByte.Length; i++)
+                    {
+                        cipherByte[i] = Convert.ToByte(text.Substring(i * 2, 2), 16);
+                    }
+
                     using (var msDecrypt = new MemoryStream(cipherByte))
                     using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                     using (var srDecrypt = new StreamReader(csDecrypt))

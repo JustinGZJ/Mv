@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OmronDriver", "OmronDriver\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mv.Modules.Hmi", "Mv.Modules.Hmi\Mv.Modules.Hmi.csproj", "{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,14 @@ Global
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|x86.ActiveCfg = Release|Any CPU
 		{7676241F-7FBC-4FB5-A6D2-868C8EAFC25B}.Release|x86.Build.0 = Release|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Debug|x86.Build.0 = Debug|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Release|x86.ActiveCfg = Release|Any CPU
+		{E83E93B3-FEB6-4EC2-88F8-77829E1A45D5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

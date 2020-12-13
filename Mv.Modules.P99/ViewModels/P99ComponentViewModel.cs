@@ -23,6 +23,7 @@ namespace Mv.Modules.P99.ViewModels
         private readonly IConfigureFile configureFile;
         private readonly IScannerComm scannerComm;
         private readonly IEpson2Cognex epson2Cognex;
+        private readonly IUpload uploader;
 
         public ObservableCollection<BindableWrapper<string>> SupportRingSNs { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
         public ObservableCollection<BindableWrapper<string>> MandrelNO { get; set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
@@ -63,12 +64,13 @@ namespace Mv.Modules.P99.ViewModels
         }
         
 
-        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm, IEpson2Cognex epson2Cognex) : base(container)
+        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm, IEpson2Cognex epson2Cognex,IUpload uploader) : base(container)
         {
             this.plcScanner = plcScanner;
             this.configureFile = configureFile;
             this.scannerComm = scannerComm;
             this.epson2Cognex = epson2Cognex;
+            this.uploader = uploader;
             EventAggregator.GetEvent<MessageEvent>().Subscribe((x) => Invoke(() => {
                 AddMessage(x);
             }));
@@ -144,8 +146,11 @@ namespace Mv.Modules.P99.ViewModels
                 var content = string.Join(',', dic.Values).Trim(',');
                 string fileName = Path.Combine(configureFile.GetValue<P99Config>(nameof(P99Config)).SaveDir,
                     (VerifyCode(SupportRingSNs[i].Value) ? SupportRingSNs[i].Value : "Empty" + Helper.GetTimeStamp().ToString()) + ".csv");
-                Helper.SaveFile(fileName, dic);
                 AddMessage(content);
+                var res = uploader.Upload(SupportRingSNs[i], dic);
+                AddMessage(res);
+                //  Helper.SaveFile(fileName, dic);
+
             }
         }
     }
