@@ -49,11 +49,11 @@ namespace Mv.Modules.P99.Service
                         Line = p99Config.LineNo
                     }.ToJson()
                 };
-                logger.Log("Upload POST:" + Utils.PostHelper.ParsToString(hash), Category.Debug, Priority.None);
-                var result = Utils.PostHelper.Post(urlbase + @"/UPLOADCoilWinding", hash);
-                logger.Log("Upload RESULT:" + result, Category.Debug, Priority.None);
-                var element = XElement.Parse(result);
-                if (bool.TryParse(element.Value, out bool value))
+                logger.Log("Upload POST:" + hash["json"].ToString(), Category.Debug, Priority.None);
+                var result = WebSvcCaller.QuerySoapWebService(urlbase, "UPLOADCoilWinding", hash);
+             //   var result = Utils.PostHelper.Post(urlbase + @"/UPLOADCoilWinding", hash);
+                logger.Log("Upload RESULT:" + result.InnerText, Category.Debug, Priority.None);
+                if (bool.TryParse(result.InnerText, out bool value))
                 {
                     return value ? "PASS" : "FAIL";
                 }
@@ -64,8 +64,8 @@ namespace Mv.Modules.P99.Service
             }
             catch (Exception EX)
             {
-                
-                logger.Log(EX.Message + "\n" + EX.StackTrace,Category.Exception,Priority.High);
+
+                logger.Log(EX.Message + "\n" + EX.StackTrace, Category.Exception, Priority.High);
                 return EX.Message;
             }
         }
@@ -101,17 +101,17 @@ namespace Mv.Modules.P99.Service
                 {
                     ["json"] = new CheckData { Project = "B390", Sn = code, Station = station }.ToJson()
                 };
-                logger.Log("CheckFormData POST:" + Utils.PostHelper.ParsToString(hash), Category.Debug, Priority.None);
-                var res = Utils.PostHelper.Post(urlbase + @"/CheckFormData", hash);
-                logger.Log("CheckFormData RECIEVE:" + res, Category.Debug, Priority.None);
-                var element = XElement.Parse(res);
-                if (int.TryParse(element.Value, out int value))
+                logger.Log("CheckFormData POST:" + hash["json"].ToString(), Category.Debug, Priority.None);
+                // var res = Utils.PostHelper.Post(urlbase + @"/CheckFormData", hash);
+                var res = WebSvcCaller.QuerySoapWebService(urlbase, "CheckFormData", hash);
+                logger.Log("CheckFormData RECIEVE:" + res.InnerText, Category.Debug, Priority.None);
+                if (int.TryParse(res.InnerText, out int value))
                 {
                     return keyValues[value];
                 }
                 else
                 {
-                    return element.Value;
+                    return res.InnerText;
                 }
             }
             catch (Exception ex)
