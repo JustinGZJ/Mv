@@ -149,7 +149,7 @@ namespace Mv.Modules.P99.ViewModels
                 AddMessage(content);
                 var res = uploader.Upload(SupportRingSNs[i], dic);
                 AddMessage(res);
-                //  Helper.SaveFile(fileName, dic);
+                  Helper.SaveFile(fileName, dic);
 
             }
         }

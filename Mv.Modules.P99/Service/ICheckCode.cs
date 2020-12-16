@@ -3,9 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
-using System.Xml.Linq;
-using System.Linq;
 using Mv.Core.Interfaces;
 
 namespace Mv.Modules.P99.Service
@@ -40,7 +37,7 @@ namespace Mv.Modules.P99.Service
                 {
                     ["json"] = new UploadData
                     {
-                        Project = "B390",
+                        Project = "LTBWhiPlash",
                         Sn = code,
                         SpindleNo = dic["Spindle NO."],
                         Station = p99Config.Station,
@@ -99,7 +96,7 @@ namespace Mv.Modules.P99.Service
             {
                 var hash = new Hashtable()
                 {
-                    ["json"] = new CheckData { Project = "B390", Sn = code, Station = station }.ToJson()
+                    ["json"] = new CheckData { Project = "LTBWhiPlash", Sn = code, Station = station }.ToJson()
                 };
                 logger.Log("CheckFormData POST:" + hash["json"].ToString(), Category.Debug, Priority.None);
                 // var res = Utils.PostHelper.Post(urlbase + @"/CheckFormData", hash);

@@ -13,9 +13,7 @@
             xmlns:pg="http://propertytools.org/wpf"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid MinHeight="300">
- 
-     
-            <Grid>
+        <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition/>
@@ -38,7 +36,7 @@
                  <TextBlock  Grid.Row="3"  VerticalAlignment="Center">UV灯端口</TextBlock>
                 <TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding Config.UvLightPort}"></TextBox>
 
-                <TextBlock  Grid.Row="4"  VerticalAlignment="Center">前站站位编号</TextBlock>
+                <TextBlock  Grid.Row="4"  VerticalAlignment="Center">站位编号</TextBlock>
                 <TextBox Grid.Row="4" Grid.Column="1"  Text="{Binding Config.Station}"></TextBox>     
             </Grid>
 

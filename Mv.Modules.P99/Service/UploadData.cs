@@ -14,7 +14,7 @@ namespace Mv.Modules.P99.Service
         public string Station { get; set; }
 
         [JsonProperty("Project")]
-        public string Project { get; set; } = "B390";
+        public string Project { get; set; } = "LTBWhiPlash";
     }
     public partial class CheckData
     {
@@ -56,7 +56,7 @@ namespace Mv.Modules.P99.Service
         public static string ToJson(this UploadData self) => JsonConvert.SerializeObject(self, Converter.Settings);
         public static string ToJson(this CheckData self) => JsonConvert.SerializeObject(self, Converter.Settings);
     }
-   
+
 
     internal static class Converter
     {
@@ -66,7 +66,7 @@ namespace Mv.Modules.P99.Service
             DateParseHandling = DateParseHandling.None,
             Converters =
             {
-                new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+                new IsoDateTimeConverter { DateTimeFormat="yyyy-MM-dd HH:mm:ss" }
             },
         };
     }
@@ -86,7 +86,8 @@ namespace Mv.Modules.P99.Service
             }
             throw new Exception("Cannot unmarshal type long");
         }
-
+        //LTBWhiPlash
+        //CoilWinding
         public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
         {
             if (untypedValue == null)
