@@ -62,16 +62,17 @@ namespace Mv.Modules.P99.ViewModels
                 return true;
             }
         }
-        
 
-        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device,IPlcScannerComm plcScanner, IConfigureFile configureFile,IScannerComm scannerComm, IEpson2Cognex epson2Cognex,IUpload uploader) : base(container)
+
+        public P99ComponentViewModel(IUnityContainer container, IDeviceReadWriter device, IPlcScannerComm plcScanner, IConfigureFile configureFile, IScannerComm scannerComm, IEpson2Cognex epson2Cognex, IUpload uploader) : base(container)
         {
             this.plcScanner = plcScanner;
             this.configureFile = configureFile;
             this.scannerComm = scannerComm;
             this.epson2Cognex = epson2Cognex;
             this.uploader = uploader;
-            EventAggregator.GetEvent<MessageEvent>().Subscribe((x) => Invoke(() => {
+            EventAggregator.GetEvent<MessageEvent>().Subscribe((x) => Invoke(() =>
+            {
                 AddMessage(x);
             }));
             var m = configureFile.GetValue<P99Config>(nameof(P99Config));
@@ -79,7 +80,7 @@ namespace Mv.Modules.P99.ViewModels
             {
                 configureFile.SetValue(nameof(P99Config), new P99Config());
             }
-          
+
             Task.Factory.StartNew(() =>
             {
                 short itick = 0;
@@ -87,10 +88,9 @@ namespace Mv.Modules.P99.ViewModels
                 {
                     this.Invoke(() =>
                     {
-
                         for (int i = 0; i < 4; i++)
                         {
-                            SupportRingSNs[i] = device.GetString(20 + i * 20, 20).Trim('\0');
+                            SupportRingSNs[i] = device.GetString(90*2 + i * 40, 40).Trim('\0');
                             MandrelNO[i] = device.GetString(100 + i * 20, 20).Trim('\0');
                         }
                         Trigger = (device.GetWord(0) > 0);
@@ -105,7 +105,7 @@ namespace Mv.Modules.P99.ViewModels
             }, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(() =>
             {
-              
+
                 while (true)
                 {
                     if (Trigger)
@@ -120,7 +120,7 @@ namespace Mv.Modules.P99.ViewModels
                         catch (Exception ex)
                         {
                             AddMessage(ex.Message);
-                         //   throw;
+                            //   throw;
                         }
                         AddMessage("数据保存完成，等待触发数据保存信号输入关闭");
                         SpinWait.SpinUntil(() => (Trigger == false), 2000);
@@ -135,21 +135,22 @@ namespace Mv.Modules.P99.ViewModels
 
         private void SaveData()
         {
+            P99Config p99Config = configureFile.GetValue<P99Config>(nameof(P99Config));
             for (int i = 0; i < 4; i++)
             {
                 var dic = new Dictionary<string, string>();
                 dic["Time"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 dic["Support ring SN"] = SupportRingSNs[i].Value;
-                dic["Spindle NO."] = configureFile.GetValue<P99Config>(nameof(P99Config)).MachineNo + "_" + (i + 1).ToString();
+
+                dic["Spindle NO."] = p99Config.MachineNo + "_" + (i + 1).ToString();
                 dic["Mandrel NO."] = MandrelNO[i].Value;
                 dic["Result"] = ((VerifyCode(SupportRingSNs[i].Value) && VerifyCode(MandrelNO[i].Value))) ? "PASS" : "FAIL";
                 var content = string.Join(',', dic.Values).Trim(',');
-                string fileName = Path.Combine(configureFile.GetValue<P99Config>(nameof(P99Config)).SaveDir,
-                    (VerifyCode(SupportRingSNs[i].Value) ? SupportRingSNs[i].Value : "Empty" + Helper.GetTimeStamp().ToString()) + ".csv");
+                string fileName = Path.Combine(p99Config.SaveDir, DateTime.Today.ToString("yyyyMMdd") + ".csv");
                 AddMessage(content);
                 var res = uploader.Upload(SupportRingSNs[i], dic);
                 AddMessage(res);
-                  Helper.SaveFile(fileName, dic);
+                Helper.SaveFile(fileName, dic);
 
             }
         }

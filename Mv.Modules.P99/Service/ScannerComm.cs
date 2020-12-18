@@ -73,7 +73,7 @@ namespace Mv.Modules.P99.Service
             var stopwatch = new Stopwatch();
             var config = configureFile.GetValue<P99Config>(nameof(P99Config));
             stopwatch.Start();
-            plcScannerComm.SetString(index, 4, "".PadRight(20, '\0'));
+            plcScannerComm.SetString(index, 4, "".PadRight(11*2, '\0'));
             aggregator.GetEvent<MessageEvent>().Publish($"{index + 1}号扫码枪扫码");
             aggregator.GetEvent<MessageEvent>().Publish(payload: $"{index + 1}号扫码反馈信号复位");
             plcScannerComm.SetShort(index, 0, 0);
@@ -125,14 +125,14 @@ namespace Mv.Modules.P99.Service
             aggregator.GetEvent<MessageEvent>().Publish(payload: $"{index + 1}#Scanner {result}:{code.Item2}");
             if (code.Item1 && (!code.Item2.Contains("ERROR")))
             {
-                plcScannerComm.SetString(index, 4, code.Item2.PadRight(20, '\0'));
+                plcScannerComm.SetString(index, 4, code.Item2.PadRight(11*2, '\0'));
                 plcScannerComm.SetShort(index, 0, 1);
                 aggregator.GetEvent<MessageEvent>().Publish($"{index + 1}号扫码结束");
             }
             else
             {
 
-                plcScannerComm.SetString(index, 4, "".PadRight(20, '\0'));
+                plcScannerComm.SetString(index, 4, "".PadRight(11*2, '\0'));
                 aggregator.GetEvent<MessageEvent>().Publish(payload: $"{index + 1}号扫码失败,{code.Item2}");
                 if(checkresult==0)
                 {

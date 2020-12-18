@@ -1,40 +1,304 @@
-﻿using System;
+﻿using HslCommunication.Core;
+using HslCommunication.ModBus;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace ConsoleApp1
 {
+    public class ModbusDeviceReadWriter
+    {
+        byte[] rbs = new byte[400 * 2];
+        byte[] wbs = new byte[40 * 2];
+        public bool IsConnected { get; set; }
+        ModbusTcpNet modbus;
+   
+
+        public ModbusDeviceReadWriter()
+        {
+            modbus = new ModbusTcpNet("127.0.0.1", 10502)
+            {
+                IsStringReverse = true,
+                DataFormat = DataFormat.CDAB
+            };
+
+            modbus.AddressStartWithZero = true;
+            Task.Factory.StartNew(() =>
+            {
+                modbus.ConnectServer();
+                while (true)
+                {
+                    var rr = modbus.Read("0", (ushort)(rbs.Length / 2));
+                    if (rr.IsSuccess)
+                    {
+                        Buffer.BlockCopy(rr.Content, 0, rbs, 0, rr.Content.Length);
+                    }
+                    else
+                    {
+            
+                    }
+                    IsConnected = rr.IsSuccess;
+                    var wt = modbus.Write("400", wbs);
+                    Thread.Sleep(100);
+                }
+            }, TaskCreationOptions.LongRunning);
+       
+        }
+        public ushort GetWord(int index)
+        {
+            return modbus.ByteTransform.TransUInt16(rbs, index * 2);
+        }
+        public bool GetBit(int index, int bit)
+        {
+            var m = GetWord(index);
+            var r = (m & (1 << bit)) > 0;
+            return r;
+        }
+
+        public short GetShort(int index)
+        {
+            return modbus.ByteTransform.TransInt16(rbs, index * 2);
+        }
+
+        public int GetInt(int index)
+        {
+            return modbus.ByteTransform.TransInt32(rbs, index * 2);
+        }
+
+        public void SetInt(int index, int value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 4);
+        }
+
+        public void SetShort(int index, short value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, wbs, index * 2, 2);
+        }
+
+        public void SetBit(int index, int bit, bool value)
+        {
+            if (value)
+            {
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(wbs, index * 2) | (1 << bit));
+                SetShort(index, (short)mInt16);
+            }
+            else
+            {
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(wbs, index * 2) & (~(1 << bit)));
+                SetShort(index, (short)mInt16);
+            }
+        }
+
+        public void SetString(int index, string value)
+        {
+            var bs = modbus.ByteTransform.TransByte(value, Encoding.ASCII);
+            Buffer.BlockCopy(bs, 0, wbs, index * 2, bs.Length);
+        }
+
+        /// <summary>
+        /// 从读取缓冲区读取
+        /// </summary>
+        /// <param name="index">字的索引</param>
+        /// <param name="len">字符串长度</param>
+        /// <returns></returns>
+        public string GetString(int index, int len)
+        {
+            return modbus.ByteTransform.TransString(rbs, index, len, Encoding.ASCII);
+        }
+
+        public bool GetSetBit(int index, int bit)
+        {
+            return (modbus.ByteTransform.TransUInt16(wbs, index * 2) & (1 << bit)) > 0;
+        }
+
+        public void PlcConnect()
+        {
+            //  throw new NotImplementedException();
+        }
+
+
+    }
+
+    public class PlcScannerComm 
+    {
+
+        List<(byte[], byte[])> localbs = new List<(byte[], byte[])>(4) {
+             (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2]),
+            (new byte[20*2],new byte[19*2])
+        };
+        public bool IsConnected { get; set; }
+        ModbusTcpNet modbus;
+      //  private readonly ILoggerFacade logger;
+
+        public PlcScannerComm()
+        {
+            modbus = new ModbusTcpNet("127.0.0.1", 10502)
+            {
+                DataFormat = DataFormat.CDAB,
+                IsStringReverse = true
+            };
+            modbus.AddressStartWithZero = true;
+
+            Task.Factory.StartNew(() =>
+            {
+                modbus.ConnectServer();
+                while (true)
+                {
+
+                    for (int i = 0; i < 4; i++)
+                    {
+                        var rr = modbus.Read((0 + 20 * i).ToString(), 20);
+                        if (rr.IsSuccess)
+                        {
+                            Buffer.BlockCopy(rr.Content, 0, localbs[i].Item1, 0, rr.Content.Length);
+                        }
+                        else
+                        {
+                        //    logger.Log(rr.Message, Category.Warn, Priority.None);
+                        }
+                        IsConnected = rr.IsSuccess;
+                        var wt = modbus.Write((1 + 20 * i).ToString(), localbs[i].Item2);
+                    }
+                    Thread.Sleep(500);
+                }
+            }, TaskCreationOptions.LongRunning);
+        }
+        public ushort GetWord(int id, int index)
+        {
+            return modbus.ByteTransform.TransUInt16(localbs[id].Item1, index * 2);
+        }
+        public bool GetBit(int id, int index, int bit)
+        {
+            var m = GetWord(id, index);
+            var r = (m & (1 << bit)) > 0;
+            return r;
+        }
+
+        public short GetShort(int id, int index)
+        {
+            return modbus.ByteTransform.TransInt16(localbs[id].Item1, index * 2);
+        }
+
+        public uint GetUInt(int id, int index)
+        {
+            return modbus.ByteTransform.TransUInt32(localbs[id].Item1, index * 2);
+        }
+
+        public int GetInt(int id, int index)
+        {
+            return modbus.ByteTransform.TransInt32(localbs[id].Item1, index * 2);
+        }
+
+        public void SetInt(int id, int index, int value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, localbs[id].Item2, index * 2, 4);
+        }
+
+        public void SetInt(int id, int index, uint value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, localbs[id].Item2, index * 2, 4);
+        }
+        public void SetShort(int id, int index, short value)
+        {
+            Buffer.BlockCopy(modbus.ByteTransform.TransByte(value), 0, localbs[id].Item2, index * 2, 2);
+        }
+
+        public void SetBit(int id, int index, int bit, bool value)
+        {
+            if (value)
+            {
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(localbs[id].Item2, index * 2) | (1 << bit));
+                SetShort(id, index, (short)mInt16);
+            }
+            else
+            {
+                var mInt16 = (ushort)(modbus.ByteTransform.TransUInt16(localbs[id].Item2, index * 2) & (~(1 << bit)));
+                SetShort(id, index, (short)mInt16);
+            }
+        }
+
+        public void SetString(int id, int index, string value)
+        {
+            var bs = modbus.ByteTransform.TransByte(value, Encoding.ASCII);
+            Buffer.BlockCopy(bs, 0, localbs[id].Item2, index * 2, bs.Length);
+        }
+
+        /// <summary>
+        /// 从读取缓冲区读取
+        /// </summary>
+        /// <param name="index">字的索引</param>
+        /// <param name="len">字符串长度</param>
+        /// <returns></returns>
+        public string GetString(int id, int index, int len)
+        {
+            return modbus.ByteTransform.TransString(localbs[id].Item1, index, len, Encoding.ASCII);
+
+        }
+
+        public bool GetSetBit(int id, int index, int bit)
+        {
+            return (modbus.ByteTransform.TransUInt16(localbs[id].Item2, index * 2) & (1 << bit)) > 0;
+        }
+
+        public void PlcConnect()
+        {
+            //  throw new NotImplementedException();
+        }
+
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            try
-            {
-                //  Console.WriteLine("Hello World!");
-                Console.WriteLine("请输入URL,比如：http://10.13.250.249:8052/LTBAssemblyWebService.asmx");
-                string url = Console.ReadLine();
-                Console.WriteLine("请输入方法名,比如：UPLOADCoilWinding");
-                string procName = Console.ReadLine();
-                Console.WriteLine("请输入json内容,比如：json:{}");
-                string json = Console.ReadLine();
-                var vs = json.Split(':');
 
-                var xmlDocument = WebSvcCaller.QuerySoapWebService(url, procName, new Hashtable() { { vs[0], vs[1] } });
-                var value = xmlDocument.InnerText;
-                Console.WriteLine(value);
-                Console.ReadLine();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message+Environment.NewLine+ex.StackTrace);
-                Console.ReadLine();
-                // throw;
-            }
+            var plcscanner = new PlcScannerComm();
+            var modbus = new ModbusDeviceReadWriter();
+            plcscanner.SetString(0, 4, "LSC05130024Q1JF7C1EL".PadRight(20, '\0'));
+            plcscanner.SetString(1, 4, "123456789A123456789A".PadRight(20, '\0'));
+            plcscanner.SetString(2, 4, "123456789B123456789B".PadRight(20, '\0'));
+            plcscanner.SetString(3, 4, "123456789C123456789C".PadRight(20, '\0'));
+            Thread.Sleep(1000);
+            var s1=  modbus.GetString(5 * 2, 20).Trim('\0');
+            var s2 = modbus.GetString(5 * 2+40, 20).Trim('\0');
+            var s3 = modbus.GetString(5 * 2+40*2, 20).Trim('\0');
+            var s4 = modbus.GetString(5 * 2+40*3, 20).Trim('\0');
+            Console.WriteLine(s1);
+            Console.WriteLine(s2);
+            Console.WriteLine(s3);
+            Console.WriteLine(s4);
+            Console.ReadLine();
+            //try
+            //{
+            //    //  Console.WriteLine("Hello World!");
+            //    Console.WriteLine("请输入URL,比如：http://10.13.250.249:8052/LTBAssemblyWebService.asmx");
+            //    string url = Console.ReadLine();
+            //    Console.WriteLine("请输入方法名,比如：UPLOADCoilWinding");
+            //    string procName = Console.ReadLine();
+            //    Console.WriteLine("请输入json内容,比如：json:{}");
+            //    string json = Console.ReadLine();
+            //    var vs = json.Split(':');
+
+            //    var xmlDocument = WebSvcCaller.QuerySoapWebService(url, procName, new Hashtable() { { vs[0], vs[1] } });
+            //    var value = xmlDocument.InnerText;
+            //    Console.WriteLine(value);
+            //    Console.ReadLine();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message+Environment.NewLine+ex.StackTrace);
+            //    Console.ReadLine();
+            //    // throw;
+            //}
         }
     }
 
