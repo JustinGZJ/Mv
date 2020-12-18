@@ -4,7 +4,7 @@ namespace Mv.Shell.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    /// </summary>mockdata
     public partial class MainWindow : Window
     {
         public MainWindow()

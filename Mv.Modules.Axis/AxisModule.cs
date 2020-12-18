@@ -1,6 +1,7 @@
 ﻿
 using MotionWrapper;
 using Mv.Core;
+using Mv.Core.Interfaces;
 using Mv.Modules.Axis.Views;
 using Mv.Ui.Core;
 using Prism.Ioc;
@@ -25,6 +26,7 @@ namespace Mv.Modules.Axis
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var factory = containerProvider.Resolve<IFactory<string, ICylinder>>(nameof(CylinderFactory));
             var motion = containerProvider.Resolve<IGtsMotion>();
             if (!motion.Init())
                 MessageBox.Show("板卡初始化失败");
@@ -37,7 +39,7 @@ namespace Mv.Modules.Axis
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Dashboard));
             containerRegistry.RegisterSingleton<IConfigManager<MotionConfig>, ConfigManager<MotionConfig>>();
             containerRegistry.RegisterSingleton<IGtsMotion, CGtsMotion>();
-            
+            containerRegistry.RegisterSingleton<IFactory<string,ICylinder>, CylinderFactory>(nameof(CylinderFactory));           
         }
     }
 }

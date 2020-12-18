@@ -32,9 +32,6 @@
                         Style="{StaticResource MainTabControlStyle}"
                         ItemContainerStyle="{StaticResource MainTabItemStyle}"
                         prism:RegionManager.RegionName="{x:Static ui:RegionNames.MainTabRegion}">
-                <TabControl.Background>
-                    <ImageBrush ImageSource="/MockData/background1.jpg" />
-                </TabControl.Background>
             </TabControl>
 
             <StackPanel Grid.Column="0" VerticalAlignment="Bottom">

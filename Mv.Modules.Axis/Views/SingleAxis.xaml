@@ -22,7 +22,7 @@
             <ColumnDefinition Width="250"/>
             <ColumnDefinition  Width="100"/>
         </Grid.ColumnDefinitions>
-        <StackPanel  Grid.Row="1" Grid.Column="0" Margin="10">
+        <StackPanel  Grid.Row="0" Grid.RowSpan="2"  Grid.Column="0" Margin="10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60"/>
@@ -69,7 +69,7 @@
                 <StackPanel Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0">
                     <WrapPanel  Orientation="Horizontal" >
                         <WrapPanel.Resources>
-                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type     controls:SimpleLed}}">
+                            <Style TargetType="controls:SimpleLed" BasedOn="{StaticResource {x:Type controls:SimpleLed}}">
                                 <Setter Property="OnColor" Value="Lime"/>
                                 <Setter Property="OffColor" Value="Gray"/>
                                 <Setter Property="Margin" Value="10 0"/>

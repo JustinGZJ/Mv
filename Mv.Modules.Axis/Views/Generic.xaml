@@ -4,38 +4,140 @@
                     xmlns:controls="clr-namespace:Mv.Ui.Converters;assembly=MV.UI"
                     xmlns:local="clr-namespace:Mv.Modules.Axis.Views" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <controls:BoolColorConverter x:Key="booltocolor"  FalseColor="Gray"  TrueColor="LimeGreen" Invert="False"/>
-    <DataTemplate DataType="{x:Type mw:Cylinder }">
-        <Grid>
-            <Grid>
-                <ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" CommandParameter="{Binding Input[0].Value}" Command="{Binding DataContext.CmdReverseOutput,RelativeSource={RelativeSource AncestorType=local:InOut}}">
-                    <ToggleButton.Content>
-                        <TextBlock Text="{Binding Output[0].Value}"></TextBlock>
-                    </ToggleButton.Content>
-                    <materialDesign:ToggleButtonAssist.OnContent>
-                        <TextBlock Text="{Binding Output[1].Value}"></TextBlock>
-                    </materialDesign:ToggleButtonAssist.OnContent>
-                </ToggleButton>
-                <Rectangle Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}" Width="10" Height="10" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-                <Rectangle Fill="{Binding Input[1].Value,Converter={StaticResource booltocolor}}"  Width="10" Height="10" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
-                <Rectangle Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}" Width="10"
-                           Height="10" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+    <DataTemplate x:Key="cylinder" DataType="{x:Type mw:Cylinder }">
+        <Grid Margin="10">
+            <Grid Width="400" Height="100">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <UniformGrid Grid.Column="1"  Columns="1">
+                        <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
+
+                            <Button.Style>
+                                <Style TargetType="Button" >
+                                    <Setter Property="Content" Value="{Binding Output[0].Prm.PinStr}"/>
+                                    <Setter Property="Background" Value="Gray"/>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="1" Rows="1" Grid.Column="0">
+                        <Grid  >
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1"  Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Output[0].Name}"/>
+                        </Grid>
+                    </UniformGrid>
+
+
+                    <UniformGrid Grid.Column="2" Columns="1" Rows="2">
+                        <Grid>
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}"  />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[0].Name}"/>
+                        </Grid>
+                        <Grid>
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[1].Value,Converter={StaticResource booltocolor}}" 
+                     />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[1].Name}"/>
+                        </Grid>
+                    </UniformGrid>
+                </Grid>
             </Grid>
         </Grid>
     </DataTemplate>
-    <DataTemplate DataType="{x:Type mw:ABCylinder }">
-        <Grid>
-            <ToggleButton Style="{StaticResource MaterialDesignActionToggleButton}" CommandParameter="{Binding Input[0].Value}" Command="{Binding DataContext.CmdReverseOutput,RelativeSource={RelativeSource AncestorType=local:InOut}}">
-                <ToggleButton.Content>
-                    <TextBlock Text="{Binding Output[0].Value}"></TextBlock>
-                </ToggleButton.Content>
-                <materialDesign:ToggleButtonAssist.OnContent>
-                    <TextBlock Text="{Binding Output[1].Value}"></TextBlock>
-                </materialDesign:ToggleButtonAssist.OnContent>
-            </ToggleButton>
-            <Rectangle Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}" Width="10" Height="10" HorizontalAlignment="Left"  VerticalAlignment="Top"/>
-            <Rectangle Fill="{Binding Input[1].Value,Converter={StaticResource booltocolor}}"  Width="10" Height="10" HorizontalAlignment="Right"  VerticalAlignment="Top"/>
-            <Rectangle Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}"  Width="10" Height="10" HorizontalAlignment="Left"  VerticalAlignment="Bottom"/>
-            <Rectangle Fill="{Binding Output[1].Value,Converter={StaticResource booltocolor}}"  Width="10" Height="10" HorizontalAlignment="Left"  VerticalAlignment="Bottom"/>
+    <DataTemplate x:Key="onesignalcylinder" DataType="{x:Type mw:OneSignalCylinder }">
+        <Grid Margin="10">
+            <Grid Width="400" Height="100">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <UniformGrid Grid.Column="1"  Columns="1">
+                    <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
+
+                        <Button.Style>
+                            <Style TargetType="Button" >
+                                <Setter Property="Content" Value="{Binding Output[0].Prm.PinStr}"/>
+                                <Setter Property="Background" Value="Gray"/>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </UniformGrid>
+
+                <UniformGrid Columns="1" Rows="1" Grid.Column="0">
+                    <Grid  >
+                        <Rectangle Stroke="DarkCyan" StrokeThickness="1"  Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Output[0].Name}"/>
+                    </Grid>
+                </UniformGrid>
+
+
+                <UniformGrid Grid.Column="2" Columns="1" Rows="1">
+                    <Grid>
+                        <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}"  />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[0].Name}"/>
+                    </Grid>
+                </UniformGrid>
+            </Grid>
+
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="abcylinder" DataType="{x:Type mw:ABCylinder }">
+        <Grid Width="400" Height="100" Margin="10">
+            <Border BorderBrush="Green" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <UniformGrid Grid.Column="1"  Columns="1">
+                        <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
+
+                            <Button.Style>
+                                <Style TargetType="Button" >
+                                    <Setter Property="Content" Value="{Binding Output[0].Prm.PinStr}"/>
+                                    <Setter Property="Background" Value="Gray"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding State}">
+                                            <Setter Property="Content" Value="{Binding Output[1].Prm.PinStr}"></Setter>
+                                            <Setter Property="Background" Value="Green"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </UniformGrid>
+
+                    <UniformGrid Columns="1" Rows="2" Grid.Column="0">
+                        <Grid  >
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1"  Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Output[0].Name}"/>
+                        </Grid>
+                        <Grid  >
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1"  Fill="{Binding Output[1].Value,Converter={StaticResource booltocolor}}" />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Output[1].Name}"/>
+                        </Grid>
+                    </UniformGrid>
+      
+
+                    <UniformGrid Grid.Column="2" Columns="1" Rows="2">
+                        <Grid>
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}"  />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[0].Name}"/>
+                        </Grid>
+                        <Grid>
+                            <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[1].Value,Converter={StaticResource booltocolor}}" 
+                     />
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[1].Name}"/>
+                        </Grid>
+                    </UniformGrid>
+                </Grid>
+            </Border>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

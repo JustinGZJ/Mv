@@ -40,7 +40,7 @@ namespace Mv.Ui.Converters
             var v = value != null && (bool)value;
             if (Invert)
                 v = !v;
-            return v ? TrueColor : FalseColor;
+            return new SolidColorBrush(v ?  TrueColor : FalseColor);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
