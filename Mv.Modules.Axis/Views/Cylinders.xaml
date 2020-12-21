@@ -4,9 +4,30 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+             xmlns:localvm="clr-namespace:Mv.Modules.Axis.ViewModels"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:axis="clr-namespace:Mv.Modules.Axis"
+             d:DataContext="{d:DesignInstance localvm:CylindersViewModel}"
              mc:Ignorable="d" 
+             prism:ViewModelLocator.AutoWireViewModel="True"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="./Generic.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <axis:CylinderSelecter x:Key="cylinderselecter"/>
+        </ResourceDictionary>
+     
+    </UserControl.Resources>
+    
     <Grid>
-           <ItemsControl></ItemsControl> 
+        <ItemsControl ItemsSource="{Binding Cylinders}" ItemTemplateSelector="{StaticResource cylinderselecter}"  >
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl> 
     </Grid>
 </UserControl>

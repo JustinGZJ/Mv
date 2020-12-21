@@ -6,6 +6,7 @@ namespace MotionWrapper
 {
     public class CylinderFactory : IFactory<string, ICylinder>
     {
+        private readonly IUnityContainer container;
         private readonly IGtsMotion _motion;
 
         /// <summary>
@@ -80,20 +81,32 @@ namespace MotionWrapper
 
         public CylinderFactory(IUnityContainer container, IGtsMotion motion)
         {
+            this.container = container;
             _motion = motion;
-            container.RegisterInstance<ICylinder>(SpindleLockingCylinder, GetAbCylinder(1, 4, 1, 5, 1, 8, 1, 9));
-            container.RegisterInstance<ICylinder>(LineNozzleFlip, GetAbCylinder(1, 8, 1, 9, 1, 2, 1, 3));
+            //todo:赶工期,待优化
+            container.RegisterInstance<ICylinder>(SpindleLockingCylinder, GetAbCylinder(1, 4, 1, 5, 1, 8, 1, 9));   
+            container.RegisterInstance<ICylinder>(FingerSideToSide, GetCylinder(1, 7, 0, 12, 0, 13));
+            container.RegisterInstance<ICylinder>(FingerFlip, GetAbCylinder(1, 8, 1, 9, 1, 0, 1, 1));
+            container.RegisterInstance<ICylinder>(FingerClosure, GetCylinder(1, 6, 0, 12, 0, 13));
+            container.RegisterInstance<ICylinder>(LineNozzleFlip, GetAbCylinder(1, 0, 1, 1, 1, 2, 1, 3));
+
             container.RegisterInstance<ICylinder>(PlugInForthBack, GetAbCylinder(1, 10, 1, 11, 1, 10, 1, 11));
             container.RegisterInstance<ICylinder>(PlugInUpDown, GetAbCylinder(1, 12, 1, 13, 1, 12, 1, 13));
-            container.RegisterInstance<ICylinder>(FingerSideToSide, GetCylinder(1, 7, 0, 12, 0, 13));
-            container.RegisterInstance<ICylinder>( FingerClosure, GetCylinder(1, 6, 0, 12, 0, 13));
+
+       
+            container.RegisterInstance<ICylinder>(PlugLeftRight, GetCylinder(1, 14, 1, 14, 1, 15));
+            container.RegisterInstance<ICylinder>(EnableTensioner, GetOneSignalCylinder(1, 15, 0, 8));
+            container.RegisterInstance<ICylinder>(FeedingForthBack, GetCylinder(1, 2, 1, 4, 1, 5));
+            container.RegisterInstance<ICylinder>(FeedingRightLeft, GetCylinder(1, 3, 1, 6, 1, 7));
+            //这个的等待信号不知道对不对
+            container.RegisterInstance<ICylinder>(ShockSplitsUpDown, GetCylinder(0, 13, 0, 10, 0, 11));
         }
 
         private ABCylinder GetAbCylinder(
             int oCh1, int oIndex1,
             int oCh2, int oIndex2,
-            int inCh1, int inIndex1,
-            int inCh2, int inIndex2
+            int inCh1, int inIndex1,//原点
+            int inCh2, int inIndex2//到位
         )
         {
             return new ABCylinder(
@@ -104,8 +117,8 @@ namespace MotionWrapper
         
         private Cylinder GetCylinder(
             int oCh1, int oIndex1,
-            int inCh1, int inIndex1,
-            int inCh2, int inIndex2
+            int inCh1, int inIndex1,//原点
+            int inCh2, int inIndex2//到位
         )
         {
             return new Cylinder(
@@ -114,9 +127,18 @@ namespace MotionWrapper
                 new[] {GetIoRef(true, inCh1, inIndex1), GetIoRef(true, inCh2, inIndex2)},_motion);
         }
 
+        private OneSignalCylinder GetOneSignalCylinder(int oCh1, int oIndex1,
+            int inCh1, int inIndex1/*到位*/)
+        {
+            return new OneSignalCylinder(
+
+                new[] { GetIoRef(false, oCh1, oIndex1) },
+                new[] { GetIoRef(true, inCh1, inIndex1) }, _motion);
+        }
+
         private IoRef GetIoRef(bool io, int ch, int index)
         {
-            var ioRef = !io
+            var ioRef =     io
                 ? _motion.Dis.FirstOrDefault(x =>
                     x.Prm.Model == ch && x.Prm.Index == index && x.Prm.IoType == EIoType.NoamlInput)
                 : _motion.Dos.FirstOrDefault(x =>
@@ -127,7 +149,7 @@ namespace MotionWrapper
 
         public ICylinder Create(string value)
         {
-            throw new System.NotImplementedException();
+          return  container.Resolve<ICylinder>(value);
         }
     }
 }

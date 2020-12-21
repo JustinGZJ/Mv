@@ -27,15 +27,19 @@ namespace MotionWrapper
 
 
         public TimeSpan TimeOut { get; set; } = TimeSpan.FromSeconds(2);
-
+        /// <summary>
+        /// 0 是动作 1 是原位
+        /// </summary>
         public IoRef[] Output => _output;
 
         public IoRef[] Input => _input;
 
+        public bool State => Output[1].Value&& (!Output[0].Value);
+
         public async Task<bool> Set()
         {
-            _ioPart1.setDO(Output[0], true);
-            _ioPart1.setDO(Output[1], false);
+            _ioPart1.setDO(Output[1], true);
+            _ioPart1.setDO(Output[0], false);
             var m1 = Task.Run(() => SpinWait.SpinUntil(() => Input[0].Value, TimeOut));
             var m2 = Task.Run(() => SpinWait.SpinUntil(() => !Input[1].Value, TimeOut));
             var results = await Task.WhenAll(m1, m2);
@@ -44,8 +48,8 @@ namespace MotionWrapper
 
         public async Task<bool> Reset()
         {
-            _ioPart1.setDO(Output[0], false);
-            _ioPart1.setDO(Output[1], true);
+            _ioPart1.setDO(Output[1], false);
+            _ioPart1.setDO(Output[0], true);
             var m1 = Task.Run(() => SpinWait.SpinUntil(() => !Input[0].Value, TimeOut));
             var m2 = Task.Run(() => SpinWait.SpinUntil(() => Input[1].Value, TimeOut));
             var results = await Task.WhenAll(m1, m2);

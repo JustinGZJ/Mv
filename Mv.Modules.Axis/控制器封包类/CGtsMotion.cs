@@ -22,13 +22,13 @@ namespace MotionWrapper
             switch (input.Prm.IoType)
             {
                 case EIoType.NoamlInput:
-                    if (input.Prm.Model > 0)
-                        if (input.Prm.NC)
-                            v = ~extval[input.Prm.Model - 1];
-                        else
-                            v = extval[input.Prm.Model - 1];
+                    if (input.Prm.Model == 0)
+                        GT_GetDi(cardNum, (short)input.Prm.IoType, out v);
                     else
-                        GT_GetDo(cardNum, (short)input.Prm.IoType, out v);
+                    {
+                        GT_GetExtIoValue(cardNum, 0, out var m);
+                        v = m;
+                    }
                     break;
                 case EIoType.Alarm:
                 case EIoType.LimitP:
@@ -65,8 +65,9 @@ namespace MotionWrapper
             }
             else
             {
-             //   value = (output.Prm.NC) ^ value;
-                GT_SetDoBit(cardNum, (short)output.Prm.IoType, output.Prm.Index, (short)((value) ? 1 : 0));
+               value = (output.Prm.NC) ^ value;
+                //从1开始
+                GT_SetDoBit(cardNum, (short)output.Prm.IoType, (short)(output.Prm.Index+1), (short)((value) ? 1 : 0));
             }
              
         }

@@ -17,6 +17,12 @@
             <TabItem Header="Follow">
                 <local:FollowAxis></local:FollowAxis>
             </TabItem>
+            <TabItem Header="IO">
+                <local:InOut></local:InOut>
+            </TabItem>
+            <TabItem Header="Cylinders">
+                <local:Cylinders></local:Cylinders>
+            </TabItem>
         </TabControl>
    
     </Grid>

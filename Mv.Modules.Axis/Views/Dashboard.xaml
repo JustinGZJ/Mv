@@ -4,11 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+         xmlns:localvm="clr-namespace:Mv.Modules.Axis.ViewModels"
          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
          mc:Ignorable="d" 
+         d:DataContext="{d:DesignInstance localvm:DashboardViewModel}"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              prism:ViewModelLocator.AutoWireViewModel="True"
+            
              d:DesignHeight="450" d:DesignWidth="800">
     <TabItem.Resources>
         <ResourceDictionary>
@@ -16,6 +19,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MV.Controls;component/Styles/Mv.Brushes.Navy.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MV.UI;component/Converters/Mv.Converters.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </TabItem.Resources>
@@ -35,13 +40,19 @@
     <Grid>
         <Grid.Resources>
             <ResourceDictionary>
-                <Style TargetType="wpf:Gauge">
+                <Style x:Key="oeegauge" TargetType="wpf:Gauge">
                     <Setter Property="Margin" Value="20 20 20 40"/>
                     <Setter Property="Uses360Mode" Value="True"/>
                     <Setter Property="From" Value="0"/>
                     <Setter Property="To" Value="100"/>
                     <Setter Property="InnerRadius" Value="80"/>
+                    <Setter Property="FontSize" Value="20"/>
                     <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=Self},Path=GaugeActiveFill}"/>
+                </Style>
+                <Style x:Key="oeetitle" TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignHeadline6TextBlock}">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}"/>
                 </Style>
             </ResourceDictionary>
         </Grid.Resources>
@@ -57,9 +68,9 @@
                         <RowDefinition Height="50"></RowDefinition>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Availability"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0" Value="20"
-                           GaugeActiveFill="#BE54A3E9"/>
+                    <TextBlock Style="{StaticResource oeetitle}" Text="Availability"/>
+                    <wpf:Gauge Style="{StaticResource oeegauge}" Grid.Row="1" Grid.Column="0" Value="{Binding Availability}"
+                        LabelFormatter="{Binding LabelFormatter}"    GaugeActiveFill="#BE54A3E9"/>
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Width="250">
@@ -68,29 +79,29 @@
                         <RowDefinition Height="50"></RowDefinition>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Performance"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0" Value="50" GaugeActiveFill="Orange"/>
+                    <TextBlock Style="{StaticResource oeetitle}" Text="Performance"/>
+                    <wpf:Gauge  Style="{StaticResource oeegauge}" Grid.Row="1" Value="{Binding Performance}" LabelFormatter="{Binding LabelFormatter}"   GaugeActiveFill="Orange"/>
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Width="250">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="80"></RowDefinition>
+                        <RowDefinition Height="50"></RowDefinition>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Quality"/>
-                    <wpf:Gauge Grid.Row="1" Grid.Column="0" Value="50"
+                    <TextBlock  Style="{StaticResource oeetitle}" Text="Quality"/>
+                    <wpf:Gauge Style="{StaticResource oeegauge}" Grid.Row="1"  Value="{Binding Quality}" LabelFormatter="{Binding LabelFormatter}" 
                            GaugeActiveFill="DarkSeaGreen"/>
                 </Grid>
             </materialDesign:Card>
             <materialDesign:Card Width="250">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="60"></RowDefinition>
+                        <RowDefinition Height="50"></RowDefinition>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource  MaterialDesignSubtitle1TextBlock }" HorizontalAlignment="Center" VerticalAlignment="Center" Text="OEE"/>
-                    <wpf:Gauge Grid.Row="1" Value="30" Grid.Column="0" GaugeActiveFill="Red"/>
+                    <TextBlock Style="{StaticResource oeetitle}" Text="OEE"/>
+                    <wpf:Gauge Style="{StaticResource oeegauge}" Grid.Row="1" Value="{Binding OEE}" LabelFormatter="{Binding LabelFormatter}" Grid.Column="0" GaugeActiveFill="Red"/>
                 </Grid>
             </materialDesign:Card>
         </UniformGrid>

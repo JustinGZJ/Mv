@@ -13,4 +13,6 @@
     <converters:RoleLimitConverter x:Key="RoleLimitConverter" Limit="Admin" ></converters:RoleLimitConverter>
     <converters:BoolToVisibilty x:Key="boolVisibilityConverter"/>
     <converters:EnumToStringConverter x:Key="EnumToStringConverter"/>
+    <converters:ValuePercentConverter x:Key="ValuePercentConverter"/>
+    <converters:ValuePercentConverter Rate="0.01"  x:Key="ValuePercentConverterDiv100" />
 </ResourceDictionary>

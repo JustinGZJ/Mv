@@ -65,6 +65,25 @@ namespace Mv.Ui.Converters
         }
     }
 
+    public class ValuePercentConverter : IValueConverter
+    {
+        /// <summary>
+        /// 转换比率
+        /// </summary>
+        public double Rate { get; set; } = 1;
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var m = value.ToString();
+            double.TryParse(m, out double v);
+            return (v*Rate).ToString("P2");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class NewLineConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -105,7 +124,6 @@ namespace Mv.Ui.Converters
                 if (s.Contains("<LineBreak />"))
                     s = s.Replace("<LineBreak />", Environment.NewLine);
             }
-
             return s;
         }
 

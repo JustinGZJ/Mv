@@ -22,8 +22,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="logo-icon.ico" />
-    <None Remove="MockData\background.jpg" />
-    <None Remove="MockData\background1.jpg" />
     <None Remove="MockData\cc.jpg" />
     <None Remove="MockData\group.png" />
     <None Remove="MockData\luluxiu.jpg" />
@@ -52,8 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="logo-icon.ico" />
-    <Resource Include="MockData\background.jpg" />
-    <Resource Include="MockData\background1.jpg" />
     <Resource Include="MockData\group.png" />
     <Resource Include="MockData\netdisk.png" />
   </ItemGroup>
