@@ -14,21 +14,21 @@ namespace Mv.Modules.Axis.ViewModels
         /// <summary>
         /// 利用率
         /// </summary>
-        public double Availability { get; set; } = 0;
+        public double Availability { get; set; } =0.88;
         /// <summary>
         /// 稼动率
         /// </summary>
-        public double Performance { get; set; } = 0;
+        public double Performance { get; set; } = 0.77;
         /// <summary>
         /// 良率
         /// </summary>
-        public double Quality { get; set; } = 0;
+        public double Quality { get; set; } =0.88;
         /// <summary>
         /// 综合指标
         /// </summary>
         public double OEE =>Availability*Performance*Quality;
 
-        public Func<double, string> LabelFormatter => x => (x / 100).ToString("P1");
+        public Func<double, string> LabelFormatter => x => (x).ToString("P1");
 
        
     }

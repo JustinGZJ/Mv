@@ -26,15 +26,16 @@ namespace MotionWrapper
             {
                 if(Name == item.Name)
                 {
-                    prm = item;
+                    Prm = item;
                     return true;
                 }
             }
             return false;
         }
-        public CInOutPrm prm = new CInOutPrm();
+        private CInOutPrm prm = new CInOutPrm();
 
         public bool Value { get => value; set => this.value = value; }
         public string Name { get => name; set => name = value; }
+        public CInOutPrm Prm { get => prm; set => prm = value; }
     }
 }

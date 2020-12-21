@@ -37,14 +37,14 @@
                        Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" />
         </Grid>
     </TabItem.Header>
-    <Grid>
+    <Grid Background="{StaticResource  MaterialDesignPaper}">
         <Grid.Resources>
             <ResourceDictionary>
                 <Style x:Key="oeegauge" TargetType="wpf:Gauge">
                     <Setter Property="Margin" Value="20 20 20 40"/>
                     <Setter Property="Uses360Mode" Value="True"/>
                     <Setter Property="From" Value="0"/>
-                    <Setter Property="To" Value="100"/>
+                    <Setter Property="To" Value="1"/>
                     <Setter Property="InnerRadius" Value="80"/>
                     <Setter Property="FontSize" Value="20"/>
                     <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=Self},Path=GaugeActiveFill}"/>
@@ -54,6 +54,11 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Foreground" Value="{StaticResource PrimaryHueMidBrush}"/>
                 </Style>
+                <Style TargetType="materialDesign:Card">
+                    <Setter Property="MinWidth" Value="250"/>
+                    <Setter Property="UniformCornerRadius" Value="10"/>
+                    <Setter Property="Margin" Value="10"/>
+                </Style>
             </ResourceDictionary>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -62,7 +67,7 @@
         </Grid.RowDefinitions>
         <UniformGrid Columns="4" Margin="10">
 
-            <materialDesign:Card Width="250">
+            <materialDesign:Card >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
@@ -73,7 +78,7 @@
                         LabelFormatter="{Binding LabelFormatter}"    GaugeActiveFill="#BE54A3E9"/>
                 </Grid>
             </materialDesign:Card>
-            <materialDesign:Card Width="250">
+            <materialDesign:Card >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
@@ -83,7 +88,7 @@
                     <wpf:Gauge  Style="{StaticResource oeegauge}" Grid.Row="1" Value="{Binding Performance}" LabelFormatter="{Binding LabelFormatter}"   GaugeActiveFill="Orange"/>
                 </Grid>
             </materialDesign:Card>
-            <materialDesign:Card Width="250">
+            <materialDesign:Card >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
@@ -94,7 +99,7 @@
                            GaugeActiveFill="DarkSeaGreen"/>
                 </Grid>
             </materialDesign:Card>
-            <materialDesign:Card Width="250">
+            <materialDesign:Card >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="50"></RowDefinition>
@@ -107,8 +112,40 @@
         </UniformGrid>
 
 
-        <Grid Grid.Row="1">
-
+        <Grid Grid.Row="1" >
+            <Grid.Resources>
+                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}">
+                    <Setter Property="Width" Value="200"/>
+                    <Setter Property="Margin" Value="10"/>
+                </Style>
+            </Grid.Resources>
+            <UniformGrid Columns="2">
+                <materialDesign:Card>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"></RowDefinition>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border BorderThickness=" 0 0 0 1" BorderBrush="{StaticResource MaterialDesignDivider}">
+                         <TextBlock Style="{StaticResource oeetitle}"  Text="运行数据"/>
+                        </Border>
+                        <Grid Grid.Row="1">
+                            <WrapPanel>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                                <TextBox materialDesign:HintAssist.Hint="运行时间" Text="111" ></TextBox>
+                            </WrapPanel>
+                        </Grid>
+                    </Grid>
+                </materialDesign:Card>
+            </UniformGrid>
         </Grid>
     </Grid>
 </TabItem>
