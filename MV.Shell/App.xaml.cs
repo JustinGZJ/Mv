@@ -15,6 +15,7 @@ using System.IO;
 
 using Prism.Logging;
 using Mv.Modules.P99;
+using Mv.Modules.TagManager;
 
 namespace Mv.Shell
 {
@@ -68,7 +69,9 @@ namespace Mv.Shell
         {
             //moduleCatalog.AddModule<TagManagerModule>();
             //moduleCatalog.AddModule<HmiModule>();
+          
             moduleCatalog.AddModule<P99Module>();
+            moduleCatalog.AddModule<TagManagerModule>();
             base.ConfigureModuleCatalog(moduleCatalog);
         }
 
