@@ -27,7 +27,7 @@ namespace Mv.Modules.P99.Service
             {
                 DataFormat = DataFormat.CDAB,
                 IsStringReverse = true
-            };       
+            };
             modbus.AddressStartWithZero = true;
 
             Task.Factory.StartNew(() =>
@@ -123,7 +123,6 @@ namespace Mv.Modules.P99.Service
         public string GetString(int id, int index, int len)
         {
             return modbus.ByteTransform.TransString(localbs[id].Item1, index, len, Encoding.ASCII);
-
         }
 
         public bool GetSetBit(int id, int index, int bit)

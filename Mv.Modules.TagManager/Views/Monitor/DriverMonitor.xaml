@@ -12,7 +12,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              
-      xmlns:contorls="clr-namespace:Mv.Controls.Controls;assembly=MV.Controls"
+      xmlns:contorls="clr-namespace:Mv.Controls;assembly=Mv.Controls"
       d:DataContext="{d:DesignInstance vms:DriverMonitorViewModel}"
       d:DesignHeight="450" d:DesignWidth="800">
 

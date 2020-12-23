@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Mv.Modules.P99.Service
 {
+
     public static class Helper
     {
         public static long GetTimeStamp()
