@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" 
              xmlns:pt="http://propertytools.org/wpf"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
               xmlns:axis="clr-namespace:Mv.Modules.Axis"
+             
              prism:ViewModelLocator.AutoWireViewModel="True">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -48,7 +50,7 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="轴名称:"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}"  SelectedValue="{Binding SelectedAxisRef}">
+                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}" IsReadOnly="{Binding Selectable }" SelectedValue="{Binding SelectedAxisRef}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"/>
@@ -186,7 +188,6 @@
                 <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="Settings"/>
                 </Button>
-
             </StackPanel>
         </Grid>
     </Grid>

@@ -7,6 +7,7 @@ using Prism.Mvvm;
 using System.Linq;
 using MotionWrapper;
 using System.Collections.Generic;
+using System.Windows;
 using Mv.Modules.Axis.Views.Dialog;
 using MaterialDesignThemes.Wpf;
 using Mv.Core;
@@ -22,10 +23,7 @@ namespace Mv.Modules.Axis.ViewModels
         public AxisRef SelectedAxisRef
         {
             get => selectedAxisRef;
-            set
-            {
-                SetProperty(ref selectedAxisRef, value);
-            }
+            set => SetProperty(ref selectedAxisRef, value);
         }
         public List<AxisRef> AxisRefs { get => axisRefs; set => SetProperty(ref axisRefs, value); }
         public double JogDistance { get => jogDistance; set => SetProperty(ref jogDistance, value); }
@@ -38,7 +36,12 @@ namespace Mv.Modules.Axis.ViewModels
             get { return continuous; }
             set { SetProperty(ref continuous, value); }
         }
-
+        bool _selectable = true;
+        public bool Selectable
+        {
+            get => _selectable;
+            set => SetProperty(ref _selectable, value);
+        }
         #endregion
 
 

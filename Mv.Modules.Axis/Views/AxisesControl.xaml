@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Mv.Modules.Axis.Views.AxisesControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/" 
+             xmlns:vm="clr-namespace:Mv.Modules.Axis.ViewModels"
+             xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <DataTemplate DataType="viewModels:SingleAxisViewModel">
+            <local:SingleAxis></local:SingleAxis>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding AxisRefs}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel></WrapPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="vm:SingleAxisViewModel">
+                    <local:SingleAxis></local:SingleAxis>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

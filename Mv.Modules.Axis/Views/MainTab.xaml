@@ -23,6 +23,9 @@
             <TabItem Header="Cylinders">
                 <local:Cylinders></local:Cylinders>
             </TabItem>
+            <TabItem Header="轴控制">
+                <local:AxisesControl />
+            </TabItem>
         </TabControl>
    
     </Grid>
