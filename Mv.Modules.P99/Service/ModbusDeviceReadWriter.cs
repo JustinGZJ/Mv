@@ -104,10 +104,9 @@ namespace Mv.Modules.P99.Service
         /// <returns></returns>
         public string GetString(int index, int len)
         {
-           return modbus.ByteTransform.TransString(rbs, index, len, Encoding.ASCII);
-          
+           return modbus.ByteTransform.TransString(rbs, index, len, Encoding.ASCII);      
         }
-
+       
         public bool GetSetBit(int index, int bit)
         {
             return (modbus.ByteTransform.TransUInt16(wbs, index * 2) & (1 << bit)) > 0;

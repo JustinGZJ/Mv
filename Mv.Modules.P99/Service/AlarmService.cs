@@ -13,6 +13,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 
 namespace Mv.Modules.P99.Service
 {
@@ -155,7 +156,21 @@ namespace Mv.Modules.P99.Service
 
         public List<AlarmItem> GetAlarmItems()
         {
-            return currentAlarmItems.Values.ToList();
+            var list = new List<AlarmItem>();
+            try
+            {
+                foreach (var item in currentAlarmItems)
+                {
+                    list.Add(item.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Log(ex.Message + ex.StackTrace,Category.Exception,Priority.None);
+              // throw;
+            }
+            return list;
+          //  return currentAlarmItems.Values.ToList();
         }
         List<AlarmInfo> alarms = new List<AlarmInfo>();
         public void LoadAlarmInfos(string filePath = @"./Alarms/Alarms.csv")
