@@ -17,17 +17,17 @@ namespace Mv.Modules.Axis.ViewModels
 
         private DelegateCommand<ICylinder> cmdReverse;
         public DelegateCommand<ICylinder> CmdReverse =>
-            cmdReverse ?? (cmdReverse = new DelegateCommand<ICylinder>(ExecuteCmdReverse, CanExecuteCmdReverse));
+            cmdReverse ??= new DelegateCommand<ICylinder>(ExecuteCmdReverse, CanExecuteCmdReverse);
 
         void ExecuteCmdReverse(ICylinder cylinder)
         {
-            if (cylinder.State)
-            {
-                cylinder.Reset();
-            }
-           else
+            if (!cylinder.State)
             {
                 cylinder.Set();
+            }
+            else
+            {
+                cylinder.Reset();
             }
         }
 

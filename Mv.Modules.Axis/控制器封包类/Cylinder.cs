@@ -79,4 +79,29 @@ namespace MotionWrapper
             return Task.Run(() => (SpinWait.SpinUntil(() => (!Input[0].Value), TimeOut)));
         }
     }
+
+    public class NoSignalCylinder : ICylinder
+    {
+        private readonly IIoPart1 _ioPart1;
+        public TimeSpan TimeOut { get; set; } = TimeSpan.FromSeconds(2);
+        public IoRef[] Output { get; }
+        public IoRef[] Input { get; }
+        public bool State => Output[0].Value;
+        public Task<bool> Set()
+        {
+            _ioPart1.setDO(Output[0], true);
+            return Task.FromResult(true);
+        }
+
+        public NoSignalCylinder(IoRef[] output, IoRef[] input, IIoPart1 ioPart1)
+        {
+            _ioPart1 = ioPart1;
+            Input = input;
+        }
+        public Task<bool> Reset()
+        {
+            _ioPart1.setDO(Output[0], false);
+            return Task.FromResult(true);
+        }
+    }
 }

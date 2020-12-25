@@ -26,7 +26,7 @@ namespace Mv.Modules.Axis
         }
     }
 
-    public class CylinderSelecter:DataTemplateSelector
+    public class CylinderSelector:DataTemplateSelector
     {
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)

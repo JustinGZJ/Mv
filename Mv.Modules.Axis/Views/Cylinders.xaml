@@ -16,7 +16,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="./Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <axis:CylinderSelecter x:Key="cylinderselecter"/>
+            <axis:CylinderSelector x:Key="cylinderselecter"/>
         </ResourceDictionary>
      
     </UserControl.Resources>

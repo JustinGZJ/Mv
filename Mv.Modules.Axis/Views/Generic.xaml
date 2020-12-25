@@ -140,5 +140,43 @@
             </Border>
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="nosignalcylinder" DataType="{x:Type mw:NoSignalCylinder }">
+        <Grid Margin="10">
+            <Grid Width="400" Height="100">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <UniformGrid Grid.Column="1"  Columns="1">
+                    <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
+
+                        <Button.Style>
+                            <Style TargetType="Button" >
+                                <Setter Property="Content" Value="{Binding Output[0].Prm.PinStr}"/>
+                                <Setter Property="Background" Value="Gray"/>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </UniformGrid>
+
+                <UniformGrid Columns="1" Rows="1" Grid.Column="0">
+                    <Grid  >
+                        <Rectangle Stroke="DarkCyan" StrokeThickness="1"  Fill="{Binding Output[0].Value,Converter={StaticResource booltocolor}}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Output[0].Name}"/>
+                    </Grid>
+                </UniformGrid>
+
+
+                <!--<UniformGrid Grid.Column="2" Columns="1" Rows="1">
+                    <Grid>
+                        <Rectangle Stroke="DarkCyan" StrokeThickness="1" Fill="{Binding Input[0].Value,Converter={StaticResource booltocolor}}"  />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Input[0].Name}"/>
+                    </Grid>
+                </UniformGrid>-->
+            </Grid>
+
+        </Grid>
+    </DataTemplate>
 </ResourceDictionary>
  
