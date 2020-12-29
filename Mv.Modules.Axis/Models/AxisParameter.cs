@@ -17,7 +17,7 @@ namespace MotionWrapper
         private string note = "无备注";
         private short cardNum = 0;//固高控制卡使用 gtn的core1-2 高川0-x
         private short axisNum = 0; //固高控制卡使用 GSN从1-X 高川0-x
-        private short active = 0;//激活
+        private bool active = false;//激活
         private EAxisType type = EAxisType.Line;//0=直线 1= 旋转 3=纯编码器 4=纯虚拟轴
         private float maxAcc = 4900.0f;
         private float maxDec = 4900.0f;
@@ -61,7 +61,7 @@ namespace MotionWrapper
         [DisplayName("轴号")]
         public short AxisNum { get => axisNum; set => axisNum = value; }
         [DisplayName("活动")]
-        public short Active { get => active; set => active = value; }
+        public bool Active { get => active; set => active = value; }
         [DisplayName("类型")]
         public EAxisType Type { get => type; set => type = value; }
         [DisplayName("最大加速度")]

@@ -18,7 +18,7 @@ namespace Mv.Core
 
         public bool Contains(string key) => _storage.Values().Any(token => token.Path == key);
 
-        public T GetValue<T>(string key)
+        public T GetValue<T>(string key=nameof(T))
         {
 
             var result = (_storage[key]?.ToString() ?? string.Empty).ToObject<T>();
@@ -84,5 +84,6 @@ namespace Mv.Core
                 WriteToLocal(path, text);
             }
         }
+
     }
 }

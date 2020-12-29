@@ -169,7 +169,7 @@ namespace Mv.Modules.Axis.ViewModels
             motionPart1 = motion;
             motionData = motion;
             AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
-         //   SelectedAxisRef = AxisRefs.FirstOrDefault();
+           SelectedAxisRef = AxisRefs.FirstOrDefault();
         }
         #endregion
 

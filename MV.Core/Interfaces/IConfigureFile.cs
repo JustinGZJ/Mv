@@ -56,7 +56,7 @@ namespace Mv.Core.Interfaces
 
         bool Contains(string key);
 
-        T GetValue<T>(string key);
+        T GetValue<T>(string key=nameof(T));
 
         IConfigureFile SetValue<T>(string key, T value);
 

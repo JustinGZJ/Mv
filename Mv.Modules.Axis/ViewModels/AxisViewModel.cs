@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;

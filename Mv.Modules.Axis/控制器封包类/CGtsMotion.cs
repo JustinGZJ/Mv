@@ -476,7 +476,6 @@ namespace MotionWrapper
             if (crdNum < 0 || crdNum >= configManager.Get().CrdParameters.Count) return -1;
             CCrdPrm crdPrm = configManager.Get().CrdParameters[crdNum];
 
-            //   ushort crd = crdHandle[crdPrm.CrdNum - 1];
 
             string tmpCmd = cmd.ToUpper();
             string tmpStr = "";

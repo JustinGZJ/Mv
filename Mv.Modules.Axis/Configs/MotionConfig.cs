@@ -22,6 +22,10 @@ namespace MotionWrapper
 
         [Category("P2P参数|P2P参数")]
         public List<P2PPrm> P2PPrameters { get; private set; } = new List<P2PPrm>();
+
+        [Category("气缸参数")]
+        public List<CylinderConfig> CylinderConfigs { get; private set; } = new List<CylinderConfig>();
+
     }
 
  

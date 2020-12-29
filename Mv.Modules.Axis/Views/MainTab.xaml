@@ -26,6 +26,9 @@
             <TabItem Header="轴控制">
                 <local:AxisesControl />
             </TabItem>
+            <TabItem Header="气缸管理">
+                <local:CylinderManager />
+            </TabItem>
         </TabControl>
    
     </Grid>
