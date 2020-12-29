@@ -134,7 +134,7 @@
     </DataTemplate>
 
     <DataTemplate DataType="viewModels:SingleAxisViewModel">
-        <local:SingleAxis></local:SingleAxis>
+        <local:SingleAxis/>
     </DataTemplate>
 </ResourceDictionary>
  

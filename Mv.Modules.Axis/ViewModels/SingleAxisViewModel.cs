@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using Prism.Commands;
 using Prism.Mvvm;
 using System.Linq;
 using MotionWrapper;
 using System.Collections.Generic;
-using System.Windows;
 using Mv.Modules.Axis.Views.Dialog;
-using MaterialDesignThemes.Wpf;
 using Mv.Core;
 using Unity;
+using MaterialDesignThemes.Wpf;
 
 namespace Mv.Modules.Axis.ViewModels
 {
@@ -115,18 +112,18 @@ namespace Mv.Modules.Axis.ViewModels
       
         #endregion
         #region 设置命令
-        private DelegateCommand<AxisRef> cmdSetAxis;
-        public DelegateCommand<AxisRef> CmdSetAxis =>
-            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand<AxisRef>(ExecuteCmdSetAxis, (axis) =>
+        private DelegateCommand cmdSetAxis;
+        public DelegateCommand CmdSetAxis =>
+            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand(ExecuteCmdSetAxis, () =>
              SelectedAxisRef != null));
 
-        async void ExecuteCmdSetAxis(AxisRef axis)
+        async void ExecuteCmdSetAxis()
         {
             await DialogHost.Show(new AxisSetting()
             {
                 DataContext = new
                 {
-                    SelectedObject = axis.Prm
+                    SelectedObject = SelectedAxisRef.Prm
                 }
             }, "RootDialog"); ;
             config.Set(config.Get());
@@ -172,7 +169,7 @@ namespace Mv.Modules.Axis.ViewModels
             motionPart1 = motion;
             motionData = motion;
             AxisRefs = motionData.AxisRefs.Where(x => x.Name != "").ToList();
-            SelectedAxisRef = AxisRefs.FirstOrDefault();
+         //   SelectedAxisRef = AxisRefs.FirstOrDefault();
         }
         #endregion
 

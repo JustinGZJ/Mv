@@ -5,9 +5,7 @@
              xmlns:pt="http://propertytools.org/wpf"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controls="clr-namespace:Mv.Controls;assembly=Mv.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-              xmlns:axis="clr-namespace:Mv.Modules.Axis"
-             
-             prism:ViewModelLocator.AutoWireViewModel="True">
+              xmlns:axis="clr-namespace:Mv.Modules.Axis">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -36,7 +34,7 @@
                     <ToggleButton IsChecked="{Binding ContinueMove}" ></ToggleButton>
                     <Label>点动</Label>
                 </StackPanel>
-          
+
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -50,13 +48,16 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="轴名称:"/>
-                <ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}" IsReadOnly="{Binding Selectable }" SelectedValue="{Binding SelectedAxisRef}">
+                <!--<ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}" IsReadOnly="{Binding Selectable }" SelectedValue="{Binding SelectedAxisRef}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
-                </ComboBox>
+                </ComboBox>-->
+
+                <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding SelectedAxisRef.Name}"></TextBox>
+
                 <Label Content="点动距离:" Grid.Row="1" Grid.Column="0" />
                 <Grid Grid.Row="1" Grid.Column="1">
                     <pt:SpinControl Value="{Binding JogDistance}">
@@ -144,7 +145,7 @@
 
             </Grid>
         </StackPanel>
-  
+
 
         <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5">
             <StackPanel>
@@ -185,7 +186,7 @@
                 <Button   Command="{Binding CmdHome}" ToolTip="回零">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="House"/>
                 </Button>
-                <Button  Command="{Binding CmdSetAxis}" CommandParameter="{Binding SelectedValue, ElementName=轴名称}" ToolTip="轴设置">
+                <Button  Command="{Binding CmdSetAxis}"  ToolTip="轴设置">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="Settings"/>
                 </Button>
             </StackPanel>
