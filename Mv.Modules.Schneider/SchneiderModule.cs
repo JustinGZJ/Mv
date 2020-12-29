@@ -1,4 +1,6 @@
-﻿using Mv.Core.Interfaces;
+﻿using LiveCharts;
+using LiveCharts.Configurations;
+using Mv.Core.Interfaces;
 using Mv.Modules.Schneider.Service;
 using Mv.Modules.Schneider.ViewModels;
 using Mv.Modules.Schneider.Views;
@@ -27,6 +29,12 @@ namespace Mv.Modules.Schneider
         }
         public override void OnInitialized(IContainerProvider containerProvider)
         {
+            var mapper = Mappers.Xy<MeasureModel>()
+               .X(model => model.DateTime.Ticks)   //use DateTime.Ticks as X
+               .Y(model => model.Value);           //use the value property as Y
+
+            //lets save the mapper globally.
+            Charting.For<MeasureModel>(mapper);
             base.OnInitialized(containerProvider);
       
         }

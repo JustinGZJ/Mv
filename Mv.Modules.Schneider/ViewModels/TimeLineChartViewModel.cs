@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Media;
 using LiveCharts;
+using LiveCharts.Configurations;
 using LiveCharts.Defaults;
-using LiveCharts.Geared;
+using LiveCharts.Wpf;
 using Mv.Core;
 using Prism.Mvvm;
 using Unity;
 
 namespace Mv.Modules.Schneider.ViewModels
 {
+    public class MeasureModel
+    {
+        public DateTime DateTime { get; set; }
+
+        public double Value { get; set; }
+    }
+
     public class TimeLineChartViewModel : BindableBase
     {
         private string title = "tension";
@@ -21,55 +30,106 @@ namespace Mv.Modules.Schneider.ViewModels
             get { return title; }
             set { SetProperty(ref title, value); }
         }
-        GearedValues<double> values = new GearedValues<double>();
+        public Func<double, string> DateTimeFormatter { get; set; } = value =>
+          new DateTime((long)value).ToString("T");
+
+
+
         IDisposable disposable;
         public TimeLineChartViewModel()
         {
-            Series = new SeriesCollection();
-            Series.Add(new GLineSeries
-            {
-                Values = values.WithQuality(Quality.Low),
-                Fill = Brushes.Transparent,
-                LineSmoothness = 0,
-                StrokeThickness = 1,
-                PointGeometry = null,
-            });
-            Observable.Interval(TimeSpan.FromMilliseconds(300)).ObserveOnDispatcher().Subscribe(x => RaisePropertyChanged(nameof(TensionValue)));
+
+
+            //the values property will store our values array
+            ChartValues = new ChartValues<MeasureModel>() ;
+            //lets set how to display the X Labels
+
+
+            //AxisStep forces the distance between each separator in the X axis
+            AxisStep = TimeSpan.FromSeconds(20).Ticks;
+            //AxisUnit forces lets the axis know that we are plotting seconds
+            //this is not always necessary, but it can prevent wrong labeling
+            AxisUnit = TimeSpan.TicksPerSecond;
+
+            SetAxisLimits(DateTime.Now);
+
 
         }
-        public Func<double, string> YFormater => (x) => Math.Round(x, 0).ToString();
+
+        private void SetAxisLimits(DateTime now)
+        {
+            AxisMax = now.Ticks + TimeSpan.FromSeconds(2).Ticks; // lets force the axis to be 1 second ahead
+            AxisMin = now.Ticks - TimeSpan.FromSeconds(118).Ticks; // and 8 seconds behind
+        }
+        public double AxisMax
+        {
+            get { return _axisMax; }
+            set
+            {
+                SetProperty(ref _axisMax, value);
+            }
+        }
+        public double AxisMin
+        {
+            get { return _axisMin; }
+            set
+            {
+                SetProperty(ref _axisMin, value);
+            }
+        }
+
+        public double YAxisMax
+        {
+            get { return _yaxisMax; }
+            set
+            {
+                SetProperty(ref _yaxisMax, value);
+            }
+        }
+        public double YAxisMin
+        {
+            get { return _yaxisMin; }
+            set
+            {
+                SetProperty(ref _yaxisMin, value);
+            }
+        }
+
 
         private double tensionValue = 0;
+        private double _axisMax;
+        private double _axisMin;
+        private double _yaxisMax=2000;
+        private double _yaxisMin=0;
         public double TensionValue
         {
             get { return tensionValue; }
-            set {
-                SetProperty(ref value, value); }
+            set
+            {
+                SetProperty(ref tensionValue, value);
+            }
         }
-
+        Random random = new Random();
         public void SetObservable(IObservable<double> observable)
         {
             disposable?.Dispose();
-            disposable = observable.ObserveOnDispatcher()
+            disposable = observable
                 .Subscribe(x =>
                 {
 
-                    try
-                    {
-                        tensionValue = Math.Round(x, 0);
-                        values.Add(tensionValue);
-                        if (values.Count > 500)
-                            values.RemoveAt(0);
-                    }
-                    catch (Exception ex)
-                    {
-                      
-                      //  throw;
-                    }
-              }
+
+                   // TensionValue = Math.Sin(DateTime.Now.Ticks/1000/60/1000)*1000+1000;
+                      TensionValue = Math.Round(x, 0);
+                    ChartValues.Add(new MeasureModel { DateTime = DateTime.Now, Value =TensionValue });
+                    if (ChartValues.Count > 150)
+                        ChartValues.RemoveAt(0);
+                    SetAxisLimits(DateTime.Now);
+                }
                 );
         }
-        public string Name { get; } = "";
         public SeriesCollection Series { get; set; }
+        public long AxisStep { get; private set; }
+        public long AxisUnit { get; private set; }
+        public ChartValues<MeasureModel> ChartValues { get; set; }
     }
 }

@@ -689,6 +689,7 @@ namespace OmronDriver
 
  
         public event ShutdownRequestEventHandler OnClose;
+        public event EventHandler<Exception> OnError;
 
         public int Limit
         {

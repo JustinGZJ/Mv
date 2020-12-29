@@ -42,7 +42,7 @@ namespace Mv.Modules.Schneider.ViewModels
         }
 
         private string barcode;
-        public ObservableCollection<BindableWrapper<string>> Barcodes { get; private set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value=""}, 4));
+        public ObservableCollection<BindableWrapper<string>> Barcodes { get; private set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
         public DashViewModel(IUnityContainer container, IDataServer dataServer, IServerOperations operations, ILoggerFacade logger) : base(container)
         {
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
@@ -54,11 +54,16 @@ namespace Mv.Modules.Schneider.ViewModels
 
             (dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
+            //Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
+            //{
+            //    if (dataServer[m] != null)
+            //        tensionobs[m] = dataServer[m].ToObservable().Select(x => x.Int16);
+            //});
             Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
-            {
-                if (dataServer[m] != null)
-                    tensionobs[m] = dataServer[m].ToObservable().Select(x => x.Int16);
-            });
+             {
+                 if (dataServer[m] != null)
+                     tensionobs[m] = Observable.Interval(TimeSpan.FromSeconds(0.5)).Select(x=>dataServer[m].Value.Int16);
+             });
 
 
             ProductDataCollection dataCollection = null;
@@ -120,18 +125,17 @@ namespace Mv.Modules.Schneider.ViewModels
             .Where(v => v == 0).Subscribe(x =>
             {
                 dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
-       
             });
 
             dataServer["IN_SCAN"]?.ToObservable().Select(x => x.Int32)
             .Where(v => v == 5).Subscribe(x =>
             {
                 PushMsg("扫码枪完成");
-                buffers.Enqueue(Barcodes.Select(x=>x.Value).ToList());
+                buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
                 Barcodes.ForEach(x => x.Value = "");
             });
             dataServer["IN_SCAN"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32)
-             .Where(value => value >= 1&&value<=4)
+             .Where(value => value >= 1 && value <= 4)
              .Subscribe(m =>
              {
                  try
@@ -251,7 +255,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
-                    PushMsg("输出：" + output.ToString("X2"));
+                    PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
                 }
 
                 disposables1.Dispose();
