@@ -1,4 +1,5 @@
-﻿using PropertyChanged;
+﻿using Mv.Ui.Core;
+using PropertyChanged;
 using System.ComponentModel;
 
 namespace MotionWrapper
@@ -24,7 +25,7 @@ namespace MotionWrapper
         public string IN1 { get; set; }
         public string IN2 { get; set; }
     }
-
+    [TypeConverter(typeof(EnumDefaultValueTypeConverter))]
     public enum CylinderType
     {
         [Description("AB 双入双出"), DefaultValue("AB 双入双出")]

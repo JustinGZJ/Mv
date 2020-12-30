@@ -13,6 +13,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+    <materialDesign:Card>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -48,13 +49,6 @@
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="轴名称:"/>
-                <!--<ComboBox Grid.Row="0" Grid.Column="1" x:Name="轴名称" ItemsSource="{Binding AxisRefs}" IsReadOnly="{Binding Selectable }" SelectedValue="{Binding SelectedAxisRef}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>-->
 
                 <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding SelectedAxisRef.Name}"></TextBox>
 
@@ -151,7 +145,7 @@
             <StackPanel>
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
-                        <Setter Property="Margin" Value="10"/>
+                        <Setter Property="Margin" Value="5"/>
                         <Setter Property="FontSize" Value="18"/>
                         <Setter Property="Cursor" Value="Hand"/>
                     </Style>
@@ -181,7 +175,9 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </Button>
-                <Button   Command="{Binding CmdStopMove}" >停止</Button>
+                    <Button  x:Name="clr" Content="{materialDesign:PackIcon Kind=Refresh}"  Command="{Binding ClearAlarms}" ToolTip="清除报警" />
+
+                    <Button   Command="{Binding CmdStopMove}" >停止</Button>
 
                 <Button   Command="{Binding CmdHome}" ToolTip="回零">
                     <materialDesign:PackIcon Width="24" Height="24" Kind="House"/>
@@ -191,5 +187,6 @@
                 </Button>
             </StackPanel>
         </Grid>
-    </Grid>
+        </Grid>
+    </materialDesign:Card>
 </UserControl>

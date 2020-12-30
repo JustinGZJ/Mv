@@ -41,7 +41,7 @@ namespace Mv.Ui.Core
         public static string GetDescription(Enum source)
         {
             var str = GetEnumAttribute<DescriptionAttribute>(source);
-            return str == null ? null : str.Description;
+            return str == null ? Enum.GetName(source.GetType(),source) : str.Description;
         }
 
     }

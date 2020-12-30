@@ -1,4 +1,5 @@
 ﻿using MotionWrapper;
+using Mv.Core;
 using Mv.Core.Interfaces;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -10,13 +11,18 @@ namespace Mv.Modules.Axis.ViewModels
 {
     public class CylinderManagerViewModel : BindableBase
     {
-        MotionConfig cfg;
-        public CylinderManagerViewModel(IConfigureFile config)
+        private readonly IConfigManager<MotionConfig> config;
+
+        public CylinderManagerViewModel(IConfigManager<MotionConfig> config)
         {
-            Cfg = config.GetValue<MotionConfig>(nameof(MotionConfig));
-            
- 
+            Cfg = config.Get();
+            this.config = config;
         }
-        public MotionConfig Cfg { get => cfg; set => cfg = value; }
+        private MotionConfig cfg;
+        public MotionConfig Cfg
+        {
+            get { return cfg; }
+            set { SetProperty(ref cfg, value); }
+        }
     }
 }

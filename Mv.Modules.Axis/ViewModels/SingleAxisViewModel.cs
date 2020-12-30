@@ -145,6 +145,14 @@ namespace Mv.Modules.Axis.ViewModels
         #endregion
 
         #endregion
+        private DelegateCommand  clrAlarm;
+        public DelegateCommand ClearAlarms => clrAlarm
+             ??  new DelegateCommand(ExecuteClearAlarms);
+
+        void ExecuteClearAlarms()
+        {
+            motionPart1.MC_Reset(selectedAxisRef);
+        }
 
         #region fields
         DispatcherTimer timer = new DispatcherTimer();
@@ -158,7 +166,7 @@ namespace Mv.Modules.Axis.ViewModels
         bool continuous;
         int jogSpeed = 10;
         bool jogMove = true;
-        private double jogDistance;
+        private double jogDistance=10;
         #endregion
 
         #region ctors
@@ -173,15 +181,5 @@ namespace Mv.Modules.Axis.ViewModels
         }
         #endregion
 
-        #region EventHandler
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            for (int i = 0; i < AxisRefs.Count; i++)
-            {
-                var axis = AxisRefs[i];
-                motion.MC_AxisRef(ref axis);
-            }
-        }
-        #endregion
     }
 }

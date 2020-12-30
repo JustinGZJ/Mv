@@ -93,10 +93,11 @@ namespace MotionWrapper
             return Task.FromResult(true);
         }
 
-        public NoSignalCylinder(IoRef[] output, IoRef[] input, IIoPart1 ioPart1)
+        public NoSignalCylinder(IoRef[] output, IIoPart1 ioPart1)
         {
+            Output = output;
             _ioPart1 = ioPart1;
-            Input = input;
+
         }
         public Task<bool> Reset()
         {
