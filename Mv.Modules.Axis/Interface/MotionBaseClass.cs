@@ -19,7 +19,7 @@ namespace MotionWrapper
     public class CCamData
     {
         private long slaver;//位移量
-        private int moveType;//0=nomal 1 = even 2=stop 3 continue
+        private int moveType=3;//0=nomal 1 = even 2=stop 3 continue
         private long master;
 
         public long Master { get => master; set => master = value; }

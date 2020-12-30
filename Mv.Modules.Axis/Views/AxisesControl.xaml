@@ -22,6 +22,12 @@
                     <local:SingleAxis></local:SingleAxis>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemContainerStyle>
+                <Style>
+                    <Setter Property="Control.Margin" Value="5"/>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
         </ItemsControl>
     </Grid>
 </UserControl>

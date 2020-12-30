@@ -1,5 +1,6 @@
 ﻿
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace MotionWrapper
@@ -9,22 +10,22 @@ namespace MotionWrapper
     {
         [Category("IO输入|输入")]
 
-        public List<CInOutPrm> Inputs { get; private set; } = new List<CInOutPrm>();
+        public ObservableCollection<CInOutPrm> Inputs { get; private set; } = new ObservableCollection<CInOutPrm>();
 
         [Category("IO输出|输出")]
-        public List<CInOutPrm> Outputs { get;private set; } = new List<CInOutPrm>();
+        public ObservableCollection<CInOutPrm> Outputs { get;private set; } = new ObservableCollection<CInOutPrm>();
 
         [Category("轴参数|轴参数")]
-        public List<AxisParameter> AxisParameters { get; private set; } = new List<AxisParameter>();
+        public ObservableCollection<AxisParameter> AxisParameters { get; private set; } = new ObservableCollection<AxisParameter>();
 
         [Category("坐标参数|坐标参数")]
-        public List<CCrdPrm> CrdParameters { get; private set;} = new List<CCrdPrm>();
+        public ObservableCollection<CCrdPrm> CrdParameters { get; private set;} = new ObservableCollection<CCrdPrm>();
 
         [Category("P2P参数|P2P参数")]
-        public List<P2PPrm> P2PPrameters { get; private set; } = new List<P2PPrm>();
+        public ObservableCollection<P2PPrm> P2PPrameters { get; private set; } = new ObservableCollection<P2PPrm>();
 
         [Category("气缸参数")]
-        public List<CylinderConfig> CylinderConfigs { get; private set; } = new List<CylinderConfig>();
+        public ObservableCollection<CylinderConfig> CylinderConfigs { get; private set; } = new ObservableCollection<CylinderConfig>();
 
     }
 

@@ -7,7 +7,7 @@
     <controls:BoolColorConverter x:Key="booltocolor"  FalseColor="Gray"  TrueColor="LimeGreen" Invert="False"/>
     <DataTemplate x:Key="cylinder" DataType="{x:Type mw:Cylinder }">
         <Grid Margin="10">
-            <Grid Width="400" Height="100">
+            <Grid Width="200" Height="100">
                 <Grid>
                     <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
 
@@ -42,7 +42,7 @@
     </DataTemplate>
     <DataTemplate x:Key="onesignalcylinder" DataType="{x:Type mw:OneSignalCylinder }">
         <Grid Margin="10">
-            <Grid Width="400" Height="100">
+            <Grid Width="200" Height="100">
                 <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
 
                     <Button.Style>
@@ -69,7 +69,7 @@
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="abcylinder" DataType="{x:Type mw:ABCylinder }">
-        <Grid Width="400" Height="100" Margin="10">
+        <Grid Width="200" Height="100" Margin="10">
             <Border BorderBrush="Green" BorderThickness="1">
                 <Grid>
                     <Button    CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
@@ -114,7 +114,7 @@
     </DataTemplate>
     <DataTemplate x:Key="nosignalcylinder" DataType="{x:Type mw:NoSignalCylinder }">
         <Grid Margin="10">
-            <Grid Width="400" Height="100">
+            <Grid Width="200" Height="100">
                 <Button     CommandParameter="{Binding}" Command="{Binding DataContext.CmdReverse,RelativeSource={RelativeSource AncestorType=local:Cylinders}}">
 
                     <Button.Style>
@@ -133,7 +133,7 @@
         </Grid>
     </DataTemplate>
 
-    <DataTemplate DataType="viewModels:SingleAxisViewModel">
+    <DataTemplate DataType="{x:Type viewModels:SingleAxisViewModel}">
         <local:SingleAxis/>
     </DataTemplate>
 </ResourceDictionary>

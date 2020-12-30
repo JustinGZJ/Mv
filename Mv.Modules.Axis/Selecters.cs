@@ -47,7 +47,10 @@ namespace Mv.Modules.Axis
                 {
                     dt = fe.FindResource("onesignalcylinder") as DataTemplate;
                 }
-
+                else if (item is NoSignalCylinder)
+                {
+                    dt = fe.FindResource("nosignalcylinder") as DataTemplate;
+                }
             }
             return dt;
         }

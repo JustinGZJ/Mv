@@ -7,26 +7,87 @@
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:col="clr-namespace:System.Collections;assembly=mscorlib" xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
+             Name="root"
+             xmlns:ui="clr-namespace:Mv.Ui.Core;assembly=MV.UI"
+             xmlns:mw="clr-namespace:MotionWrapper"
             d:DataContext="{d:DesignInstance vm:CylinderManagerViewModel}"
              prism:ViewModelLocator.AutoWireViewModel="True">
-    <Grid>
-        <DataGrid ItemsSource="{Binding Cfg.CylinderConfigs}">
+    <StackPanel>
+
+        <DataGrid HeadersVisibility="All" RowHeaderWidth="60" AutoGenerateColumns="False" ItemsSource="{Binding Cfg.CylinderConfigs}">
+            <DataGrid.RowHeaderTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=DataGridRow}}"/>
+                </DataTemplate>
+            </DataGrid.RowHeaderTemplate>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{ Binding Name}" />
-                <DataGridComboBoxColumn  ItemsSource="{Binding Cfg.Inputs}" SelectedValuePath="Name"/>
-                <DataGridComboBoxColumn ItemsSource="{Binding Cfg.Inputs}" SelectedValuePath="Name"/>
-                <DataGridComboBoxColumn  ItemsSource="{Binding Cfg.Outputs}" SelectedValuePath="Name"/>
-                <DataGridComboBoxColumn Header="性别(内联集合)"
-                                TextBinding="{Binding Sex}"
-                                SelectedItemBinding="{Binding Sex,UpdateSourceTrigger=PropertyChanged}">
-                    <DataGridComboBoxColumn.ItemsSource>
-                        <col:ArrayList>
-                            <sys:String>男</sys:String>
-                            <sys:String>女</sys:String>
-                        </col:ArrayList>
-                    </DataGridComboBoxColumn.ItemsSource>
+                <DataGridTextColumn Binding="{Binding Name}" Header="名称" />
+                <DataGridComboBoxColumn ItemsSource="{ui:EnumBindingSource EnumType=mw:CylinderType}" Width="150" SelectedValueBinding="{Binding Type}" Header="类型" />
+                <DataGridComboBoxColumn Header="输出1" Width="200"
+                    SelectedValueBinding="{Binding OUT1}" 
+                    DisplayMemberPath="PinStr" 
+                    SelectedValuePath="Name">
+
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Outputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Outputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridComboBoxColumn Header="输出2" Width="200"
+                    SelectedValueBinding="{Binding OUT2}" 
+                    DisplayMemberPath="PinStr" 
+                    SelectedValuePath="Name">
+
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Outputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Outputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridComboBoxColumn Header="输入1" Width="200"
+                    SelectedValueBinding="{Binding IN1}" 
+                    DisplayMemberPath="PinStr" 
+                    SelectedValuePath="Name">
+
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Inputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Inputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
+                </DataGridComboBoxColumn>
+                <DataGridComboBoxColumn Header="输入2"
+                    SelectedValueBinding="{Binding IN2}" 
+                    DisplayMemberPath="PinStr" 
+                    SelectedValuePath="Name">
+
+                    <DataGridComboBoxColumn.ElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Inputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.ElementStyle>
+                    <DataGridComboBoxColumn.EditingElementStyle>
+                        <Style TargetType="{x:Type ComboBox}">
+                            <Setter Property="ItemsSource" Value="{Binding Path=DataContext.Cfg.Inputs, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}" />
+                        </Style>
+                    </DataGridComboBoxColumn.EditingElementStyle>
                 </DataGridComboBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
-    </Grid>
+    </StackPanel>
 </UserControl>

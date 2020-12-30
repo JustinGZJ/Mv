@@ -394,7 +394,7 @@ namespace MotionWrapper
         public CGtsMotion(IConfigManager<MotionConfig> configManager)
         {
             MotionConfig motionConfig = configManager.Get();
-            List<AxisParameter> axisParameters = motionConfig.AxisParameters;
+            List<AxisParameter> axisParameters = motionConfig.AxisParameters.ToList();
             var inputs = motionConfig.Inputs;
             var outputs = motionConfig.Outputs;
             for (int i = 0; i < axisParameters.Count; i++)
@@ -768,7 +768,7 @@ namespace MotionWrapper
             ////辅助编码器
             //rtn = mc.GT_GetEncPos(0, 9, out fzencpos[0], 2, out _);
             //rtn = mc.GT_GetEncVel(0, 9, out fzencvel[0], 2, out _);
-            List<AxisParameter> axisParameters = configManager.Get().AxisParameters;
+            List<AxisParameter> axisParameters = configManager.Get().AxisParameters.ToList();
 
 
             //解析

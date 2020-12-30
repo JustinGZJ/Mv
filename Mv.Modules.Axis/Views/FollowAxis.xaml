@@ -3,20 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/" xmlns:views="clr-namespace:Mv.Modules.Axis.Views"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <ResourceDictionary Source="Generic.xaml"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Grid>
-            <views:SingleAxis></views:SingleAxis>
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="0">
-            <views:SingleAxis></views:SingleAxis>
-        </Grid>
+        <ContentControl Content="{Binding MasterAxis}" />
+        <ContentControl Grid.Row="1" Content="{Binding SlaveAxis}"/>
     </Grid>
 </UserControl>
