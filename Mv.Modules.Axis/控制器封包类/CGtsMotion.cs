@@ -7,6 +7,7 @@ using Mv.Core;
 using Mv.Modules.Axis.Views;
 using System.Windows.Documents;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MotionWrapper
 {
@@ -60,16 +61,16 @@ namespace MotionWrapper
                     extval[output.Prm.Model - 1] |= (ushort)(1 << output.Prm.Index);
                 else
                     extval[output.Prm.Model - 1] &= ((ushort)(~(1 << output.Prm.Index)));
-               var  v = (output.Prm.NC) ^ value;
+                var v = (output.Prm.NC) ^ value;
                 GT_SetExtIoBit(cardNum, (short)(output.Prm.Model - 1), output.Prm.Index, (ushort)((v) ? 1 : 0));
             }
             else
             {
-               value = (output.Prm.NC) ^ value;
+                value = (output.Prm.NC) ^ value;
                 //从1开始
-                GT_SetDoBit(cardNum, (short)output.Prm.IoType, (short)(output.Prm.Index+1), (short)((value) ? 1 : 0));
+                GT_SetDoBit(cardNum, (short)output.Prm.IoType, (short)(output.Prm.Index + 1), (short)((value) ? 1 : 0));
             }
-             
+
         }
 
         public bool getDo(IoRef output)
@@ -109,7 +110,7 @@ namespace MotionWrapper
                     break;
             }
 
-            return ((v & (1 << output.Prm.Index)) > 0)^(output.Prm.NC);
+            return ((v & (1 << output.Prm.Index)) > 0) ^ (output.Prm.NC);
         }
         public bool getDi(int startIndex, int lenth, ref bool[] value)
         {
@@ -141,39 +142,54 @@ namespace MotionWrapper
             mc.GT_SynchAxisPos(axis.Prm.CardNum, 1 << (axis.Prm.AxisNum - 1));
             return 0;
         }
-        public int MC_Home(ref AxisRef axis)
+        public async Task<int> MC_Home(AxisRef axis)
         {
+
+
             THomePrm prm = new THomePrm();
             axis.Homed = 0;
             axis.IsHoming = false;
+
             short rtn = GT_GetHomePrm(axis.Prm.CardNum, axis.Prm.AxisNum, out prm);
             rtn = GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
             rtn = GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
-            prm.mode =20;
+            prm.mode = 20;
             prm.acc = axis.Prm.getAccPlsPerMs2();
             prm.dec = prm.acc;
-            prm.pad2_1=1;
-            if (axis.Prm.homeSearch >= 0)
-            {
-                prm.moveDir = 1;
-            }
-            else
-            {
-                prm.moveDir = -1;
-            }
+          //  prm.pad2_1 = 1;  //检测极限位置和回零位置进行回退
+            prm.moveDir = (short)(axis.Prm.HomeSearch >= 0 ? 1 : -1);
             prm.indexDir = 1;
-            prm.edge = 0;
+            prm.edge = 0;//1 上升沿 0下降延
             prm.homeOffset = (int)axis.Prm.mm2pls(axis.Prm.Homeoffset);
             prm.velHigh = axis.Prm.mmpers2plsperms(axis.Prm.HomeVelHigh);
             prm.velLow = axis.Prm.mmpers2plsperms(axis.Prm.HomeVelLow);
-            prm.searchHomeDistance = Math.Abs((int)axis.Prm.mm2pls(axis.Prm.homeSearch));
+            prm.searchHomeDistance = Math.Abs((int)axis.Prm.mm2pls(axis.Prm.HomeSearch));
             prm.searchIndexDistance = prm.searchHomeDistance;
             prm.escapeStep = (int)axis.Prm.mm2pls(axis.Prm.HomeLeave);
+            if (axis.HomeSwitch)
+            {
+                rtn += (short)MC_MoveAdd(axis, axis.Prm.HomeLeave * prm.moveDir * (-1), axis.Rate);
+                var axisref = axis;
+                if(rtn==0)
+                {
+                    rtn = (short)await Task.Run<short>(() =>
+                      {
+                          if (SpinWait.SpinUntil(() => axisref.Moving == true, 1000))
+                          {
+                              return (short)(SpinWait.SpinUntil(() => axisref.Moving == false, 20 * 1000) ? 0 : -200);
+                          }
+                          return -100;
+                      });           
+                }
+                if (rtn < 0)
+                    return rtn;
+            }
             rtn += mc.GT_GoHome(axis.Prm.CardNum, axis.Prm.AxisNum, ref prm);
             if (rtn == 0) axis.IsHoming = true;
             else axis.IsHoming = false;
             return rtn;
         }
+
 
         public int MC_MoveAbs(AxisRef axis, double tpos, double beilv)
         {
@@ -315,7 +331,7 @@ namespace MotionWrapper
             axisref.Moving = (sts[0] & 0x400) != 0;
             axisref.HomeSwitch = (home & (1 << (axisref.Prm.AxisNum - 1))) > 0;
 
-          //  axisref.AtHome=GT_GetDi(cardNum,)
+            //  axisref.AtHome=GT_GetDi(cardNum,)
 
             axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
             axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
@@ -539,12 +555,12 @@ namespace MotionWrapper
             throw new NotImplementedException();
         }
         /// <summary>
-        /// 提前进入cam模式  防止浪费时间
+        /// 提前进入Follow模式  防止浪费时间
         /// </summary>
         /// <param name="master"></param>
         /// <param name="slaver"></param>
         /// <returns></returns>
-        public int preMC_CamModel(AxisRef master, AxisRef slaver)
+        public int MC_FollowMode(AxisRef master, AxisRef slaver)
         {
             int model = 0;
             uint clock = 0;
@@ -577,7 +593,7 @@ namespace MotionWrapper
         /// <param name="data"></param>
         /// <param name="relPasspos">是否使用增量穿越点</param>
         /// <returns></returns>
-        public int MC_Cam(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos)
+        public int MC_Follow(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos)
         {
             short rtn = 0;
             uint clock = 0;

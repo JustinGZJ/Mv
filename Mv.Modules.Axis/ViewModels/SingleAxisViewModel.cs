@@ -134,11 +134,11 @@ namespace Mv.Modules.Axis.ViewModels
         #region 回零运动
         private DelegateCommand cmdHome;
         public DelegateCommand CmdHome =>
-            cmdHome ?? (cmdHome = new DelegateCommand(ExecuteHome, () => SelectedAxisRef != null));
+            cmdHome ?? (cmdHome = new DelegateCommand(async ()=>await ExecuteHomeAsync(), () => SelectedAxisRef != null));
 
-        void ExecuteHome()
+        async System.Threading.Tasks.Task ExecuteHomeAsync()
         {
-            motionPart1.MC_Home(ref selectedAxisRef);
+          await  motionPart1.MC_Home( selectedAxisRef);
         }
         #endregion
 

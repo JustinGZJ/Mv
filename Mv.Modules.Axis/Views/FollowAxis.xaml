@@ -17,5 +17,8 @@
         </Grid.RowDefinitions>
         <ContentControl Content="{Binding MasterAxis}" />
         <ContentControl Grid.Row="1" Content="{Binding SlaveAxis}"/>
+        <Grid Grid.Column="1" Grid.RowSpan="1">
+                
+        </Grid>
     </Grid>
 </UserControl>

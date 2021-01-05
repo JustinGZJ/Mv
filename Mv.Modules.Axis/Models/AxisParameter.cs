@@ -4,6 +4,7 @@ using System.Windows.Documents;
 
 namespace MotionWrapper
 {
+
     /// <summary>
     /// 轴的参数 
     /// </summary>
@@ -30,18 +31,18 @@ namespace MotionWrapper
         private bool enableAlm = true;
         private bool enableLmtP = true;
         private bool enableLmtN = true;          //限位和报警的使能
-        //private bool enableFollowErr = false;//启用跟随误差检测
-        //private float followErrPos = 1.0f;
-   //     private float arrivePand = 1.0f;//unit
-      //  private short followeTime = 10;
-     //   private float arriveDelay = 10;//ms
+                                                 //private bool enableFollowErr = false;//启用跟随误差检测
+                                                 //private float followErrPos = 1.0f;
+                                                 //     private float arrivePand = 1.0f;//unit
+                                                 //  private short followeTime = 10;
+                                                 //   private float arriveDelay = 10;//ms
         private float softlmtn = 0;                       //正负软限位使能 0表示无效 !=0 并且上面限位有效的时候 才有效
 
         //public short reverseHome = 0;
         //public short reverseLmtp = 0;
         //public short reverseLmtn = 0;//开关取反
-        public short homeType = gts.mc.HOME_MODE_HOME;//<0表示不需要回零
-        public float homeSearch = 1000000.0f;//回零搜索距离
+        private EHomeMode homeType = EHomeMode.HOME_MODE_HOME;//<0表示不需要回零
+        private float homeSearch = 1000000.0f;//回零搜索距离
         private float homeLeave = 100;
         //public float homeTriger = 0;//GSN 1=上升沿 0=下降沿
         private float homeVel2 = 25.0f;            //回零相关
@@ -94,6 +95,12 @@ namespace MotionWrapper
         public float SoftLimitPositive { get => softlmtp; set => softlmtp = value; }
         [DisplayName("负软限位")]
         public float SoftLimitNegative { get => softlmtn; set => softlmtn = value; }
+
+
+        [DisplayName("回零方式")]
+        public EHomeMode HomeType { get => homeType; set => homeType = value; }
+        [DisplayName("回零搜索距离")]
+        public float HomeSearch { get => homeSearch; set => homeSearch = value; }
         [DisplayName("回零偏移量")]
         public float Homeoffset { get => homeoffset; set => homeoffset = value; }
         [DisplayName("回零速度上限")]
@@ -102,6 +109,7 @@ namespace MotionWrapper
         public float HomeVelLow { get => homeVel2; set => homeVel2 = value; }
         [DisplayName("极限离开(极限回原点)")]
         public float HomeLeave { get => homeLeave; set => homeLeave = value; }
+
 
         //急停中的急停方式减速度
         /// <summary>

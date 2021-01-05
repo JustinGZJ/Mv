@@ -30,8 +30,8 @@ namespace MotionWrapper
         /// <param name="passpos">切记这个是一个相关两,实际使用中要用这个值加上当前编码器值 为了提高速度</param>
         /// <param name="data"></param>
         /// <returns></returns>
-        int MC_Cam(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos = false);     //凸轮运动
-        int preMC_CamModel(AxisRef master, AxisRef slaver);
+        int MC_Follow(AxisRef master, AxisRef slaver, double passpos, List<CCamData> data, bool relPasspos = false);     //凸轮运动
+        int MC_FollowMode(AxisRef master, AxisRef slaver);
 
         //捕获
         int MC_StartCapture(AxisRef enc, CCapturePrm captruePrm);

@@ -1,4 +1,6 @@
-﻿namespace MotionWrapper
+﻿using System.Threading.Tasks;
+
+namespace MotionWrapper
 {
     /// <summary>
     /// 运动控制的1
@@ -8,7 +10,7 @@
         int MC_PowerOff(AxisRef axis); //关闭伺服
         int MC_Power(AxisRef axis);    //开电
         int MC_Reset(AxisRef axis);    //复位
-        int MC_Home(ref AxisRef axis);     //回零
+        Task<int> MC_Home(AxisRef axis);     //回零
         int MC_HomeStatus(ref AxisRef axis);//回零的状态
         int MC_MoveAbs(AxisRef axis, double tpos, double beilv = 0.5);
         int MC_MoveAdd(AxisRef axis, double dist, double beilv = 0.5);

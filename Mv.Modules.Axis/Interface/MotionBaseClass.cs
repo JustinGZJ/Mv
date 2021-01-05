@@ -13,17 +13,22 @@ namespace MotionWrapper
     {
         Line=1,Circle=2,Enc=3,Vir=4
     }
+
+    public enum EMoveType
+    {
+        Normal,Even,Stop,Continue
+    }
     /// <summary>
     /// 凸轮数据
     /// </summary>
     public class CCamData
     {
         private long slaver;//位移量
-        private int moveType=3;//0=nomal 1 = even 2=stop 3 continue
+        private EMoveType moveType;//0=nomal 1 = even 2=stop 3 continue
         private long master;
 
         public long Master { get => master; set => master = value; }
-        public int MoveType { get => moveType; set => moveType = value; }
+        public EMoveType MoveType { get => moveType; set => moveType = value; }
         public long Slaver { get => slaver; set => slaver = value; }
     }
 

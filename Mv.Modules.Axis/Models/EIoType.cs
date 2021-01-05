@@ -38,19 +38,19 @@ namespace MotionWrapper
         HOME_MODE_LIMIT = 10,
         [Description("限位+Home回原点 "), DefaultValue("限位+Home回原点 ")]
         HOME_MODE_LIMIT_HOME = 11,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("限位+Index 回原点"), DefaultValue("限位+Index 回原点")]
         HOME_MODE_LIMIT_INDEX = 12,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("限位+Home+Index 回原点"), DefaultValue("限位+Home+Index 回原点")]
         HOME_MODE_LIMIT_HOME_INDEX = 13,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("Home 回原点"), DefaultValue("Home 回原点")]
         HOME_MODE_HOME = 20,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("Home+Index 回原点"), DefaultValue("Home+Index 回原点")]
         HOME_MODE_HOME_INDEX = 22,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("Index 回原点"), DefaultValue("Index 回原点")]
         HOME_MODE_INDEX = 30,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("强制 Home 回原点"), DefaultValue("强制 Home 回原点")]
         HOME_MODE_FORCED_HOME = 40,
-        [Description("通用输入"), DefaultValue("通用输入")]
+        [Description("强制 Home+Index 回原点"), DefaultValue("强制 Home+Index 回原点")]
         HOME_MODE_FORCED_HOME_INDEX = 41,
     }
 }

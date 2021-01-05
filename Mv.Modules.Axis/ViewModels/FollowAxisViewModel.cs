@@ -11,7 +11,7 @@ namespace Mv.Modules.Axis.ViewModels
     public class FollowAxisViewModel : BindableBase
     {
         private readonly IGtsMotion motion;
-
+        IMotionPart5 part5;
         public SingleAxisViewModel MasterAxis { get; set; }
         public SingleAxisViewModel SlaveAxis { get; set; }
         public FollowAxisViewModel(IUnityContainer unityContainer,IGtsMotion motion)
@@ -26,7 +26,7 @@ namespace Mv.Modules.Axis.ViewModels
                 SelectedAxisRef = motion.AxisRefs.FirstOrDefault(x => x.Name == "Y")
             };
             this.motion = motion;
-           
+            part5 = motion;                    
         }
     }
 }

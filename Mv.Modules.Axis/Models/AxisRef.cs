@@ -34,7 +34,7 @@ namespace MotionWrapper
         private float relPos;
         private float cmdVel;
 
-        private float belif = 0.5f;
+        private float belif = 1f;
         //参数
         private AxisParameter prm = new AxisParameter();
         #endregion
