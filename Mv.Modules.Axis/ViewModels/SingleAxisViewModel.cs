@@ -68,7 +68,7 @@ namespace Mv.Modules.Axis.ViewModels
             }
             else
             {
-
+                selectedAxisRef.Prm.MaxVel = JogSpeed;
                 motionPart1.MC_MoveAdd(SelectedAxisRef, JogDistance, SelectedAxisRef.Rate);
 
             }
@@ -101,7 +101,8 @@ namespace Mv.Modules.Axis.ViewModels
         #region 停止移动
         private DelegateCommand cmdStopMove;
         public DelegateCommand CmdStopMove =>
-            cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove, () => SelectedAxisRef != null));
+            cmdStopMove ?? (cmdStopMove = new DelegateCommand(ExecuteStopMove, 
+                () => SelectedAxisRef != null));
         public void ExecuteStopMove()
         {
             if (ContinueMove)
@@ -114,8 +115,7 @@ namespace Mv.Modules.Axis.ViewModels
         #region 设置命令
         private DelegateCommand cmdSetAxis;
         public DelegateCommand CmdSetAxis =>
-            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand(ExecuteCmdSetAxis, () =>
-             SelectedAxisRef != null));
+            cmdSetAxis ?? (cmdSetAxis = new DelegateCommand(ExecuteCmdSetAxis, () =>SelectedAxisRef != null));
 
         async void ExecuteCmdSetAxis()
         {

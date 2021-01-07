@@ -17,6 +17,11 @@ namespace MotionWrapper
         int MC_MoveJog(AxisRef axis, double beilv = 0.5);
         int MC_AxisRef(ref AxisRef axisref);
         int MC_AxisRef(int startIndex, int lenth, ref AxisRef[] axisS);
+        /// <summary>
+        /// 停止
+        /// </summary>
+        /// <param name="axis"></param>
+        /// <returns></returns>
         int MC_EStop(AxisRef axis);
         /// <summary>
         /// 会把编码器和指令规划器都设置成制定位置,单位是MM，内部会根据当量转换成脉冲再设置

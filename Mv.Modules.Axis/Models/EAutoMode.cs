@@ -18,6 +18,10 @@
     /// </summary>
     public enum EAutoMode
     {
-        MANUAL = 0, AUTO = 1, PAUSE = 2,OHTER=3
+        MANUAL = 0, 
+        AUTO = 1, 
+        PAUSE = 2,
+        OHTER=3, 
+        STEP = 4
     }
 }

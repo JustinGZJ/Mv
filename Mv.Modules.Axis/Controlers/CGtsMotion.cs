@@ -156,7 +156,7 @@ namespace MotionWrapper
             prm.mode = 20;
             prm.acc = axis.Prm.getAccPlsPerMs2();
             prm.dec = prm.acc;
-          //  prm.pad2_1 = 1;  //检测极限位置和回零位置进行回退
+            //  prm.pad2_1 = 1;  //检测极限位置和回零位置进行回退
             prm.moveDir = (short)(axis.Prm.HomeSearch >= 0 ? 1 : -1);
             prm.indexDir = 1;
             prm.edge = 0;//1 上升沿 0下降延
@@ -170,16 +170,16 @@ namespace MotionWrapper
             {
                 rtn += (short)MC_MoveAdd(axis, axis.Prm.HomeLeave * prm.moveDir * (-1), axis.Rate);
                 var axisref = axis;
-                if(rtn==0)
+                if (rtn == 0)
                 {
-                    rtn = (short)await Task.Run<short>(() =>
+                    rtn += await Task.Run<short>(() =>
                       {
                           if (SpinWait.SpinUntil(() => axisref.Moving == true, 1000))
                           {
                               return (short)(SpinWait.SpinUntil(() => axisref.Moving == false, 20 * 1000) ? 0 : -200);
                           }
                           return -100;
-                      });           
+                      });
                 }
                 if (rtn < 0)
                     return rtn;
@@ -187,6 +187,16 @@ namespace MotionWrapper
             rtn += mc.GT_GoHome(axis.Prm.CardNum, axis.Prm.AxisNum, ref prm);
             if (rtn == 0) axis.IsHoming = true;
             else axis.IsHoming = false;
+            THomeStatus tHomeSts = new mc.THomeStatus();
+            await Task.Run(() =>
+             {
+                 do
+                 {
+                     rtn = GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tHomeSts); //获取回原点状态
+                } while (tHomeSts.run != 0); //等待搜索原点停止 
+                 Thread.Sleep(500);
+            });
+            rtn +=(short) MC_HomeStatus(ref axis);
             return rtn;
         }
 
@@ -297,6 +307,7 @@ namespace MotionWrapper
 
         public int MC_Power(AxisRef axis)
         {
+            GT_ClrSts(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
             return mc.GT_AxisOn(axis.Prm.CardNum, axis.Prm.AxisNum);
         }
 
@@ -330,8 +341,6 @@ namespace MotionWrapper
             axisref.LimitP = (sts[0] & 0x20) != 0;
             axisref.Moving = (sts[0] & 0x400) != 0;
             axisref.HomeSwitch = (home & (1 << (axisref.Prm.AxisNum - 1))) > 0;
-
-            //  axisref.AtHome=GT_GetDi(cardNum,)
 
             axisref.CmdPos = (float)axisref.Prm.pls2mm((long)prfpos[0]);
             axisref.RelPos = (float)axisref.Prm.pls2mm((long)encpos[0]);
@@ -374,10 +383,15 @@ namespace MotionWrapper
             short rtn = 0;
             mc.THomeStatus tmpHomeSts = new mc.THomeStatus();
             rtn = mc.GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tmpHomeSts);
+
             if (tmpHomeSts.run == 0 && tmpHomeSts.error == mc.HOME_ERROR_NONE)//回零完成
             {
+                if (axis.Homed == 0)
+                {
+                    mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+                }
                 axis.Homed = 1;
-                mc.GT_ZeroPos(axis.Prm.CardNum, axis.Prm.AxisNum, 1);
+
                 axis.IsHoming = false;
             }
             if (tmpHomeSts.run == 0 && tmpHomeSts.error != mc.HOME_ERROR_NONE)//回零完成
@@ -722,7 +736,7 @@ namespace MotionWrapper
                 rtn += mc.GT_LoadExtConfig(cardNum, @"EXTIO.cfg");
                 rtn += mc.GT_ClrSts(cardNum, 1, 8);
                 rtn += mc.GT_ZeroPos(cardNum, 1, 8);
-
+                rtn+=(short)AxisRefs.Where(x => x.Prm.Active).Select(axis => this.MC_Power(axis)).Sum();
                 if (rtn == 0)
                 {
                     runThread = new Thread(Run);
@@ -807,8 +821,11 @@ namespace MotionWrapper
                     axisRef.CmdPos = (float)axisRef.Prm.pls2mm((long)prfpos[index]);
                     axisRef.RelPos = (float)axisRef.Prm.pls2mm((long)encpos[index]);
                     axisRef.RelVel = (float)axisRef.Prm.plsperms2mmpers(encvel[index]);
+                    //  MC_HomeStatus(ref AxisRefs[i]);
                 }
+
             }
+
             var dis = Dis.Where(x => x.Name != "");
             foreach (var item in dis)
             {

@@ -85,7 +85,7 @@ namespace MotionWrapper
             _motion = motion;
             //todo:赶工期,待优化
             container.RegisterInstance<ICylinder>(SpindleLockingCylinder, GetAbCylinder(1, 4, 1, 5, 1, 8, 1, 9));
-            container.RegisterInstance<ICylinder>(FingerSideToSide, GetCylinder(1, 7, 0, 12, 0, 13));
+            container.RegisterInstance<ICylinder>(FingerSideToSide, GetNoSignalCylinder(1, 7));
             container.RegisterInstance<ICylinder>(FingerFlip, GetAbCylinder(1, 8, 1, 9, 1, 0, 1, 1));
             container.RegisterInstance<ICylinder>(FingerClosure,GetNoSignalCylinder(1, 6));
             container.RegisterInstance<ICylinder>(LineNozzleFlip, GetAbCylinder(1, 0, 1, 1, 1, 2, 1, 3));
@@ -99,7 +99,7 @@ namespace MotionWrapper
             container.RegisterInstance<ICylinder>(FeedingForthBack, GetCylinder(1, 2, 1, 4, 1, 5));
             container.RegisterInstance<ICylinder>(FeedingRightLeft, GetCylinder(1, 3, 1, 6, 1, 7));
             //这个的等待信号不知道对不对
-            container.RegisterInstance<ICylinder>(ShockSplitsUpDown, GetCylinder(0, 13, 0, 10, 0, 11));
+            container.RegisterInstance<ICylinder>(ShockSplitsUpDown, GetNoSignalCylinder(0, 13));
         }
 
         private NoSignalCylinder GetNoSignalCylinder(int oCh1, int oIndex1)

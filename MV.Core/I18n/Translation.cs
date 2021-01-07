@@ -1,4 +1,4 @@
-﻿using System.Resources;
+﻿                                                    using System.Resources;
 using System.Windows;
 
 namespace MV.Core.I18n

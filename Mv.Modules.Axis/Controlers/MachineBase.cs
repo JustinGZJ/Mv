@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace MotionWrapper
 {
@@ -11,15 +12,14 @@ namespace MotionWrapper
     {
         public Thread runThread = null;//内部使用的线程
         public Thread homeThread = null;//回零用的传感器
-        public bool threadself = false, initok = false;//自带线程
+        bool initok = false;//自带线程
 
         public EAutoMode run_mode = EAutoMode.MANUAL;//当前运行模式
         public CPauseType pauseData = new CPauseType();//暂停的类型,如要暂停的时候执行这个
-        public volatile bool alm = true, lmt = true, move = false, allok = false,servoOn = false;//回零OK 有报警 有限位触发 在运动
         //-1为各种异常  0位正常  1为各种运行状态
         //只能表示模组本身的安全状态 不能表示产品流程结果
         public EMachSts statusTotal = EMachSts.Ok;//总体状态
-        public float beilv = 0.5f;//运动倍率
+        public float beilv = 1f;//运动倍率
         private int step_auto;
         private int step_pause;
         private volatile int step_home = 0;//自动执行得流程  暂停的时候保存的流程号
@@ -28,6 +28,7 @@ namespace MotionWrapper
         public int Step_pause { get => step_pause; set => step_pause = value; }
         public int Step_home { get => step_home; set => step_home = value; }
         public bool Homeok { get => homeok; set => homeok = value; }
+        public bool Initok { get => initok; set => initok = value; }
 
         public abstract void Fresh();
         public abstract bool Start();
@@ -57,6 +58,6 @@ namespace MotionWrapper
         /// </summary>
         /// <returns></returns>
         public abstract bool preCheckStatus();
-        public abstract bool Home();
+        public abstract Task<bool> Home();
     }
 }

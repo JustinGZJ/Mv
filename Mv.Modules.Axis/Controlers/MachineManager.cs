@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace MotionWrapper
 {
@@ -10,9 +11,13 @@ namespace MotionWrapper
     {
         //所有的机器组件都在这个列表中
         List<MachineBase> machlist = new List<MachineBase>();
-        public MachineManager()
+        private readonly IGtsMotion motion;
+
+        public MachineManager(IGtsMotion motion)
         {
-            machlist.Clear();
+            this.motion = motion;
+          //  motion.Dis.get
+            // machlist.Clear();
         }
         public void AddMachine(MachineBase inMach)
         {
@@ -30,15 +35,16 @@ namespace MotionWrapper
 
         public override void Fresh()
         {
-            throw new NotImplementedException();
+           
+           // throw new NotImplementedException();
         }
 
-        public override bool Home()
+        public override async Task<bool> Home()
         {
             bool statusAll = true;
             foreach (MachineBase item in machlist)
             {
-                if (!item.Home())
+                if (!await item.Home())
                 {
                     statusAll = false;
                     break;
@@ -50,15 +56,15 @@ namespace MotionWrapper
 
         public bool Init()
         {
-            initok = true;
+            Initok = true;
             foreach (MachineBase item in machlist)
             {
                 if (item is IInitable)//判断是否继承了接口
                 {
-                    if (!((IInitable)item).Init()) initok = false;
+                    if (!((IInitable)item).Init()) Initok = false;
                 }
             }
-            return initok;
+            return Initok;
         }
 
         public override bool Pause()
@@ -86,7 +92,10 @@ namespace MotionWrapper
 
         public override void Run()
         {
-            throw new NotImplementedException();
+           while(true)
+            {
+                Fresh();
+            }
         }
 
         public override bool Start()

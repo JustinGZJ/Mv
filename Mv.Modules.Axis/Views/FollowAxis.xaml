@@ -1,15 +1,25 @@
 ﻿<UserControl x:Class="Mv.Modules.Axis.Views.FollowAxis"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Mv.Modules.Axis.Views"
+         xmlns:localvm="clr-namespace:Mv.Modules.Axis.ViewModels"
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+            xmlns:ui="clr-namespace:Mv.Ui.Core;assembly=MV.UI"
+    xmlns:motion="clr-namespace:MotionWrapper"
+         mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance localvm:FollowAxisViewModel}"
              xmlns:prism="http://prismlibrary.com/" xmlns:views="clr-namespace:Mv.Modules.Axis.Views"
-             prism:ViewModelLocator.AutoWireViewModel="True">
+             prism:ViewModelLocator.AutoWireViewModel="True" >
     <UserControl.Resources>
         <ResourceDictionary Source="Generic.xaml"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"  MinWidth="100"/>
             <ColumnDefinition/>
+            <ColumnDefinition MinWidth="100"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -17,8 +27,50 @@
         </Grid.RowDefinitions>
         <ContentControl Content="{Binding MasterAxis}" />
         <ContentControl Grid.Row="1" Content="{Binding SlaveAxis}"/>
-        <Grid Grid.Column="1" Grid.RowSpan="1">
-                
+        <Grid Grid.Column="1" >
+            <DataGrid >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Master}" Header="主轴位移"/>
+                    <DataGridTextColumn Binding="{Binding Slaver}" Header="从轴位移"/>
+                    <DataGridTemplateColumn Header="段类型">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox SelectedItem="{Binding MoveType}" ItemsSource="{ui:EnumBindingSource  EnumType=motion:EMoveType}" ></ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="操作">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.DeleteCommand,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}">删除</Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <Grid Column="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="70"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <UniformGrid Columns="2">
+                    <TextBlock>主轴位移</TextBlock>
+                    <TextBox></TextBox>
+                    <TextBlock>从轴位移</TextBlock>
+                    <TextBox></TextBox>
+                    <TextBlock>重复次数</TextBlock>
+                    <TextBox></TextBox>
+                </UniformGrid>
+            </StackPanel>
+            <Grid Grid.Column="1" Margin="10 0">
+                <StackPanel>
+                    <Button>添加匀速段</Button>
+                    <Button>添加普通段</Button>
+                    <Button>添加停止段</Button>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

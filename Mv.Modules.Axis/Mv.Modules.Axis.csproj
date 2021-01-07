@@ -5,8 +5,8 @@
     <AssemblyName>Mv.Modules.Axis</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="控制器封包类\CGaoChuanMotion.cs" />
-    <Compile Remove="控制器封包类\CGsnMotion.cs" />
+    <Compile Remove="Controlers\CGaoChuanMotion.cs" />
+    <Compile Remove="Controlers\CGsnMotion.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="AxisModule.cs~RFab02fbe.TMP" />

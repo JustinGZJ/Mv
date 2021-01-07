@@ -28,7 +28,7 @@ namespace MotionWrapper
         private bool inPos = false;
         private bool isHoming = false;//如果在回零过程中 可能会进行回零检测
         private float relVel = 0.0f;
-        private short homed = 0;//0初始化 1 成功 -1失败
+        private short homed = -1;//0初始化 1 成功 -1失败
         private bool homeSwitch = false;//回零开关是否接通
         private float cmdPos;
         private float relPos;
