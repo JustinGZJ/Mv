@@ -263,7 +263,7 @@ namespace ModbusDriver
 
         public int PDU
         {
-            get { return 252; }
+            get { return 100; }
             //get { return 256; }
         }
 
