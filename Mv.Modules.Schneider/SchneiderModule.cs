@@ -43,6 +43,7 @@ namespace Mv.Modules.Schneider
         {
             Container.RegisterType<IServerOperations, ServerOperations>();
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Dashboard));
+            regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(ProductInfo));
             regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(Settings));
 
         }

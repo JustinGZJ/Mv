@@ -1,4 +1,5 @@
 ﻿using DataService;
+using Mv.Core.Interfaces;
 using Mv.Modules.Schneider.Service;
 using Mv.Modules.Schneider.Views;
 using Mv.Ui.Core;
@@ -32,9 +33,11 @@ namespace Mv.Modules.Schneider.ViewModels
 
         private readonly IDataServer dataServer;
         private readonly IServerOperations operations;
+        private readonly IConfigureFile configureFile;
         private readonly ILoggerFacade logger;
         Dictionary<string, IObservable<short>> tensionobs = new Dictionary<string, IObservable<short>>();
         UserMessageEvent userMessageEvent;
+
         IDevice scanner;
         private void PushMsg(string msg, Category category = Category.Debug)
         {
@@ -43,7 +46,11 @@ namespace Mv.Modules.Schneider.ViewModels
 
         private string barcode;
         public ObservableCollection<BindableWrapper<string>> Barcodes { get; private set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
-        public DashViewModel(IUnityContainer container, IDataServer dataServer, IServerOperations operations, ILoggerFacade logger) : base(container)
+        public DashViewModel(IUnityContainer container,
+                             IDataServer dataServer,
+                             IServerOperations operations,
+                             IConfigureFile configureFile,
+                             ILoggerFacade logger) : base(container)
         {
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
@@ -54,11 +61,6 @@ namespace Mv.Modules.Schneider.ViewModels
 
             (dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
-            //Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
-            //{
-            //    if (dataServer[m] != null)
-            //        tensionobs[m] = dataServer[m].ToObservable().Select(x => x.Int16);
-            //});
             Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
              {
                  if (dataServer[m] != null)
@@ -161,7 +163,8 @@ namespace Mv.Modules.Schneider.ViewModels
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.PRODUCTERR);
                                  return;
                              }
-                             if (operations.CheckCode(result) == 0)
+                             var config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
+                             if (operations.CheckCode($"{result},{config.MaterialCodes[m-1]},{config.MaterialCodes[m - 1+4]}") == 0)
                              {
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.OK);
                                  PushMsg("OK!");
@@ -325,8 +328,8 @@ namespace Mv.Modules.Schneider.ViewModels
             //  
 
             this.operations = operations;
+            this.configureFile = configureFile;
             this.logger = logger;
-            //     InitChart();
 
 
         }

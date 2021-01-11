@@ -37,28 +37,8 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Turns { get; set; }
         public string Program { get; set; } = "";
 
-        public string Type { get; set; }
+        public string[] MaterialCodes { get; set; }
 
-        public string Size { get; set; }
-        public string Customer { get; set; }
-        public string GrossWeight { get; set; }
-        public string Suttle { get; set; }
-
-        public string SerialNumber { get; set; }
-
-        public DateTime Date { get; set; }
-
-        public DateTime Nose { get; set; }
-
-
-        public DateTime JobNumber { get; set; }
-
-
-        public DateTime Online { get; set; }
-
-        public DateTime Offline { get; set; }
-
-        public string BatchNumber { get; set; }
     }
 
     public class ProductData

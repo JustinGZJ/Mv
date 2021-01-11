@@ -1,17 +1,15 @@
 ﻿using DataService;
-using Mv.Core;
 using Mv.Core.Interfaces;
 using Mv.Modules.Schneider.ViewModels;
 using MV.Core.Events;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Prism.Events;
 using Prism.Logging;
 using SimpleTCP;
 using System;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+
 using System.Threading.Tasks.Dataflow;
 
 namespace Mv.Modules.Schneider.Service
@@ -31,13 +29,8 @@ namespace Mv.Modules.Schneider.Service
         private readonly IConfigureFile configure;
         private readonly ILoggerFacade logger;
         ScheiderConfig scheiderConfig => configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig();
-        public string Station
-        {
-            get
-            {
-                return scheiderConfig.Station;
-            }
-        }
+        Func<ScheiderConfig> GetConfig => () => configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig();
+        public string Station => scheiderConfig.Station;
 
         bool serverDisable => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerDisable;
         public string Ip => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerIP;
@@ -97,7 +90,6 @@ namespace Mv.Modules.Schneider.Service
                 OnMessage("服务器验证已关闭");
                 return 0;
             }
-
             return Read($"{Station}SC${refId}\n", (s) =>
             {
                 if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
@@ -132,7 +124,7 @@ namespace Mv.Modules.Schneider.Service
                 string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
                 SaveFileAction.Post((fileName, localdata));
             }
-            var uploadData = new ServerData
+            var uploadData = new ServerData()
             {
                 Status = dataServer["R_STATUS"].Value.Int32,
                 LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f,
@@ -140,19 +132,7 @@ namespace Mv.Modules.Schneider.Service
                 Turns = dataServer["R_ROWS"].Value.Int32,
                 Velocity = dataServer["R_Speed"].Value.Int32,
                 Program = dataServer["PROGRAM"].ToString(),
-                BatchNumber = scheiderConfig.BatchNumber,
-                Customer = scheiderConfig.Customer,
-                GrossWeight = scheiderConfig.GrossWeight,
-                JobNumber = scheiderConfig.JobNumber,
-                Offline = scheiderConfig.Offline,
-                Online = scheiderConfig.Online,
-                SerialNumber = scheiderConfig.SerialNumber,
-                Size = scheiderConfig.Size,
-                Suttle = scheiderConfig.Suttle,
-                Date = scheiderConfig.Date,
-                Nose = scheiderConfig.Nose,
-                Type = scheiderConfig.Type
-
+                MaterialCodes = configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).MaterialCodes
             };
             uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));
             var json = JsonConvert.SerializeObject(uploadData);

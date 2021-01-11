@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="LiveCharts.NetCore" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.7" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
     <PackageReference Include="SimpleTCP.Core" Version="1.0.4" />
   </ItemGroup>
@@ -32,6 +33,11 @@
     <Reference Include="PropertyTools.Wpf">
       <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\ProductInfo.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Update="C:\Users\Administrator.LAPTOP-7D6B2GK7\.nuget\packages\system.reactive\4.4.1\buildTransitive\netcoreapp3.0\..\..\build\netcoreapp3.0\System.Reactive.dll">
