@@ -119,7 +119,6 @@ namespace Mv.Modules.Schneider.Service
                 localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
                 localdata.Quantity = dataServer["R_QTY"].Value.Int32;
                 localdata.Turns = dataServer["R_ROWS"].Value.Int32;
-
                 localdata.Program = dataServer["PROGRAM"].ToString();
                 string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
                 SaveFileAction.Post((fileName, localdata));
@@ -132,6 +131,7 @@ namespace Mv.Modules.Schneider.Service
                 Turns = dataServer["R_ROWS"].Value.Int32,
                 Velocity = dataServer["R_Speed"].Value.Int32,
                 Program = dataServer["PROGRAM"].ToString(),
+                HVC = dataServer["HVC"].Value.Int32,
                 MaterialCodes = configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).MaterialCodes
             };
             uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));

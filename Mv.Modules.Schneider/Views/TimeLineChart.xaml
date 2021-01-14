@@ -48,10 +48,8 @@
                     </lvc:Axis>
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis
-                          MaxValue="{Binding YAxisMax}" 
-                          MinValue="{Binding YAxisMin}">
-                        <lvc:Axis.Separator>
+                    <lvc:Axis LabelFormatter="{Binding YFormatter}">
+                        <lvc:Axis.Separator >
                             <lvc:Separator StrokeThickness="1" />
                         </lvc:Axis.Separator>
                     </lvc:Axis>

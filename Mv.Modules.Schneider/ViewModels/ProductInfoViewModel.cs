@@ -124,7 +124,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 {
                     var match = RegexST.Match(Input);
                     var ST = int.Parse(match.Groups[1].Value);
-                    if (ST > 0 && ST < Infos.Count)
+                    if (ST > 0 && ST <= Infos.Count)
                     {
                         if (selectedInfo != null)
                             selectedInfo.Seleceted = false;

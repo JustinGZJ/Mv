@@ -36,6 +36,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Angle { get; set; }
         public int Turns { get; set; }
         public string Program { get; set; } = "";
+        public int HVC { get; set; }
 
         public string[] MaterialCodes { get; set; }
 
@@ -60,6 +61,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Angle { get; set; }
         public int Turns { get; set; }
         public string Program { get; set; } = "";
+        public int HVC { get; set; }
         public ICollection<TensionGroup> TensionGroups { get; set; }
 
         public class TensionGroup

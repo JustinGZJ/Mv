@@ -32,7 +32,7 @@ namespace Mv.Modules.Schneider.ViewModels
         }
         public Func<double, string> DateTimeFormatter { get; set; } = value =>
           new DateTime((long)value).ToString("T");
-
+        public Func<double, string> YFormatter { get; set; } = value => value.ToString("f0");
 
 
         IDisposable disposable;
@@ -116,10 +116,7 @@ namespace Mv.Modules.Schneider.ViewModels
             disposable = observable
                 .Subscribe(x =>
                 {
-
-
-                   // TensionValue = Math.Sin(DateTime.Now.Ticks/1000/60/1000)*1000+1000;
-                      TensionValue = Math.Round(x, 0);
+                      TensionValue =x;
                     ChartValues.Add(new MeasureModel { DateTime = DateTime.Now, Value =TensionValue });
                     if (ChartValues.Count > 150)
                         ChartValues.RemoveAt(0);

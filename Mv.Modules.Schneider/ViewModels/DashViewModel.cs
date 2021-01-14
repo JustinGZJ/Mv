@@ -157,7 +157,7 @@ namespace Mv.Modules.Schneider.ViewModels
                              barcode = result.Trim('\r');
                              Barcodes[m - 1] = barcode;
                              // barcod
-                             if (!barcode.Contains(dataServer["PROGRAM"].ToString().Trim('\0')))
+                             if (!barcode.Contains("GDE888888")&& !barcode.Contains("GDE999999") && !barcode.Contains(dataServer["PROGRAM"].ToString().Trim('\0')))
                              {
                                  PushMsg("机种信息不符");
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.PRODUCTERR);
@@ -260,7 +260,6 @@ namespace Mv.Modules.Schneider.ViewModels
                     dataServer["TS_OUTPUT"].Write(output);
                     PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
                 }
-
                 disposables1.Dispose();
             });
             #endregion
@@ -336,7 +335,6 @@ namespace Mv.Modules.Schneider.ViewModels
 
         public void InitChart()
         {
-            var random = new Random();
             var regionManager = Container.Resolve<IRegionManager>();
             if (!regionManager.Regions["TENSIONS"].Views.Any())
             {
@@ -345,8 +343,10 @@ namespace Mv.Modules.Schneider.ViewModels
                     var node = $"tension{i + 1}";
                     if (tensionobs.ContainsKey(node))
                     {
-                        var m = new TimeLineChartViewModel();
-                        m.Title = $"张力器{i + 1}";
+                        var m = new TimeLineChartViewModel
+                        {
+                            Title = $"张力器{i + 1}"
+                        };
                         regionManager.Regions["TENSIONS"].Add(new TimeLineChart() { DataContext = m });
                         m.SetObservable(tensionobs[node].Select(x => (double)x));
                     }
