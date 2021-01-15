@@ -193,10 +193,10 @@ namespace MotionWrapper
                  do
                  {
                      rtn = GT_GetHomeStatus(axis.Prm.CardNum, axis.Prm.AxisNum, out tHomeSts); //获取回原点状态
-                } while (tHomeSts.run != 0); //等待搜索原点停止 
+                 } while (tHomeSts.run != 0); //等待搜索原点停止 
                  Thread.Sleep(500);
-            });
-            rtn +=(short) MC_HomeStatus(ref axis);
+             });
+            rtn += (short)MC_HomeStatus(ref axis);
             return rtn;
         }
 
@@ -593,7 +593,7 @@ namespace MotionWrapper
                     return -1;//模式不对
                 }
             }
-            rtn += mc.GT_SetFollowMaster(slaver.Prm.CardNum, slaver.Prm.AxisNum, master.Prm.AxisNum, mc.FOLLOW_MASTER_ENCODER, 0);
+            rtn += mc.GT_SetFollowMaster(slaver.Prm.CardNum, slaver.Prm.AxisNum, master.Prm.AxisNum, mc.FOLLOW_MASTER_PROFILE, 0);
             rtn += mc.GT_FollowClear(slaver.Prm.CardNum, slaver.Prm.AxisNum, 0);
             rtn += mc.GT_FollowClear(slaver.Prm.CardNum, slaver.Prm.AxisNum, 1);
             return rtn;
@@ -611,17 +611,21 @@ namespace MotionWrapper
         {
             short rtn = 0;
             uint clock = 0;
+
             //判断是否是跟随模式
             foreach (var item in data)
             {
+                rtn += GT_FollowSpace(slaver.Prm.CardNum, slaver.Prm.AxisNum, out short space, 0);
                 rtn += mc.GT_FollowData(slaver.Prm.CardNum, slaver.Prm.AxisNum, (int)item.Master, item.Slaver, (short)item.MoveType, 0);
             }
+
+
             if (passpos != 0)
             {
                 if (relPasspos)
                 {
                     double value = 0;
-                    rtn += mc.GT_GetEncPos(master.Prm.CardNum, master.Prm.AxisNum, out value, 1, out clock);
+                    rtn += mc.GT_GetAxisPrfPos(master.Prm.CardNum, master.Prm.AxisNum, out value, 1, out clock);
                     rtn += mc.GT_SetFollowEvent(slaver.Prm.CardNum, slaver.Prm.AxisNum, mc.FOLLOW_EVENT_PASS, 1, (int)(passpos + value));
                 }
                 else
@@ -736,7 +740,7 @@ namespace MotionWrapper
                 rtn += mc.GT_LoadExtConfig(cardNum, @"EXTIO.cfg");
                 rtn += mc.GT_ClrSts(cardNum, 1, 8);
                 rtn += mc.GT_ZeroPos(cardNum, 1, 8);
-                rtn+=(short)AxisRefs.Where(x => x.Prm.Active).Select(axis => this.MC_Power(axis)).Sum();
+                rtn += (short)AxisRefs.Where(x => x.Prm.Active).Select(axis => this.MC_Power(axis)).Sum();
                 if (rtn == 0)
                 {
                     runThread = new Thread(Run);

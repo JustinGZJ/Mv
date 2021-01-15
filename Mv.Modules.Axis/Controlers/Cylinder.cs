@@ -1,5 +1,6 @@
 ﻿using PropertyChanged;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,6 +47,11 @@ namespace MotionWrapper
             _ioPart1.setDO(Output[0], false);
             return Task.Run(() => (SpinWait.SpinUntil(() => Input[0].Value && (!Input[1].Value), TimeOut)));
 
+        }
+
+        private string GetDebuggerDisplay()
+        {
+            return ToString();
         }
     }
 
