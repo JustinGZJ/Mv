@@ -20,7 +20,7 @@ namespace Mv.Modules.Axis.Controller
         public ICylinder CyLoadFB { get; set; }
         public ICylinder CyLoadLR { get; set; }
         #endregion
-        IGtsMotion gtsMotion;
+        IGtsMotion motion;
         public Loader(IUnityContainer container, IEventAggregator @event)
         {
             var factory = container.Resolve<IFactory<string, ICylinder>>(nameof(CylinderFactory));
@@ -29,8 +29,8 @@ namespace Mv.Modules.Axis.Controller
             CyFrontBack = factory.Create(CylinderFactory.PlugInForthBack);
             CyLoadFB = factory.Create(CylinderFactory.FeedingForthBack);
             CyLoadLR = factory.Create(CylinderFactory.FeedingRightLeft);
-            gtsMotion = container.Resolve<IGtsMotion>();
-            Servo = gtsMotion.AxisRefs.FirstOrDefault(x => x.Name == "C");
+            motion = container.Resolve<IGtsMotion>();
+            Servo = motion.AxisRefs.FirstOrDefault(x => x.Name == "C");
             this.@event = @event;
         }
 
@@ -48,7 +48,7 @@ namespace Mv.Modules.Axis.Controller
             arr.Add(await CyFrontBack.Reset());
             arr.Add(await CyLoadFB.Reset());
             arr.Add(await CyLoadLR.Reset());
-            arr.Add((await gtsMotion.MC_Home(Servo) == 0));
+            arr.Add((await motion.MC_Home(Servo) == 0));
             return arr.Aggregate((a, b) => a && b);
 
         }
@@ -72,9 +72,12 @@ namespace Mv.Modules.Axis.Controller
         }
         int step_auto_temp = 0;
         private readonly IEventAggregator @event;
-
+        AxisRef c;
         public override void Run()
         {
+            c = Servo;
+            c.Prm.MaxVel = 40000;
+            c.Prm.MaxAcc = 40000;
             while (true)
             {
                 try
@@ -84,19 +87,22 @@ namespace Mv.Modules.Axis.Controller
                         switch (Step_auto)
                         {
                             case 0:
-
+                                GetProduct();
                                 break;
                             case 1:
-
+                                PutProduct(30000);
                                 break;
                             case 2:
-
+                                GetProduct();
                                 break;
                             case 3:
-
+                                PutProduct(15000);
                                 break;
                             case 4:
-
+                                GetProduct();
+                                break;
+                            case 5:
+                                PutProduct(0);
                                 break;
                             default:
                                 break;
@@ -117,6 +123,30 @@ namespace Mv.Modules.Axis.Controller
                     /// throw;
                 }
             }
+        }
+        private void GetProduct()
+        {
+            CyLoadFB.Reset();
+            CyLoadLR.Reset();
+            motion.MC_MoveAbs(c, 50000);
+            SpinWait.SpinUntil(() => c.CmdPos == 50000);
+            CyLoadFB.Set();
+            Thread.Sleep(1000);
+            motion.MC_MoveAbs(c, 45000);
+            SpinWait.SpinUntil(() => c.CmdPos == 45000);
+        }
+
+        private void PutProduct(double location)
+        {
+            CyLoadLR.Set();
+            motion.MC_MoveAbs(c, location);
+            SpinWait.SpinUntil(() => c.CmdPos == location);
+            CyUpDown.Set();
+            Thread.Sleep(1000);
+            CyLoadFB.Reset();
+            Thread.Sleep(1000);
+            CyUpDown.Reset();
+            Thread.Sleep(1000);
         }
 
         public override void RunModel(int modelIndex, ref EAutoMode modelNow)

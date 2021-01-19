@@ -30,12 +30,7 @@ namespace Mv.Modules.Axis.Controller
             B = motion.AxisRefs.FirstOrDefault(x => x.Name == "B");
             C = motion.AxisRefs.FirstOrDefault(x => x.Name == "C");
             SP = motion.AxisRefs.FirstOrDefault(x => x.Name == "SP");
-            motion.MC_Home(X);
-            motion.MC_Home(Y);
-            motion.MC_Home(Z);
-            motion.MC_Home(SP);
-            motion.MC_Home(B);
-            motion.MC_Home(C);
+
         }
 
 
@@ -55,6 +50,8 @@ namespace Mv.Modules.Axis.Controller
             arr.Add(await FingerFlip.Reset());
             arr.Add(await FingerSideToSide.Reset());
             arr.Add(await LineNozzleFlip.Reset());
+            await Task.WhenAll(motion.MC_Home(X), motion.MC_Home(Y), motion.MC_Home(Z), motion.MC_Home(SP), motion.MC_Home(B), motion.MC_Home(B), motion.MC_Home(C));
+
             return await Task.FromResult(arr.Aggregate((a, b) => a && b));
         }
 
@@ -106,9 +103,9 @@ namespace Mv.Modules.Axis.Controller
                                     motion.MC_MoveAbs(Y, -5000, 1);
                                     motion.MC_MoveAdd(SP, 10000, 1);
                                     Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Y.Moving);               
+                                    SpinWait.SpinUntil(() => !Y.Moving);
                                     motion.MC_MoveAbs(Y, 0, 1);
-                                    motion.MC_MoveAdd(SP,5000, 1);                                 
+                                    motion.MC_MoveAdd(SP, 5000, 1);
                                     SpinWait.SpinUntil(() => !Y.Moving);
                                     Thread.Sleep(100);
                                 }
@@ -129,7 +126,7 @@ namespace Mv.Modules.Axis.Controller
                                     motion.MC_MoveAbs(Y, -5000, 1);
                                     Thread.Sleep(100);
                                     SpinWait.SpinUntil(() => !Y.Moving);
-                                    motion.MC_MoveAbs(X, 5000, 1);                                 
+                                    motion.MC_MoveAbs(X, 5000, 1);
                                     Thread.Sleep(100);
                                     SpinWait.SpinUntil(() => !X.Moving);
                                     motion.MC_MoveAbs(Z, 2000, 1);
@@ -147,13 +144,13 @@ namespace Mv.Modules.Axis.Controller
                                 }
                                 break;
                             case 4:
-               
+
                                 break;
                         }
                         step_auto_temp = Step_auto;
                         if (run_mode == EAutoMode.AUTO)
                         {
-                            if (Step_auto <100)
+                            if (Step_auto < 100)
                                 Step_auto++;
                             else
                                 Step_auto = 0;

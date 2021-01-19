@@ -82,8 +82,6 @@ namespace Mv.Modules.Axis.ViewModels
             motion.MC_MoveJog(master);
             motion.MC_FollowMode(master, slave);
             motion.MC_Follow(master, slave, 0, Datas.ToList());
-            
-          // motion.MC_MoveJog()
         }
 
 
@@ -107,14 +105,6 @@ namespace Mv.Modules.Axis.ViewModels
             get { return repeattime; }
             set { SetProperty(ref repeattime, value); }
         }
-
-
-
-
-
-
-
-
 
     }
 }

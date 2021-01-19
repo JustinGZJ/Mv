@@ -220,6 +220,7 @@ namespace MotionWrapper
                 trapprm.dec = axis.Prm.getAccPlsPerMs2();
                 trapprm.smoothTime = 50;
                 trapprm.velStart = 0;
+                axis.Prm.MaxVel = Math.Abs(axis.Prm.MaxVel);
                 rtn += mc.GT_SetTrapPrm(axis.Prm.CardNum, axis.Prm.AxisNum, ref trapprm);
                 rtn += mc.GT_SetVel(axis.Prm.CardNum, axis.Prm.AxisNum, axis.Prm.getVelPlsPerMs() * beilv);
                 rtn += mc.GT_SetPos(axis.Prm.CardNum, axis.Prm.AxisNum, (int)(axis.Prm.mm2pls(tpos)));
@@ -740,7 +741,7 @@ namespace MotionWrapper
                 rtn += mc.GT_LoadExtConfig(cardNum, @"EXTIO.cfg");
                 rtn += mc.GT_ClrSts(cardNum, 1, 8);
                 rtn += mc.GT_ZeroPos(cardNum, 1, 8);
-                rtn += (short)AxisRefs.Where(x => x.Prm.Active).Select(axis => this.MC_Power(axis)).Sum();
+                var pw = (short)AxisRefs.Where(x => x.Prm.Active).Select(axis => this.MC_Power(axis)).Sum();
                 if (rtn == 0)
                 {
                     runThread = new Thread(Run);
