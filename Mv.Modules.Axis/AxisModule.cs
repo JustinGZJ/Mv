@@ -10,6 +10,7 @@ using Prism.Modularity;
 using Prism.Regions;
 using System.Windows;
 using Unity;
+using Mv.Modules.Axis.Controlers;
 
 namespace Mv.Modules.Axis
 {
@@ -58,6 +59,8 @@ namespace Mv.Modules.Axis
             containerRegistry.RegisterSingleton<MachineBase, MachineManager>(nameof(MachineManager));
             containerRegistry.RegisterSingleton<MachineBase, Wielding>(nameof(Wielding));
             containerRegistry.RegisterSingleton<MachineBase, Loader>(nameof(Loader));
+            containerRegistry.RegisterSingleton<IShareData, ShareData>();
+            
         }
     }
 }

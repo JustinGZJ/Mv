@@ -7,15 +7,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity;
 using System.Linq;
+using Mv.Modules.Axis.Controlers;
 
 namespace Mv.Modules.Axis.Controller
 {
     public class Wielding : MachineBase
     {
         public Wielding(
-            IUnityContainer container)
+            IUnityContainer container,IShareData shareData)
         {
             this.container = container;
+            this.shareData = shareData;
             this.factory = container.Resolve<IFactory<string, ICylinder>>(nameof(CylinderFactory));
             SpindleLockingCylinder = factory.Create(CylinderFactory.SpindleLockingCylinder);
             EnableTensioner = factory.Create(CylinderFactory.EnableTensioner);
@@ -76,12 +78,17 @@ namespace Mv.Modules.Axis.Controller
 
         private int step_auto_temp = -1;
         private readonly IUnityContainer container;
+        private readonly IShareData shareData;
         private readonly IFactory<string, ICylinder> factory;
 
         public override void Run()
         {
             while (true)
             {
+                X.Prm.MaxVel = 15000;
+                X.Prm.MaxAcc = 15000;
+                Y.Prm.MaxVel = 15000;
+                Y.Prm.MaxAcc = 15000;
                 try
                 {
                     if (step_auto_temp != Step_auto && (run_mode == EAutoMode.AUTO || run_mode == EAutoMode.STEP))
@@ -89,62 +96,115 @@ namespace Mv.Modules.Axis.Controller
                         switch (Step_auto)
                         {
                             case 0:
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    Task.WaitAll(FingerFlip.Set(), FingerClosure.Set());
-                                    Thread.Sleep(1000);
-                                    Task.WaitAll(FingerFlip.Reset(), FingerClosure.Reset());
-                                    Thread.Sleep(1000);
-                                }
+                                SpinWait.SpinUntil(() => shareData.LoaderHandshake==1);
+                                shareData.WeildingHandshake = 1;
+                    //            SpinWait.SpinUntil(() => shareData.LoaderHandshake == 1);
                                 break;
                             case 1:
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    motion.MC_MoveAbs(Y, -5000, 1);
-                                    motion.MC_MoveAdd(SP, 10000, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Y.Moving);
-                                    motion.MC_MoveAbs(Y, 0, 1);
-                                    motion.MC_MoveAdd(SP, 5000, 1);
-                                    SpinWait.SpinUntil(() => !Y.Moving);
-                                    Thread.Sleep(100);
-                                }
+                                //   B和Y 同时  →  手指左
+                                motion.MC_MoveAbs(B, -12000, 1);
+                                motion.MC_MoveAbs(Y, -12000, 1);
+                                FingerSideToSide.Set();
+                                SpinWait.SpinUntil(() => B.CmdPos == -12000);
+                                SpinWait.SpinUntil(() => Y.CmdPos == -12000);
                                 break;
                             case 2:
-                                for (int i = 0; i < 2; i++)
+                                //X Y Z 缠pin 上下左右 *10 起线
+                                X.Prm.MaxVel = 50000;
+                                X.Prm.MaxAcc = 50000;
+                                Y.Prm.MaxVel = 50000;
+                                Y.Prm.MaxAcc = 50000;
+                                var xpos = X.CmdPos;
+                                var ypos = Y.CmdPos;
+                                for (int i = 0; i < 5; i++)
                                 {
-                                    Task.WaitAll(FingerClosure.Set(), FingerSideToSide.Set());
-                                    Thread.Sleep(1000);
-                                    Task.WaitAll(FingerClosure.Reset(), FingerSideToSide.Reset());
-                                    Thread.Sleep(1000);
+                                    motion.MC_MoveAdd(X, 1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos + 1000);
+                                    motion.MC_MoveAdd(Y, 1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos + 1000);
+                                    motion.MC_MoveAdd(X, -1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos );
+                                    motion.MC_MoveAdd(Y, -1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos ); 
                                 }
                                 break;
                             case 3:
-                                for (int i = 0; i < 2; i++)
-                                {
-                                    motion.MC_MoveAdd(SP, 100000, 1);
-                                    motion.MC_MoveAbs(Y, -5000, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Y.Moving);
-                                    motion.MC_MoveAbs(X, 5000, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !X.Moving);
-                                    motion.MC_MoveAbs(Z, 2000, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Z.Moving);
-                                    motion.MC_MoveAbs(Z, 0, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Z.Moving);
-                                    motion.MC_MoveAbs(Y, 0, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !Y.Moving);
-                                    motion.MC_MoveAbs(X, 0, 1);
-                                    Thread.Sleep(100);
-                                    SpinWait.SpinUntil(() => !X.Moving);
-                                }
+                                //手指右   //扯线
+                                //手指倒下  //180
+                                FingerSideToSide.Reset();
+                                FingerFlip.Set();
+                                Thread.Sleep(500);
                                 break;
                             case 4:
-
+                                //绕线 同时 手指张闭张 * 3
+                                Task.Run(() => {
+                                    for (int i = 0; i < 3; i++)
+                                    {
+                                        FingerClosure.Set();
+                                        Thread.Sleep(300);
+                                        FingerClosure.Reset();
+                                        Thread.Sleep(300);
+                                    }
+                                });
+                                var startpos = -12000;
+                                motion.MC_MoveAbs(Y, startpos, 1);
+                                SpinWait.SpinUntil(() => Y.CmdPos == startpos);
+                                motion.MC_MoveAdd(SP, 24000, 1);
+                                for (int i = 0; i < 8; i++)
+                                {
+                                    motion.MC_MoveAbs(Y, -8000, 1);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == -8000);
+                                    motion.MC_MoveAbs(Y, -12000, 1);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == -12000);
+                                }
+                                SpinWait.SpinUntil(() => !SP.Moving);
+                                break;
+                            case 5:
+                                FingerFlip.Reset();
+                                Thread.Sleep(1000);
+                                xpos = X.CmdPos;
+                                ypos = Y.CmdPos;
+                                X.Prm.MaxVel = 50000;
+                                X.Prm.MaxAcc = 50000;
+                                Y.Prm.MaxVel = 50000;
+                                Y.Prm.MaxAcc = 50000;
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    motion.MC_MoveAdd(X, 1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos + 1000);
+                                    motion.MC_MoveAdd(Y, 1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos + 1000);
+                                    motion.MC_MoveAdd(X, -1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos);
+                                    motion.MC_MoveAdd(Y, -1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos);
+                                }
+                                FingerSideToSide.Set();
+                                Thread.Sleep(300);
+                                for (int i = 0; i < 5; i++)
+                                {
+                                    motion.MC_MoveAdd(X, 1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos + 1000);
+                                    motion.MC_MoveAdd(Y, 1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos + 1000);
+                                    motion.MC_MoveAdd(X, -1000);
+                                    SpinWait.SpinUntil(() => X.CmdPos == xpos);
+                                    motion.MC_MoveAdd(Y, -1000);
+                                    SpinWait.SpinUntil(() => Y.CmdPos == ypos);
+                                }
+                                FingerSideToSide.Reset();
+                                Thread.Sleep(300);
+                                break;
+                            case 6:
+                                motion.MC_MoveAbs(Y, 0, 1);
+                                motion.MC_MoveAbs(X, 0, 1);
+                                motion.MC_MoveAbs(Z, 0, 1);
+                                motion.MC_MoveAbs(B, 0, 1);
+                                SpinWait.SpinUntil(() => Y.CmdPos == 0);
+                                SpinWait.SpinUntil(() => X.CmdPos == 0);
+                                SpinWait.SpinUntil(() => Z.CmdPos == 0);
+                                SpinWait.SpinUntil(() => B.CmdPos == 0);
+                                shareData.WeildingHandshake = 0;
                                 break;
                         }
                         step_auto_temp = Step_auto;

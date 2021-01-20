@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Prism.Events;
 using System.Collections.Generic;
+using Mv.Modules.Axis.Controlers;
 
 namespace Mv.Modules.Axis.Controller
 {
@@ -14,24 +15,25 @@ namespace Mv.Modules.Axis.Controller
     {
         #region Properties
         public AxisRef Servo { get; set; }
-        public ICylinder CyRightLeft { get; set; }
-        public ICylinder CyUpDown { get; set; }
-        public ICylinder CyFrontBack { get; set; }
+        public ICylinder CyPluginRightLeft { get; set; }
+        public ICylinder CyPluginUpDown { get; set; }
+        public ICylinder CyPlugInFrontBack { get; set; }
         public ICylinder CyLoadFB { get; set; }
         public ICylinder CyLoadLR { get; set; }
         #endregion
         IGtsMotion motion;
-        public Loader(IUnityContainer container, IEventAggregator @event)
+        public Loader(IUnityContainer container, IEventAggregator @event,IShareData shareData)
         {
             var factory = container.Resolve<IFactory<string, ICylinder>>(nameof(CylinderFactory));
-            CyRightLeft = factory.Create(CylinderFactory.PlugLeftRight);
-            CyUpDown = factory.Create(CylinderFactory.PlugInUpDown);
-            CyFrontBack = factory.Create(CylinderFactory.PlugInForthBack);
+            CyPluginRightLeft = factory.Create(CylinderFactory.PlugLeftRight);
+            CyPluginUpDown = factory.Create(CylinderFactory.PlugInUpDown);
+            CyPlugInFrontBack = factory.Create(CylinderFactory.PlugInForthBack);
             CyLoadFB = factory.Create(CylinderFactory.FeedingForthBack);
             CyLoadLR = factory.Create(CylinderFactory.FeedingRightLeft);
             motion = container.Resolve<IGtsMotion>();
             Servo = motion.AxisRefs.FirstOrDefault(x => x.Name == "C");
             this.@event = @event;
+            this.shareData = shareData;
         }
 
         #region machinebase
@@ -43,9 +45,9 @@ namespace Mv.Modules.Axis.Controller
         public override async Task<bool> Home()
         {
             var arr = new List<bool>();
-            arr.Add(await CyRightLeft.Reset());
-            arr.Add(await CyUpDown.Reset());
-            arr.Add(await CyFrontBack.Reset());
+            arr.Add(await CyPluginRightLeft.Reset());
+            arr.Add(await CyPluginUpDown.Reset());
+            arr.Add(await CyPlugInFrontBack.Reset());
             arr.Add(await CyLoadFB.Reset());
             arr.Add(await CyLoadLR.Reset());
             arr.Add((await motion.MC_Home(Servo) == 0));
@@ -72,6 +74,7 @@ namespace Mv.Modules.Axis.Controller
         }
         int step_auto_temp = 0;
         private readonly IEventAggregator @event;
+        private readonly IShareData shareData;
         AxisRef c;
         public override void Run()
         {
@@ -103,6 +106,17 @@ namespace Mv.Modules.Axis.Controller
                                 break;
                             case 5:
                                 PutProduct(0);
+                               // 
+                                break;
+                            case 6:
+                                SpinWait.SpinUntil(() => shareData.WeildingHandshake == 0);
+                                CyPluginRightLeft.Reset();
+                                PutIntoFixture();
+                                CyPluginRightLeft.Set();
+                                PutIntoFixture();
+                                shareData.LoaderHandshake = 1;
+                                SpinWait.SpinUntil(() => shareData.WeildingHandshake == 1);
+                                shareData.LoaderHandshake = 0;
                                 break;
                             default:
                                 break;
@@ -124,6 +138,18 @@ namespace Mv.Modules.Axis.Controller
                 }
             }
         }
+
+        private void PutIntoFixture()
+        {
+            CyPluginUpDown.Reset();
+            CyPlugInFrontBack.Set(); //QIANJIN
+            Thread.Sleep(1000);
+            CyPluginUpDown.Set();
+            Thread.Sleep(500);
+            CyPlugInFrontBack.Reset();//TUIHUI
+            Thread.Sleep(1000);
+        }
+
         private void GetProduct()
         {
             CyLoadFB.Reset();
@@ -141,12 +167,12 @@ namespace Mv.Modules.Axis.Controller
             CyLoadLR.Set();
             motion.MC_MoveAbs(c, location);
             SpinWait.SpinUntil(() => c.CmdPos == location);
-            CyUpDown.Set();
-            Thread.Sleep(1000);
+            CyPluginUpDown.Set();
+            Thread.Sleep(500);
             CyLoadFB.Reset();
-            Thread.Sleep(1000);
-            CyUpDown.Reset();
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
+            CyPluginUpDown.Reset();
+            Thread.Sleep(500);
         }
 
         public override void RunModel(int modelIndex, ref EAutoMode modelNow)
