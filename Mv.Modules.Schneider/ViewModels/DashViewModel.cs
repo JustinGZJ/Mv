@@ -35,8 +35,15 @@ namespace Mv.Modules.Schneider.ViewModels
         private readonly IServerOperations operations;
         private readonly IConfigureFile configureFile;
         private readonly ILoggerFacade logger;
+        private bool bgettensiongroup1;
+        private bool bgettensiongroup2;
         Dictionary<string, IObservable<short>> tensionobs = new Dictionary<string, IObservable<short>>();
         UserMessageEvent userMessageEvent;
+        ProductDataCollection dataCollection = null;
+        CompositeDisposable disposables1 = new CompositeDisposable();
+        CompositeDisposable disposables2 = new CompositeDisposable();
+        CompositeDisposable disposables3 = new CompositeDisposable();
+        Queue<List<string>> buffers = new Queue<List<string>>();
 
         IDevice scanner;
         private void PushMsg(string msg, Category category = Category.Debug)
@@ -64,15 +71,11 @@ namespace Mv.Modules.Schneider.ViewModels
             Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
              {
                  if (dataServer[m] != null)
-                     tensionobs[m] = Observable.Interval(TimeSpan.FromSeconds(0.5)).Select(x=>dataServer[m].Value.Int16);
+                     tensionobs[m] = Observable.Interval(TimeSpan.FromSeconds(0.5)).Select(x => dataServer[m].Value.Int16);
              });
 
 
-            ProductDataCollection dataCollection = null;
-            CompositeDisposable disposables1 = new CompositeDisposable();
-            CompositeDisposable disposables2 = new CompositeDisposable();
-            CompositeDisposable disposables3 = new CompositeDisposable();
-            Queue<List<string>> buffers = new Queue<List<string>>();
+
 
             dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 1).Subscribe(x =>
             {
@@ -135,6 +138,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 PushMsg("扫码枪完成");
                 buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
                 Barcodes.ForEach(x => x.Value = "");
+                dataServer["OUT_SCAN_ERROR"]?.Write(5);
             });
             dataServer["IN_SCAN"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32)
              .Where(value => value >= 1 && value <= 4)
@@ -157,14 +161,14 @@ namespace Mv.Modules.Schneider.ViewModels
                              barcode = result.Trim('\r');
                              Barcodes[m - 1] = barcode;
                              // barcod
-                             if (!barcode.Contains("GDE888888")&& !barcode.Contains("GDE999999") && !barcode.Contains(dataServer["PROGRAM"].ToString().Trim('\0')))
+                             if (!barcode.Contains("GDE888888") && !barcode.Contains("GDE999999") && !barcode.Contains(dataServer["PROGRAM"].ToString().Trim('\0')))
                              {
                                  PushMsg("机种信息不符");
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.PRODUCTERR);
                                  return;
                              }
                              var config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
-                             if (operations.CheckCode($"{result},{config.MaterialCodes[m-1]},{config.MaterialCodes[m - 1+4]}") == 0)
+                             if (operations.CheckCode($"{result},{config.MaterialCodes[m - 1]},{config.MaterialCodes[m - 1 + 4]}") == 0)
                              {
                                  dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.OK);
                                  PushMsg("OK!");
@@ -194,7 +198,6 @@ namespace Mv.Modules.Schneider.ViewModels
             dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
                 .Where(v => v == 1).Subscribe(x =>
                 {
-                    PushMsg("开始记录第一组张力数据");
                     if (dataCollection == null)
                     {
                         dataCollection = new ProductDataCollection();
@@ -206,20 +209,15 @@ namespace Mv.Modules.Schneider.ViewModels
                             }
                         }
                     }
-                    disposables1 = new CompositeDisposable();
-                    var groups = dataCollection.ProductDatas.SelectMany(x => x.TensionGroups);
-
-                    IEnumerable<string> tensionNames = Enumerable.Range(1, 4).Select(x => $"tension{x}");
-                    tensionNames.ForEach(m => disposables1.Add(tensionobs[m]?.Subscribe(value =>
-                    {
-                        groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
-                    })));
+                    bgettensiongroup1 = true;
+                   // gettensiongroup1();
                 });
             dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
             .Where(v => v == 0).Subscribe(x =>
             {
+                bgettensiongroup1 = false;
                 var standard1 = dataServer["TS1_STANDARD"].Value.Int32 * 1d;
-                var offset1 = standard1 * dataServer["TS1_OFFSET"].Value.Int32 / 1000.0d;
+                var offset1 = standard1 * dataServer["TS1_OFFSET"].Value.Int32 / 1000.0d / 100d;
                 var output = 0;
                 if (standard1 != 0)
                 {
@@ -237,6 +235,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     });
                     ps.ForEach(x =>
                     {
+                        var indexs = new int[] { 0, 1, 2, 3, 0, 1, 2, 3 };
                         PushMsg($"{x.Name}张力数据,规格{standard1}±{offset1}");
                         if (x.Values.Any())
                         {
@@ -244,7 +243,7 @@ namespace Mv.Modules.Schneider.ViewModels
                             if (!x.Result)
                             {
                                 PushMsg($"{x.Name}张力数据NG");
-                                output += 1 << x.Index;
+                                output += 1 << indexs[x.Index];
                             }
                             else
                             {
@@ -254,40 +253,35 @@ namespace Mv.Modules.Schneider.ViewModels
                         else
                         {
                             PushMsg($"{x.Name}张力数据无变化");
-                            output += 1 << x.Index;
+                            output += 1 << indexs[x.Index];
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
                     PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
                 }
-                disposables1.Dispose();
+        
             });
             #endregion
             #region 记录第二组张力
             dataServer["TS2_IN"]?.ToObservable().Select(X => X.Int32)
              .Where(v => v == 1).Subscribe(x =>
              {
-                 PushMsg("开始记录第二组张力数据");
-                 disposables2 = new CompositeDisposable();
-                 var groups = dataCollection.ProductDatas.SelectMany(x => x.TensionGroups).ToList();
-                 Enumerable.Range(5, 4).Select(x => $"tension{x}").ForEach(m => disposables2.Add(tensionobs[m]?.Subscribe(value =>
-                 {
-                     groups.FirstOrDefault(x => x.Name == m).Values.Add(item: new ProductData.Tension() { Time = DateTime.Now, Value = value });
-                 })));
+                 bgettensiongroup2 = true;
              });
 
             dataServer["TS2_IN"]?.ToObservable().Select(X => X.Int32)
             .Where(v => v == 0).Subscribe(x =>
             {
+                bgettensiongroup2 = false;
                 var standard2 = dataServer["TS2_STANDARD"].Value.Int32 * 1d;
-                var offset2 = standard2 * (dataServer["TS2_OFFSET"].Value.Int32 / 1000.0d);
+                var offset2 = standard2 * (dataServer["TS2_OFFSET"].Value.Int32 / 1000.0d / 100d);
                 int output = 0;
                 var groups = dataCollection.ProductDatas.Select(x => x.TensionGroups.Last()).ToList();
                 var gpNames = string.Join(",", groups.Select(x => x.Name));
                 PushMsg($"{gpNames}输出结果");
                 if (standard2 != 0)
                 {
-                    var ps = Enumerable.Range(5, 4).Zip(groups).Select(m => new
+                    var ps = Enumerable.Range(4, 4).Zip(groups).Select(m => new
                     {
                         Index = m.First,
                         Name = m.Second.Name,
@@ -296,6 +290,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     });
                     ps.ForEach(x =>
                     {
+                        var indexs = new int[] { 0, 1, 2, 3, 0, 1, 2, 3 };
                         PushMsg($"{x.Name}张力数据,规格{standard2}±{offset2}");
                         if (x.Values.Any())
                         {
@@ -303,7 +298,7 @@ namespace Mv.Modules.Schneider.ViewModels
                             if (!x.Result)
                             {
                                 PushMsg($"{x.Name}张力数据NG");
-                                output += 1 << (x.Index - 4);
+                                output += 1 << indexs[(x.Index)];
                             }
                             else
                             {
@@ -313,24 +308,67 @@ namespace Mv.Modules.Schneider.ViewModels
                         else
                         {
                             PushMsg($"{x.Name}张力数据无变化");
-                            output += 1 << (x.Index - 4);
+                            output += 1 << indexs[(x.Index)];
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
-                    PushMsg(output.ToString("X2"));
+                    PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
+                    //  PushMsg(output.ToString("X2"));
                 }
                 disposables2.Dispose();
             });
             this.dataServer = dataServer;
             #endregion
-
-            //  
-
             this.operations = operations;
             this.configureFile = configureFile;
             this.logger = logger;
+            gettensiongroup1();
+            gettensiongroup2();
 
 
+        }
+
+        private void gettensiongroup2()
+        {
+            PushMsg("开始记录第二组张力数据");
+         
+            var tensionnames = Enumerable.Range(5, 4).Select(x => $"tension{x}").ToList();
+            for (int i = 0; i < 4; i++)
+            {
+                var tn = tensionnames[i];
+                tensionobs[tn]?.Subscribe(value =>
+                   {
+                       var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups).ToList();
+                       if (bgettensiongroup2)
+                       {
+                           PushMsg($"{tn},value:{value}");
+                           groups?.FirstOrDefault(g => g.Name == tn).Values.Add(item: new ProductData.Tension() { Time = DateTime.Now, Value = value });
+                       }
+                
+                   });
+            }
+        }
+
+        private void gettensiongroup1()
+        {
+            PushMsg("开始记录第一组张力数据");
+         
+
+            var tensionNames = Enumerable.Range(1, 4).Select(x => $"tension{x}").ToList();
+            for (int i = 0; i < 4; i++)
+            {
+                var m = tensionNames[i];
+                tensionobs[m]?.Subscribe(value =>
+                {
+                    var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups);
+                    if (bgettensiongroup1)
+                    {
+                        PushMsg($"{m},value:{value}");
+                        groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
+                    }
+                 
+                });
+            }
         }
 
         public void InitChart()
