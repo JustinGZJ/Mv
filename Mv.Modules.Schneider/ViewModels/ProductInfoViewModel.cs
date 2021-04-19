@@ -69,7 +69,7 @@ namespace Mv.Modules.Schneider.ViewModels
     public class ProductInfoViewModel : BindableBase
     {
         //匹配名
-        Regex RegexCode = new Regex(@"(\d+(?:\.\d+)?)+\/([^\(]+)\((\S{1,3})\)\/([\w\d]+)\/(\d{4}-\d{1,2}-\d{1,2})", RegexOptions.IgnoreCase);
+        Regex RegexCode = new Regex(@"(\d+(?:\.\d+)?)+\/([^\(]+)\((\S{1,3})\)\/([\w\d]+)\/(\d{4}\/\d{1,2}\/\d{1,2})", RegexOptions.IgnoreCase);
         Regex RegexST = new Regex(@"ST(\d+)", RegexOptions.IgnoreCase);
         public ObservableCollection<PdtInfo> Infos { get; }
         private string input;
