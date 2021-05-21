@@ -44,16 +44,53 @@
            
             
             <StackPanel  Margin="5">
-                <TextBlock Text="扫码信息"  Style="{StaticResource MaterialDesignSubtitle2TextBlock}" />
-                <Border BorderThickness="1" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}">
-                    <ItemsControl  ItemsSource="{Binding Barcodes}" Style="{StaticResource codesStyle}" >
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock MinWidth="150" Text="{Binding Value}" Margin="5"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <TextBlock Text="QR Codes"  Style="{StaticResource MaterialDesignSubtitle2TextBlock}" />
+                        <Border BorderThickness="1" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}">
+                            <ItemsControl  ItemsSource="{Binding Barcodes}" Style="{StaticResource codesStyle}" >
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock MinWidth="150" Text="{Binding Value}" Margin="5"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </StackPanel>
+                    <Grid Grid.Column="1" Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Codes in queue"  Style="{StaticResource MaterialDesignSubtitle2TextBlock}" />
+                        <Border Grid.Row="1" BorderThickness="1" BorderBrush="{StaticResource MaterialDesignTextBoxBorder}">
+                            <ItemsControl    ItemsSource="{Binding Buffers}" Style="{StaticResource codesStyle}"  >
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"></StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    
+                                        <DataTemplate>
+                                        <ItemsControl ItemsSource="{Binding}"  >
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock MinWidth="150" Text="{Binding}" Margin="5"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Grid>
+                </Grid>
+
             </StackPanel>
             <Grid Grid.Row="1">
                 <ItemsControl prism:RegionManager.RegionName="TENSIONS">

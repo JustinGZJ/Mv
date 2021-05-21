@@ -43,7 +43,8 @@ namespace Mv.Modules.Schneider.ViewModels
         CompositeDisposable disposables1 = new CompositeDisposable();
         CompositeDisposable disposables2 = new CompositeDisposable();
         CompositeDisposable disposables3 = new CompositeDisposable();
-        Queue<List<string>> buffers = new Queue<List<string>>();
+        Queue<List<string>> buffers = new Queue<List<string>>() ;
+
 
         IDevice scanner;
         private void PushMsg(string msg, Category category = Category.Debug)
@@ -53,6 +54,8 @@ namespace Mv.Modules.Schneider.ViewModels
 
         private string barcode;
         public ObservableCollection<BindableWrapper<string>> Barcodes { get; private set; } = new ObservableCollection<BindableWrapper<string>>(Enumerable.Repeat(new BindableWrapper<string>() { Value = "" }, 4));
+        public Queue<List<string>> Buffers { get => buffers; set => buffers = value; }
+
         public DashViewModel(IUnityContainer container,
                              IDataServer dataServer,
                              IServerOperations operations,
@@ -95,7 +98,7 @@ namespace Mv.Modules.Schneider.ViewModels
                           })
                     );
 
-                if (buffers.TryDequeue(out var barcodes))
+                if (Buffers.TryDequeue(out var barcodes))
                 {
                     for (int i = 0; i < 4; i++)
                     {
@@ -106,6 +109,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 {
                     PushMsg("不存在已扫过的码");
                 }
+                RaisePropertyChanged(nameof(Buffers));
             });
 
             dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 0).Subscribe(x =>
@@ -116,6 +120,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         if (dataCollection != null)
                         {
                             operations.Upload(dataCollection);
+
                         }
                     }
                     catch (Exception ex)
@@ -136,7 +141,8 @@ namespace Mv.Modules.Schneider.ViewModels
             .Where(v => v == 5).Subscribe(x =>
             {
                 PushMsg("扫码枪完成");
-                buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
+                Buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
+                RaisePropertyChanged(nameof(Buffers));
                 Barcodes.ForEach(x => x.Value = "");
                 dataServer["OUT_SCAN_ERROR"]?.Write(5);
             });
@@ -198,10 +204,11 @@ namespace Mv.Modules.Schneider.ViewModels
             dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
                 .Where(v => v == 1).Subscribe(x =>
                 {
-                    if (dataCollection == null)
+                    if (dataCollection
+                        == null)
                     {
                         dataCollection = new ProductDataCollection();
-                        if (buffers.TryDequeue(out var barcodes))
+                        if (Buffers.TryDequeue(out var barcodes))
                         {
                             for (int i = 0; i < 4; i++)
                             {
@@ -237,13 +244,15 @@ namespace Mv.Modules.Schneider.ViewModels
                     {
                         var indexs = new int[] { 0, 1, 2, 3, 0, 1, 2, 3 };
                         PushMsg($"{x.Name}张力数据,规格{standard1}±{offset1}");
-                        if (x.Values.Any())
+                        var values = x.Values.Skip(3).SkipLast(3).ToList();
+                        if (values.Any())
                         {
-                            PushMsg($"最大值{x.Values.Max(x => x.Value)}，最小值{x.Values.Min(x => x.Value)}");
-                            if (!x.Result)
+                            PushMsg($"最大值{values.Max(x => x.Value)}，最小值{values.Min(x => x.Value)}");
+                            if (!values.All(z => z.Value < (standard1 + offset1) && z.Value > (standard1 - offset1)))
                             {
                                 PushMsg($"{x.Name}张力数据NG");
                                 output += 1 << indexs[x.Index];
+                                dataCollection.TensionOutput += (uint)(1 << x.Index);
                             }
                             else
                             {
@@ -253,10 +262,12 @@ namespace Mv.Modules.Schneider.ViewModels
                         else
                         {
                             PushMsg($"{x.Name}张力数据无变化");
+                            dataCollection.TensionOutput += (uint)(1 << x.Index);
                             output += 1 << indexs[x.Index];
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
+                    
                     PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
                 }
         
@@ -292,13 +303,15 @@ namespace Mv.Modules.Schneider.ViewModels
                     {
                         var indexs = new int[] { 0, 1, 2, 3, 0, 1, 2, 3 };
                         PushMsg($"{x.Name}张力数据,规格{standard2}±{offset2}");
-                        if (x.Values.Any())
+                        var values = x.Values.Skip(3).SkipLast(3).ToList();
+                        if (values.Any())
                         {
-                            PushMsg($"最大值{x.Values.Max(x => x.Value)}，最小值{x.Values.Min(x => x.Value)}");
-                            if (!x.Result)
+                            PushMsg($"最大值{values.Max(x => x.Value)}，最小值{values.Min(x => x.Value)}");
+                            if (!values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 - offset2)))
                             {
                                 PushMsg($"{x.Name}张力数据NG");
                                 output += 1 << indexs[(x.Index)];
+                                dataCollection.TensionOutput += (uint)(1 << x.Index);
                             }
                             else
                             {
@@ -307,6 +320,7 @@ namespace Mv.Modules.Schneider.ViewModels
                         }
                         else
                         {
+                            dataCollection.TensionOutput += (uint)(1 << x.Index);
                             PushMsg($"{x.Name}张力数据无变化");
                             output += 1 << indexs[(x.Index)];
                         }
@@ -341,7 +355,7 @@ namespace Mv.Modules.Schneider.ViewModels
                        var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups).ToList();
                        if (bgettensiongroup2)
                        {
-                           PushMsg($"{tn},value:{value}");
+                        //   PushMsg($"{tn},value:{value}");
                            groups?.FirstOrDefault(g => g.Name == tn).Values.Add(item: new ProductData.Tension() { Time = DateTime.Now, Value = value });
                        }
                 
@@ -363,7 +377,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups);
                     if (bgettensiongroup1)
                     {
-                        PushMsg($"{m},value:{value}");
+                     //   PushMsg($"{m},value:{value}");
                         groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
                     }
                  
@@ -383,7 +397,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     {
                         var m = new TimeLineChartViewModel
                         {
-                            Title = $"张力器{i + 1}"
+                            Title = $"tension {i + 1}"
                         };
                         regionManager.Regions["TENSIONS"].Add(new TimeLineChart() { DataContext = m });
                         m.SetObservable(tensionobs[node].Select(x => (double)x));

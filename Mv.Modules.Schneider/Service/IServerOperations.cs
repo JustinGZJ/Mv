@@ -41,6 +41,23 @@ namespace Mv.Modules.Schneider.Service
             this.dataServer = dataServer;
             this.configure = configure;
             this.logger = logger;
+            SaveFileAction = new ActionBlock<(string, ProductData)>(x =>
+            {
+                try
+                {
+                    var localdata = x.Item2;
+                    var fileName = x.Item1;
+                    string contents = JsonConvert.SerializeObject(localdata);
+                    OnMessage($"{fileName}--{contents}");
+                    File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
+                    File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+                }
+                catch (Exception ex)
+                {
+                    OnMessage(ex.GetExceptionMsg());
+                    // throw;
+                }
+            });
         }
 
         public void OnMessage(string msg, Category level = Category.Debug)
@@ -98,14 +115,7 @@ namespace Mv.Modules.Schneider.Service
                     return -4;
             });
         }
-        ActionBlock<(string, ProductData)> SaveFileAction = new ActionBlock<(string, ProductData)>(x =>
-        {
-            var localdata = x.Item2;
-            var fileName = x.Item1;
-            string contents = JsonConvert.SerializeObject(localdata);
-            File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
-            File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
-        });
+        ActionBlock<(string, ProductData)> SaveFileAction;
         public int Upload(ProductDataCollection uploaddataCollection)
         {
             if (serverDisable)
@@ -132,6 +142,7 @@ namespace Mv.Modules.Schneider.Service
                 Velocity = dataServer["R_Speed"].Value.Int32,
                 Program = dataServer["PROGRAM"].ToString(),
                 HVC = dataServer["HVC"].Value.Int32,
+                TensionOutput = uploaddataCollection.TensionOutput,
                 MaterialCodes = configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).MaterialCodes
             };
             uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));

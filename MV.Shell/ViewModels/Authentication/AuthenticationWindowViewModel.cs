@@ -17,12 +17,7 @@ namespace Mv.Shell.ViewModels.Authentication
             this.GlobalMessageQueue = container.Resolve<ISnackbarMessageQueue>();
             EventAggregator.GetEvent<MainWindowLoadingEvent>().Subscribe(e => IsLoading = e);
             EventAggregator.GetEvent<SignUpSuccessEvent>().Subscribe(signUpInfo => _signInTabItem.IsSelected = true); // It cannot be done by binding the IsSelected property, it will cause an animation error.
-            /*
-             * There are some puzzle here:
-             * 1. If SignInTabItem.IsSelected is not directly set to "True" (e.g. Set value by Binding), a style error will occur in AuthenticationWindow UI;
-             * 2. If SignInTabItem.IsSelected is first set to "True" in Xaml, then binding to a property, (e.g. SetBinding(TabItem.IsSelectedProperty, XXX) in OnLoaded or code behind)
-             *    which can avoid the error in 1. But an animation error will occur when loading SignInView every time.
-             */
+
         }
 
 

@@ -29,7 +29,7 @@
             </Grid.RowDefinitions>
             <materialDesign:PackIcon Kind="MonitorDashboard" Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="施耐德" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="Schneider" HorizontalAlignment="Center"
                        Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" />
          
         </Grid>
@@ -39,7 +39,7 @@
             <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline6TextBlock }" Text="施耐德"/>
+        <TextBlock Grid.Row="0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline6TextBlock }" Text="Schneider"/>
      
         <Grid Grid.Row="1">
             <local:Dash HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>

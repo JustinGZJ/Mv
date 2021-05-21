@@ -20,6 +20,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 ProductDatas.Add(new ProductData(i));
             }
         }
+        public uint TensionOutput { get; set; }
         public List<ProductData> ProductDatas { get; set; }
     }
     public class ServerData
@@ -37,6 +38,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public int Turns { get; set; }
         public string Program { get; set; } = "";
         public int HVC { get; set; }
+        public uint TensionOutput { get; set; }
 
         public string[] MaterialCodes { get; set; }
 

@@ -30,7 +30,7 @@
             </Grid.RowDefinitions>
             <materialDesign:PackIcon Kind="TagFaces" Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="标签信息" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="Tags" HorizontalAlignment="Center"
                        Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" />
         </Grid>
     </TabItem.Header>

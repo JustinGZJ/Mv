@@ -31,7 +31,7 @@
             </Grid.RowDefinitions>
             <materialDesign:PackIcon Kind="Message"  Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="消息中心" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="Messages" HorizontalAlignment="Center"
                        Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" />
         </Grid>
     </TabItem.Header>

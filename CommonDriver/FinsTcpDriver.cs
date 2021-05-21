@@ -8,6 +8,9 @@ using System.Xml.Xsl;
 
 namespace CommonDriver
 {
+   
+
+
     [Description("FINS TCP协议")]
     public class FinsTcpDriver : DriverInitBase, IPLCDriver, IMultiReadWrite
     {

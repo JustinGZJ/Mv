@@ -32,7 +32,7 @@
             </Grid.RowDefinitions>
             <materialDesign:PackIcon Kind="Information" Foreground="{StaticResource LightGreyBackgroundBrush}"
                                      HorizontalAlignment="Center" Height="22" Width="22" />
-            <TextBlock Grid.Row="2" Text="信息录入" HorizontalAlignment="Center"
+            <TextBlock Grid.Row="2" Text="data input" HorizontalAlignment="Center"
                        Foreground="{StaticResource LightGreyBackgroundBrush}"  FontSize="10" >
 
             </TextBlock>
@@ -44,7 +44,7 @@
             <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline6TextBlock }" Text="生产信息"/>
+        <TextBlock Grid.Row="0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignHeadline6TextBlock }" Text="product info"/>
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
@@ -55,7 +55,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock VerticalAlignment="Bottom" Margin="10 0" >扫码枪录入:</TextBlock>
+                <TextBlock VerticalAlignment="Bottom" Margin="10 0" >scan:</TextBlock>
                 <TextBox x:Name="input" Focusable="True" Grid.Column="1" Margin="0 0 10 0"  Text="{Binding Input,UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Triggers >
                         <i:EventTrigger EventName="PreviewKeyUp" >
@@ -87,28 +87,28 @@
                                     </Style>
                                 </StackPanel.Resources>
                                 <StackPanel>
-                                    <TextBlock Width="100">二维码</TextBlock>
+                                    <TextBlock Width="100">qrcode </TextBlock>
                                     <TextBox  Text="{Binding Code}"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
-                                    <TextBlock Width="100">规格</TextBlock>
+                                    <TextBlock Width="100">specs</TextBlock>
                                     <TextBox  Text="{Binding  Specs}" ></TextBox>
 
                                 </StackPanel>
                                 <StackPanel>
-                                    <TextBlock Width="100">型号</TextBlock>
+                                    <TextBlock Width="100">model</TextBlock>
                                     <TextBox  Text="{Binding  Model}"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
-                                    <TextBlock Width="100">线盘大小</TextBlock>
+                                    <TextBlock Width="100">panel size</TextBlock>
                                     <TextBox  Text="{Binding PanelSize}"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
-                                    <TextBlock Width="100">生产机台</TextBlock>
+                                    <TextBlock Width="100">machine no</TextBlock>
                                     <TextBox  Text="{Binding MachineNo}"></TextBox>
                                 </StackPanel>
                                 <StackPanel>
-                                    <TextBlock Width="100">生产时间</TextBlock>
+                                    <TextBlock Width="100">date</TextBlock>
                                     <TextBox  Text="{Binding Date}"></TextBox>
                                 </StackPanel>
                             </StackPanel>
