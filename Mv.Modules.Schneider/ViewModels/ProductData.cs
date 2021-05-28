@@ -6,7 +6,7 @@ namespace Mv.Modules.Schneider.ViewModels
 {
     public static class GlobalValues
     {
-        public const int AXISCNT= 4;
+        public const int AXISCNT= 1;
     }
    
     public class ProductDataCollection
@@ -49,7 +49,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public ProductData(int index)
         {
             TensionGroups = new List<TensionGroup>();
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 1; i++)
             {
                 TensionGroups.Add(new TensionGroup() { Name = $"tension{i*AXISCNT + 1+index}" });
             }

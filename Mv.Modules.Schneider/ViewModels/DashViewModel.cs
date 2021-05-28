@@ -71,7 +71,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             (dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
-            Enumerable.Range(1, 8).Select(x => $"tension{x}").ForEach(m =>
+            Enumerable.Range(1, 1).Select(x => $"tension{x}").ForEach(m =>
              {
                  if (dataServer[m] != null)
                      tensionobs[m] = Observable.Interval(TimeSpan.FromSeconds(0.5)).Select(x => dataServer[m].Value.Int16);
@@ -100,7 +100,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
                 if (Buffers.TryDequeue(out var barcodes))
                 {
-                    for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 1; i++)
                     {
                         dataCollection.ProductDatas.ToList()[i].Code = barcodes[i];
                     }
@@ -109,6 +109,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 {
                     PushMsg("不存在已扫过的码");
                 }
+                dataServer["CNT"].Write(Buffers.Count);
                 RaisePropertyChanged(nameof(Buffers));
             });
 
@@ -145,7 +146,17 @@ namespace Mv.Modules.Schneider.ViewModels
                 RaisePropertyChanged(nameof(Buffers));
                 Barcodes.ForEach(x => x.Value = "");
                 dataServer["OUT_SCAN_ERROR"]?.Write(5);
+                dataServer["CNT"].Write(Buffers.Count);
             });
+            dataServer["CLR"]?.ToObservable().Select(X => X.Int32).Where(X => X == 1).Subscribe(X =>
+            {
+                PushMsg("清除数据");
+                Buffers.Clear();
+                dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
+            });
+         
+           
+
             dataServer["IN_SCAN"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32)
              .Where(value => value >= 1 && value <= 4)
              .Subscribe(m =>
@@ -204,22 +215,24 @@ namespace Mv.Modules.Schneider.ViewModels
             dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
                 .Where(v => v == 1).Subscribe(x =>
                 {
+                    PushMsg("开始记录第一组张力");
                     if (dataCollection
                         == null)
                     {
                         dataCollection = new ProductDataCollection();
                         if (Buffers.TryDequeue(out var barcodes))
                         {
-                            for (int i = 0; i < 4; i++)
+                            for (int i = 0; i < 1; i++)
                             {
                                 dataCollection.ProductDatas.ToList()[i].Code = barcodes[i];
                             }
                         }
                     }
                     bgettensiongroup1 = true;
-                   // gettensiongroup1();
                 });
-            dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
+            dataServer["TS1_IN"]?
+                .ToObservable()
+                .Select(X => X.Int32)
             .Where(v => v == 0).Subscribe(x =>
             {
                 bgettensiongroup1 = false;
@@ -231,7 +244,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     var groups = dataCollection.ProductDatas.Select(x => x.TensionGroups.First());
                     var gpNames = string.Join(",", groups.Select(x => x.Name));
                     PushMsg($"{gpNames}输出结果");
-                    var ps = Enumerable.Range(0, 4).Zip(groups).Select(m => new
+                    var ps = Enumerable.Range(0, 1).Zip(groups).Select(m => new
                     {
                         Index = m.First,
                         Name = m.Second.Name,
@@ -273,94 +286,14 @@ namespace Mv.Modules.Schneider.ViewModels
         
             });
             #endregion
-            #region 记录第二组张力
-            dataServer["TS2_IN"]?.ToObservable().Select(X => X.Int32)
-             .Where(v => v == 1).Subscribe(x =>
-             {
-                 bgettensiongroup2 = true;
-             });
 
-            dataServer["TS2_IN"]?.ToObservable().Select(X => X.Int32)
-            .Where(v => v == 0).Subscribe(x =>
-            {
-                bgettensiongroup2 = false;
-                var standard2 = dataServer["TS2_STANDARD"].Value.Int32 * 1d;
-                var offset2 = standard2 * (dataServer["TS2_OFFSET"].Value.Int32 / 1000.0d / 100d);
-                int output = 0;
-                var groups = dataCollection.ProductDatas.Select(x => x.TensionGroups.Last()).ToList();
-                var gpNames = string.Join(",", groups.Select(x => x.Name));
-                PushMsg($"{gpNames}输出结果");
-                if (standard2 != 0)
-                {
-                    var ps = Enumerable.Range(4, 4).Zip(groups).Select(m => new
-                    {
-                        Index = m.First,
-                        Name = m.Second.Name,
-                        Values = m.Second.Values,
-                        Result = m.Second.Values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 - offset2))
-                    });
-                    ps.ForEach(x =>
-                    {
-                        var indexs = new int[] { 0, 1, 2, 3, 0, 1, 2, 3 };
-                        PushMsg($"{x.Name}张力数据,规格{standard2}±{offset2}");
-                        var values = x.Values.Skip(3).SkipLast(3).ToList();
-                        if (values.Any())
-                        {
-                            PushMsg($"最大值{values.Max(x => x.Value)}，最小值{values.Min(x => x.Value)}");
-                            if (!values.All(z => z.Value < (standard2 + offset2) && z.Value > (standard2 - offset2)))
-                            {
-                                PushMsg($"{x.Name}张力数据NG");
-                                output += 1 << indexs[(x.Index)];
-                                dataCollection.TensionOutput += (uint)(1 << x.Index);
-                            }
-                            else
-                            {
-                                PushMsg($"{x.Name}张力数据OK");
-                            }
-                        }
-                        else
-                        {
-                            dataCollection.TensionOutput += (uint)(1 << x.Index);
-                            PushMsg($"{x.Name}张力数据无变化");
-                            output += 1 << indexs[(x.Index)];
-                        }
-                    });
-                    dataServer["TS_OUTPUT"].Write(output);
-                    PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
-                    //  PushMsg(output.ToString("X2"));
-                }
-                disposables2.Dispose();
-            });
-            this.dataServer = dataServer;
-            #endregion
             this.operations = operations;
             this.configureFile = configureFile;
             this.logger = logger;
             gettensiongroup1();
-            gettensiongroup2();
+           // gettensiongroup2();
 
 
-        }
-
-        private void gettensiongroup2()
-        {
-            PushMsg("开始记录第二组张力数据");
-         
-            var tensionnames = Enumerable.Range(5, 4).Select(x => $"tension{x}").ToList();
-            for (int i = 0; i < 4; i++)
-            {
-                var tn = tensionnames[i];
-                tensionobs[tn]?.Subscribe(value =>
-                   {
-                       var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups).ToList();
-                       if (bgettensiongroup2)
-                       {
-                        //   PushMsg($"{tn},value:{value}");
-                           groups?.FirstOrDefault(g => g.Name == tn).Values.Add(item: new ProductData.Tension() { Time = DateTime.Now, Value = value });
-                       }
-                
-                   });
-            }
         }
 
         private void gettensiongroup1()
@@ -368,8 +301,8 @@ namespace Mv.Modules.Schneider.ViewModels
             PushMsg("开始记录第一组张力数据");
          
 
-            var tensionNames = Enumerable.Range(1, 4).Select(x => $"tension{x}").ToList();
-            for (int i = 0; i < 4; i++)
+            var tensionNames = Enumerable.Range(1, 1).Select(x => $"tension{x}").ToList();
+            for (int i = 0; i < 1; i++)
             {
                 var m = tensionNames[i];
                 tensionobs[m]?.Subscribe(value =>
@@ -379,8 +312,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     {
                      //   PushMsg($"{m},value:{value}");
                         groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
-                    }
-                 
+                    }                 
                 });
             }
         }
@@ -390,7 +322,7 @@ namespace Mv.Modules.Schneider.ViewModels
             var regionManager = Container.Resolve<IRegionManager>();
             if (!regionManager.Regions["TENSIONS"].Views.Any())
             {
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < 1; i++)
                 {
                     var node = $"tension{i + 1}";
                     if (tensionobs.ContainsKey(node))

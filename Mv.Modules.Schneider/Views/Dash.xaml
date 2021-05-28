@@ -96,7 +96,7 @@
                 <ItemsControl prism:RegionManager.RegionName="TENSIONS">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="4"></UniformGrid>
+                            <UniformGrid Columns="1"></UniformGrid>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>

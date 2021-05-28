@@ -12,8 +12,6 @@ using System.Reflection;
 namespace CommonDriver
 {
 
-
-
     [Description("Melsec-MC-3E协议")]
     public class MelsecMcNetDriver :DriverInitBase, IPLCDriver, IMultiReadWrite
     {

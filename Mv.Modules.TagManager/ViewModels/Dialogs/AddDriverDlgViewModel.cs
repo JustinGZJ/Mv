@@ -57,6 +57,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
         public AddDriverDlgViewModel()
         {
             var drivers = Directory.GetFiles(MvFolders.Drivers, "*.dll")
+                 
                   .Select(x => Assembly.LoadFrom(x))
                   .SelectMany(m => m.GetTypes())
                   .Where(t => t.GetInterfaces().Contains(typeof(IDriver)))

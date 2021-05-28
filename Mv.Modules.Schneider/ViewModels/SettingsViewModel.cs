@@ -25,7 +25,7 @@ namespace Mv.Modules.Schneider.ViewModels
         [Category("配置")]
         [DisplayName("上传禁用")]
         public bool ServerDisable { get; set; }
-
+   
         public string[] MaterialCodes { get; set; } = Enumerable.Repeat("", 8).ToArray();
 
     }

@@ -88,9 +88,9 @@ namespace Mv.Modules.Schneider.ViewModels
 
         public ProductInfoViewModel(IConfigureFile configureFile)
         {
-            Infos = new ObservableCollection<PdtInfo>(Enumerable.Range(0, 8).Select(x => new PdtInfo()));
+            Infos = new ObservableCollection<PdtInfo>(Enumerable.Range(0, 1).Select(x => new PdtInfo()));
             var config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
-            for (int i = 0; i < config.MaterialCodes.Length; i++)
+            for (int i = 0; i < 1; i++)
             {
                 var input = config.MaterialCodes[i];
                 var info = Infos[i];
