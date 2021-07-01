@@ -41,23 +41,14 @@ namespace Mv.Modules.Schneider.Service
             this.dataServer = dataServer;
             this.configure = configure;
             this.logger = logger;
-            SaveFileAction = new ActionBlock<(string, ProductData)>(x =>
-            {
-                try
-                {
-                    var localdata = x.Item2;
-                    var fileName = x.Item1;
-                    string contents = JsonConvert.SerializeObject(localdata);
-                    OnMessage($"{fileName}--{contents}");
-                    File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
-                    File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
-                }
-                catch (Exception ex)
-                {
-                    OnMessage(ex.GetExceptionMsg());
-                    // throw;
-                }
-            });
+      
+        }
+
+        public void saveFile(string localdata,string fileName) {
+            string contents = JsonConvert.SerializeObject(localdata);
+            OnMessage($"{fileName}--{contents}");
+            File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
+            File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
         }
 
         public void OnMessage(string msg, Category level = Category.Debug)
@@ -100,6 +91,32 @@ namespace Mv.Modules.Schneider.Service
             }
         }
 
+        private int Write(string cmd)
+        {
+            try
+            {
+                using (SimpleTcpClient client = new SimpleTcpClient())
+                {
+                    client.TimeOut = TimeSpan.FromSeconds(3);
+                    client.Connect(Ip, Port);
+                    if (!client.TcpClient.IsOnline())
+                    {
+                        OnMessage("没连接上.");
+                        return -1;//连接失败
+                    }
+                     client.Write(cmd);
+                    OnMessage("发送数据:" + cmd);
+                    return 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                OnMessage(ex.Message + "\n" + ex.StackTrace, Category.Warn);
+                return -3;
+                //  throw;
+            }
+        }
+
         public int CheckCode(string refId)
         {
             if (serverDisable)
@@ -115,7 +132,7 @@ namespace Mv.Modules.Schneider.Service
                     return -4;
             });
         }
-        ActionBlock<(string, ProductData)> SaveFileAction;
+       
         public int Upload(ProductDataCollection uploaddataCollection)
         {
             if (serverDisable)
@@ -123,16 +140,7 @@ namespace Mv.Modules.Schneider.Service
                 OnMessage("服务器验证已关闭");
                 return 0;
             }
-            foreach (var localdata in uploaddataCollection.ProductDatas)
-            {
-                localdata.Status = dataServer["R_STATUS"].Value.Int32;
-                localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
-                localdata.Quantity = dataServer["R_QTY"].Value.Int32;
-                localdata.Turns = dataServer["R_ROWS"].Value.Int32;
-                localdata.Program = dataServer["PROGRAM"].ToString();
-                string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
-                SaveFileAction.Post((fileName, localdata));
-            }
+
             var uploadData = new ServerData()
             {
                 Status = dataServer["R_STATUS"].Value.Int32,
@@ -143,17 +151,38 @@ namespace Mv.Modules.Schneider.Service
                 Program = dataServer["PROGRAM"].ToString(),
                 HVC = dataServer["HVC"].Value.Int32,
                 TensionOutput = uploaddataCollection.TensionOutput,
+                TensionResults=uploaddataCollection.TensionResut,
                 MaterialCodes = configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).MaterialCodes
             };
             uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));
             var json = JsonConvert.SerializeObject(uploadData);
-            return Read($"{Station}UL${json}\n", (s) =>
+            Write($"{Station}UL${json}\n");
+            foreach (var localdata in uploaddataCollection.ProductDatas)
             {
-                if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
-                    return 0;
-                else
-                    return -4;
-            });
+                try
+                {
+                    foreach (var group in localdata.TensionGroups)
+                    {
+                        group.Values = group.Values.ToList();
+                    }
+                    localdata.Status = dataServer["R_STATUS"].Value.Int32;
+                    localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
+                    localdata.Quantity = dataServer["R_QTY"].Value.Int32;
+                    localdata.Turns = dataServer["R_ROWS"].Value.Int32;
+                    localdata.Program = dataServer["PROGRAM"].ToString();
+                    string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
+                    string content = $"{Station}JS$,{localdata.Code}," + JsonConvert.SerializeObject(localdata) + "\n";
+                    Write(content);
+                    saveFile(content, fileName);
+                }
+                catch (Exception ex)
+                {
+                    OnMessage(ex.GetExceptionMsg());
+                  //  throw;
+                }
+               
+            }
+            return 0;
         }
     }
 }

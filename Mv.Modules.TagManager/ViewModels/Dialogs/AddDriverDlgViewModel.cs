@@ -57,7 +57,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
         public AddDriverDlgViewModel()
         {
             var drivers = Directory.GetFiles(MvFolders.Drivers, "*.dll")
-                  .Select(x => Assembly.LoadFrom(x))
+                  .Select(x =>GetAssembly(x))
                   .SelectMany(m => m.GetTypes())
                   .Where(t => t.GetInterfaces().Contains(typeof(IDriver)))
                   .Where(t => !t.IsInterface)
@@ -69,6 +69,18 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
                   });
             DriverInfos.AddRange(drivers);
             SelectedValue = DriverInfos.FirstOrDefault();
+        }
+
+        private Assembly GetAssembly(string filename) {
+            try
+            {
+               return Assembly.LoadFrom(filename);
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
         }
     }
 }

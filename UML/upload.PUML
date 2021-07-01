@@ -1,0 +1,15 @@
+@startuml
+map ServerData {
+    Status=>G4状态
+    LoopTime=>周期时间
+    Quantity=>数量
+    Velocity=>速度
+    Angle=>角度
+    Turns=>圈数
+    Program=>G4程序名
+    HVC=>HVC
+    TensionOutput=>张力结果
+    MaterialCodes=>物料码
+    Codes=>产品二维码
+}
+@enduml

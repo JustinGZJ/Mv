@@ -37,8 +37,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             //AxisStep forces the distance between each separator in the X axis
             AxisStep = TimeSpan.FromSeconds(20).Ticks;
-            //AxisUnit forces lets the axis know that we are plotting seconds
-            //this is not always necessary, but it can prevent wrong labeling
+
             AxisUnit = TimeSpan.TicksPerSecond;
 
             SetAxisLimits(DateTime.Now);
@@ -103,7 +102,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public void SetObservable(IObservable<double> observable)
         {
             disposable?.Dispose();
-            disposable = observable
+            disposable = observable.ObserveOnDispatcher()
                 .Subscribe(x =>
                 {
                       TensionValue =x;

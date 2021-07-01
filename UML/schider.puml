@@ -1,0 +1,54 @@
+@startuml
+title:"绕线机数据交互流程"
+G4 -> IPC : 发送指令扫码指令1
+IPC -> SCANNER : 发送LON指令
+SCANNER -> IPC : 二维码
+IPC->IPC:判断机种是否匹配
+IPC->IPC:判断是否为Sample
+IPC->MES:转发二维码 （SC，二维码，线材参数）
+MES->IPC:回传MES判定
+IPC->G4:1:为OK 其他为:错误
+G4 -> IPC : 发送指令扫码指令2
+IPC -> SCANNER : 发送LON指令
+SCANNER -> IPC : 二维码
+IPC->IPC:判断机种是否匹配
+IPC->IPC:判断是否为Sample
+IPC->MES:转发二维码 （SC，二维码，线材参数）
+MES->IPC:回传MES判定
+IPC->G4:1:为OK 其他为:错误
+G4 -> IPC : 发送指令扫码指令3
+IPC -> SCANNER : 发送LON指令
+SCANNER -> IPC : 二维码
+IPC->IPC:判断机种是否匹配
+IPC->IPC:判断是否为Sample
+IPC->MES:转发二维码 （SC，二维码，线材参数）
+MES->IPC:回传MES判定
+IPC->G4:1:为OK 其他为:错误
+G4 -> IPC : 发送指令扫码指令4
+IPC -> SCANNER : 发送LON指令
+SCANNER -> IPC : 二维码
+IPC->IPC:判断机种是否匹配
+IPC->IPC:判断是否为Sample
+IPC->MES:转发二维码 （SC，二维码，线材参数）
+MES->IPC:回传MES判定
+IPC->G4:1:为OK 其他为:错误
+G4->IPC:发送指令5，扫码结束
+IPC->IPC:缓存4个二维码
+G4->IPC:开始绕线信号ON
+IPC->IPC:将4个缓存的码绑定到4个绕线通道
+G4->IPC:提供张力，张力上下限等参数
+G4->IPC:第一组绕线ON
+IPC->IPC:缓存一组的张力
+G4->IPC:第一组张力OFF
+IPC->IPC:结束缓存第一组张力
+G4->IPC:第二组绕线ON
+IPC->IPC:缓存二组的张力
+G4->IPC:第二组张力OFF
+IPC->IPC:结束缓存第二组张力
+G4->IPC:开始绕线信号OFF
+IPC->G4:根据张力上下限提供张力结果（bit）
+IPC->MES:上传产品信息（UL,JSON）
+
+@enduml
+
+

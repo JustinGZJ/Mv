@@ -10,6 +10,7 @@
     <PackageReference Include="LiveCharts.NetCore" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Wpf.NetCore3" Version="0.9.7" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
+    <PackageReference Include="NModbus4.Core" Version="1.0.2" />
     <PackageReference Include="Prism.Wpf" Version="7.2.0.1422" />
     <PackageReference Include="SimpleTCP.Core" Version="1.0.4" />
   </ItemGroup>
@@ -23,6 +24,9 @@
     <Exec Command="xcopy &quot;$(TargetDir)*$(TargetExt)&quot; &quot;$(SolutionDir)$(SolutionName).Shell\bin\Debug\netcoreapp3.1\Modules&quot; /Y /S" />
   </Target>
   <ItemGroup>
+    <Reference Include="Communication">
+      <HintPath>Communication.dll</HintPath>
+    </Reference>
     <Reference Include="LiveCharts.Geared">
       <HintPath>LiveCharts.Geared.dll</HintPath>
       <Private>true</Private>
