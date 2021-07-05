@@ -10,12 +10,8 @@ using System;
 using System.IO;
 using System.Linq;
 
-using System.Threading.Tasks.Dataflow;
-
 namespace Mv.Modules.Schneider.Service
 {
-
-
     public interface IServerOperations
     {
         int CheckCode(string refId);
@@ -41,10 +37,11 @@ namespace Mv.Modules.Schneider.Service
             this.dataServer = dataServer;
             this.configure = configure;
             this.logger = logger;
-      
+
         }
 
-        public void saveFile(string localdata,string fileName) {
+        public void saveFile(string localdata, string fileName)
+        {
             string contents = JsonConvert.SerializeObject(localdata);
             OnMessage($"{fileName}--{contents}");
             File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
@@ -104,7 +101,7 @@ namespace Mv.Modules.Schneider.Service
                         OnMessage("没连接上.");
                         return -1;//连接失败
                     }
-                     client.Write(cmd);
+                    client.Write(cmd);
                     OnMessage("发送数据:" + cmd);
                     return 0;
                 }
@@ -132,7 +129,7 @@ namespace Mv.Modules.Schneider.Service
                     return -4;
             });
         }
-       
+
         public int Upload(ProductDataCollection uploaddataCollection)
         {
             if (serverDisable)
@@ -151,7 +148,7 @@ namespace Mv.Modules.Schneider.Service
                 Program = dataServer["PROGRAM"].ToString(),
                 HVC = dataServer["HVC"].Value.Int32,
                 TensionOutput = uploaddataCollection.TensionOutput,
-                TensionResults=uploaddataCollection.TensionResut,
+                TensionResults = uploaddataCollection.TensionResut,
                 MaterialCodes = configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)).MaterialCodes
             };
             uploadData.Codes.AddRange(uploaddataCollection.ProductDatas.Select(x => x.Code));
@@ -178,9 +175,9 @@ namespace Mv.Modules.Schneider.Service
                 catch (Exception ex)
                 {
                     OnMessage(ex.GetExceptionMsg());
-                  //  throw;
+                    //  throw;
                 }
-               
+
             }
             return 0;
         }

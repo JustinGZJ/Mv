@@ -32,7 +32,7 @@ namespace DataService
         public int Stop();
     }
 
-    public interface IDataServer :IRunable, IDisposable
+    public interface IDataServer : IRunable, IDisposable
     {
         ITag this[short id] { get; }
         ITag this[string name] { get; }
@@ -43,7 +43,7 @@ namespace DataService
         IEnumerable<IDriver> Drivers { get; }
         IEnumerable<string> BrowseItems(BrowseType browseType, string tagName, DataType dataType);
         IDriver AddDriver(short id, string name, string server, int timeOut,
-            string assembly, string className, IDictionary<string,string> dictionary);
+            string assembly, string className, IDictionary<string, string> dictionary);
         IGroup GetGroupByName(string name);
         int GetScaleByID(short id);
         int GetItemProperties(short id);//返回的是元数据在元数据列表的索引

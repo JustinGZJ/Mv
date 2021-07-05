@@ -696,9 +696,9 @@ namespace DataService
             base(id, conditionType, source, comment, para, deadBand, delay)
         {
             _subConditions = new SubCondition[2]
-                { 
+                {
                     new SubCondition(SubAlarmType.MajDev),
-                    new SubCondition(SubAlarmType.MinDev)          
+                    new SubCondition(SubAlarmType.MinDev)
                 };
         }
 

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Mv.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Mv.Core.Interfaces;
 
 namespace Mv.Core
 {
@@ -43,7 +43,7 @@ namespace Mv.Core
 
         public virtual Func<T, Task<IEnumerable<T>>> ChildrenProvider
         {
-            get => _childrenProvider ??(_childrenProvider=((LazyTreeNode<T>)Parent)?.ChildrenProvider);
+            get => _childrenProvider ?? (_childrenProvider = ((LazyTreeNode<T>)Parent)?.ChildrenProvider);
             set => _childrenProvider = value;
         }
 

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Core.Interfaces;
 using Mv.Shell.Constants;
 using Mv.Shell.Views;
 using Mv.Shell.Views.Authentication;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
-using Refit;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Input;
 using Unity;
 using MvUser = Mv.Authentication.MvUserImpl;
 
@@ -48,7 +47,7 @@ namespace Mv.Shell.ViewModels.Authentication
         private ISnackbarMessageQueue _queue;
         public SignInViewModel(IUnityContainer container) : base(container)
         {
-          //  _nonAuthenticationApi = Container.Resolve<INonAuthenticationApi>();
+            //  _nonAuthenticationApi = Container.Resolve<INonAuthenticationApi>();
             ConfigureFile = Container.Resolve<IConfigureFile>();
             _queue = container.Resolve<ISnackbarMessageQueue>();
             _nonAuthenticationApi = Container.Resolve<INonAuthenticationApi>();
@@ -59,7 +58,7 @@ namespace Mv.Shell.ViewModels.Authentication
 
         public void OnLoaded(SignInView view)
         {
-            
+
             var passwordBox = view.PasswordBox;
 
             // 1. Login info from SignUpView
@@ -108,7 +107,7 @@ namespace Mv.Shell.ViewModels.Authentication
             EventAggregator.GetEvent<MainWindowLoadingEvent>().Publish(true);
 
             var r = await AuthenticateAsync(username, password);
-            if(r.Item1!=1)
+            if (r.Item1 != 1)
             {
                 EventAggregator.GetEvent<MainWindowLoadingEvent>().Publish(false);
                 ConfigureFile.SetValue(ConfigureKeys.AutoSignIn, false);
@@ -121,18 +120,18 @@ namespace Mv.Shell.ViewModels.Authentication
                 Username = username,
                 Role = r.Item3
             });
-            
+
             // Saves data.
             ConfigureFile.SetValue(ConfigureKeys.Username, IsRememberPassword ? username : string.Empty);
             // ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password.EncryptByRijndael() : string.Empty);
-            ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password: string.Empty);
+            ConfigureFile.SetValue(ConfigureKeys.Password, IsRememberPassword ? password : string.Empty);
             ConfigureFile.SetValue(ConfigureKeys.AutoSignIn, IsAutoSignIn);
-            
+
             // Launches main window and closes itself.
             ShellSwitcher.Switch<AuthenticationWindow, MainWindow>();
         }
 
-        private async Task<(int,string,MvRole)> AuthenticateAsync(string username, string passwordMd5)
+        private async Task<(int, string, MvRole)> AuthenticateAsync(string username, string passwordMd5)
         {
             var result = await _nonAuthenticationApi.LoginAsync(new LoginArgs
             {

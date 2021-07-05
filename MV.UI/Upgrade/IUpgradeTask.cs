@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Mv.Core.JsonObjects;
+using System;
 using System.Threading.Tasks;
-using Mv.Core.JsonObjects;
 
 namespace Mv.Ui.Core.Upgrade
 {

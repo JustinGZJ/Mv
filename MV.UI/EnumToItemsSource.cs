@@ -56,7 +56,7 @@ namespace Mv.Ui.Core
         [Description("ja-JP"), DefaultValue("Japanese")]
         jaJP
     }
-  
+
 
     public class EnumDefaultValueTypeConverter : EnumConverter
     {

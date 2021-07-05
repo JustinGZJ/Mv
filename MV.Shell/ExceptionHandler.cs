@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Prism.Logging;
+using System;
 using System.Windows;
 using System.Windows.Threading;
-using Prism.Logging;
 
 namespace Mv.Shell
 {

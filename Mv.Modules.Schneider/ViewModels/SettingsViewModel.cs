@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using Mv.Core.Interfaces;
+﻿using Mv.Core.Interfaces;
 using Mv.Modules.Schneider.Views;
 using Mv.Ui.Mvvm;
-using Prism;
+using System.ComponentModel;
+using System.Linq;
 using Unity;
 
 namespace Mv.Modules.Schneider.ViewModels
@@ -29,10 +24,10 @@ namespace Mv.Modules.Schneider.ViewModels
         public string[] MaterialCodes { get; set; } = Enumerable.Repeat("", 8).ToArray();
 
     }
-    public class SettingsViewModel : ViewModelValidateBase,IViewLoadedAndUnloadedAware<Settings>
+    public class SettingsViewModel : ViewModelValidateBase, IViewLoadedAndUnloadedAware<Settings>
     {
         private readonly IConfigureFile configureFile;
-        ScheiderConfig config=null;
+        ScheiderConfig config = null;
 
         public SettingsViewModel(IUnityContainer container, IConfigureFile configureFile) : base(container)
         {

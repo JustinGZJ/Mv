@@ -1,7 +1,7 @@
-﻿using System;
+﻿using DataService;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using DataService;
 
 namespace BatchCoreService
 {

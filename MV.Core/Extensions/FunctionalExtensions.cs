@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using  static  Mv.Core.Guards;
+using static Mv.Core.Guards;
 
 
 // ReSharper disable once CheckNamespace

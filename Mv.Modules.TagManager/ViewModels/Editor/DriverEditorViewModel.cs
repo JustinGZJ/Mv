@@ -1,23 +1,22 @@
 ﻿using BatchCoreService;
+using DataService;
+using MaterialDesignThemes.Wpf;
+using Mv.Modules.TagManager.ViewModels.Dialogs;
+using Mv.Modules.TagManager.Views;
+using Mv.Modules.TagManager.Views.Dialogs;
+using Mv.Ui.Mvvm;
+using Prism.Commands;
+using Prism.Regions;
+using PropertyTools.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
-using Mv.Ui.Mvvm;
-using Unity;
-using Prism.Commands;
-using MaterialDesignThemes.Wpf;
-using System.Threading.Tasks;
-using Mv.Modules.TagManager.Views.Dialogs;
-using Mv.Modules.TagManager.ViewModels.Dialogs;
-using Mv.Modules.TagManager.Views;
-using DataService;
-using System.Reflection;
-using System.Linq;
 using System.Globalization;
-using PropertyTools.Wpf;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Unity;
 using DelegateCommand = Prism.Commands.DelegateCommand;
-using Prism.Regions;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
@@ -27,7 +26,7 @@ namespace Mv.Modules.TagManager.ViewModels
         private readonly IDataServer dataServer;
         private readonly IDriverDataContext driverDataContext;
 
-        public DriverEditerViewModel(IUnityContainer container,IDataServer dataServer,IDriverDataContext driverDataContext) : base(container)
+        public DriverEditerViewModel(IUnityContainer container, IDataServer dataServer, IDriverDataContext driverDataContext) : base(container)
         {
             this.regionManager = container.Resolve<IRegionManager>();
             this.dataServer = dataServer;
@@ -57,11 +56,11 @@ namespace Mv.Modules.TagManager.ViewModels
 
         private DelegateCommand _NaviBackCommand;
         public DelegateCommand NaviBackCommand =>
-            _NaviBackCommand ?? (_NaviBackCommand = new DelegateCommand( () => regionManager.RequestNavigate("TAG_CONTENT",nameof(DriverMonitor))));
+            _NaviBackCommand ?? (_NaviBackCommand = new DelegateCommand(() => regionManager.RequestNavigate("TAG_CONTENT", nameof(DriverMonitor))));
 
         private async Task AddDriverAsync()
         {
-     
+
             var dlg = new AddDriverDlg();
             var result = await DialogHost.Show(dlg, "RootDialog");
             if (result.ToString() == "OK")
@@ -126,7 +125,7 @@ namespace Mv.Modules.TagManager.ViewModels
                     {
                         var props = dv.GetType().GetProperties()
                             .Where(x => x.CanWrite)
-                            .Where(x=>x.CanRead)
+                            .Where(x => x.CanRead)
                             .Where(x => x.GetIndexParameters().Length == 0);
                         var arguments = new List<DriverArgument>();
                         foreach (var x in props)
@@ -135,7 +134,7 @@ namespace Mv.Modules.TagManager.ViewModels
                             {
                                 DriverID = dv.ID,
                                 PropertyName = x.Name,
-                                PropertyValue = x.GetValue(dv)==null? "":x.GetValue(dv).ToString()
+                                PropertyValue = x.GetValue(dv) == null ? "" : x.GetValue(dv).ToString()
                             });
                         }
                         driver.Server = dv.ServerName;
@@ -159,7 +158,7 @@ namespace Mv.Modules.TagManager.ViewModels
         void IViewLoadedAndUnloadedAware<DriverEditer>.OnUnloaded(DriverEditer view)
         {
             driverDataContext.SetDrivers(Drivers);
-   
+
         }
     }
 }

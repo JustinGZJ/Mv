@@ -9,7 +9,7 @@ using System.Text;
 namespace OmronDriver
 {
     [Description("Omron(CS/CJ) UDP协议")]
-    public sealed class OmronCsCjUDPReader :DriverInitBase, IPLCDriver, IMultiReadWrite                    //IPLCDriver : IDriver, IReaderWriter       IDriver : IDisposable
+    public sealed class OmronCsCjUDPReader : DriverInitBase, IPLCDriver, IMultiReadWrite                    //IPLCDriver : IDriver, IReaderWriter       IDriver : IDisposable
     {
 
 
@@ -139,7 +139,7 @@ namespace OmronDriver
             }
         }
 
-        string _ip="127.0.0.1";//服务ip
+        string _ip = "127.0.0.1";//服务ip
         int _port = 9600; //服务端口
         public int Port
         {
@@ -482,7 +482,7 @@ namespace OmronDriver
             Console.WriteLine("OmronReader错误->" + GetErrorString(exception));
             if (exception == OmronCSCJ.excExceptionConnectionLost && IsClosed == false)
             {
-             //   OnError?.Invoke(this, new IOErrorEventArgs(exception));
+                //   OnError?.Invoke(this, new IOErrorEventArgs(exception));
             }
 
         }
@@ -524,7 +524,7 @@ namespace OmronDriver
             else
                 return new ItemData<uint>((uint)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(data, 0)), 0, QUALITIES.QUALITY_GOOD);
         }
-     
+
         public ItemData<ushort> ReadUInt16(DeviceAddress address)
         {
             byte[] data = WriteSyncData(CreateReadHeader(PcNodeId, address.Start, 1, (byte)address.DBNumber, (byte)address.Area));
@@ -687,7 +687,7 @@ namespace OmronDriver
             return this.WriteValueEx(address, value);
         }
 
- 
+
         public event ShutdownRequestEventHandler OnClose;
         public event EventHandler<Exception> OnError;
 

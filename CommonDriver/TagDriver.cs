@@ -3,7 +3,6 @@ using HslCommunication;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace CommonDriver
 {
@@ -77,7 +76,7 @@ namespace CommonDriver
             get { return _parent; }
         }
 
-        public string FileName { get ; set ; }
+        public string FileName { get; set; }
 
         public TagDriver(IDataServer parent, short id, string name)
         {

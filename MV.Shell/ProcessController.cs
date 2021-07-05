@@ -83,11 +83,11 @@ namespace Mv.Shell
                     }
                 }
             }
-            catch(Exception Err)
+            catch (Exception Err)
             {
                 MessageBox.Show(Err.Message.ToString(), "MUS", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-     
+
         }
 
         public static void CheckSingleton()

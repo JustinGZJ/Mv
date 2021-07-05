@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Mv.Core;
+using Mv.Ui.Core.Modularity;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using Mv.Core;
-using Mv.Ui.Core.Modularity;
-using Mv.Ui.TransferService;
-using Newtonsoft.Json;
 
 namespace Mv.Ui.Modularity
 {

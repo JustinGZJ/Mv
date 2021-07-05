@@ -1,11 +1,9 @@
-﻿using System;
+﻿using DataService;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using DataService;
 
 namespace ModbusDriver
 {
@@ -71,12 +69,12 @@ namespace ModbusDriver
         }
 
         public ModbusRTU_TCPReader(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null)
-            :base(server,id,name,serverName,timeOut,paras)
+            : base(server, id, name, serverName, timeOut, paras)
         {
             _id = id;//id 
             _name = name;
             _server = server;
-            _ip = serverName??"localhost";
+            _ip = serverName ?? "localhost";
             _timeout = timeOut;
         }
 

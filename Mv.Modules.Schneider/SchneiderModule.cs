@@ -7,13 +7,12 @@ using Mv.Modules.Schneider.Views;
 using Mv.Ui.Core;
 using Mv.Ui.Core.Modularity;
 using Prism.Ioc;
-using Prism.Modularity;
 using Prism.Regions;
 using Unity;
 
 namespace Mv.Modules.Schneider
 {
-   // [ModuleDependency("TagManager")]
+    // [ModuleDependency("TagManager")]
     public class SchneiderModule : ModuleBase
     {
         private readonly IRegionManager regionManager;
@@ -36,12 +35,15 @@ namespace Mv.Modules.Schneider
             //lets save the mapper globally.
             Charting.For<MeasureModel>(mapper);
             base.OnInitialized(containerProvider);
-      
-        }
 
+        }
+ 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             Container.RegisterType<IServerOperations, ServerOperations>();
+
+            Container.RegisterType<IRemoteIOService, RemoteIOService>();
+            //     var d=   Container.Resolve<IRemoteIOService>();
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Dashboard));
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(ProductInfo));
             regionManager.RegisterViewWithRegion(RegionNames.SettingsTabRegion, typeof(Settings));

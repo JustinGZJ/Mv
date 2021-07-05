@@ -1,7 +1,4 @@
-﻿using BatchCoreService;
-using System;
-
-namespace GateWay
+﻿namespace GateWay
 {
 
 }

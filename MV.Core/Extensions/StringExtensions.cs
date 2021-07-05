@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using Mv.Core;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using Mv.Core;
 
 // ReSharper disable once CheckNamespace
 namespace System

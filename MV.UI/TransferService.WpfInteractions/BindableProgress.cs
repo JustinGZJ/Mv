@@ -1,5 +1,5 @@
-﻿using System;
-using Prism.Mvvm;
+﻿using Prism.Mvvm;
+using System;
 
 // ReSharper disable once CheckNamespace
 namespace Mv.Ui.TransferService.WpfInteractions

@@ -277,14 +277,14 @@ namespace DataService
                             cacheLength += segmentLength;
                         }
                     }
-                    _cacheReader.Size = cacheLength+1;
+                    _cacheReader.Size = cacheLength + 1;
                 }
                 else
                 {
-                     _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
+                    _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
                     _rangeList.Add(new PDUArea(_start, 1, 0, 1));
                 }
-               //     _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
+                //     _cacheReader.Size = _start.DataSize <= bitCount ? 1 : _start.DataSize / bitCount;//改变Cache的Size属性值将创建Cache的内存区域
             }
         }
 
@@ -302,6 +302,7 @@ namespace DataService
         object sync = new object();
         protected void timer_Timer(object sender, EventArgs e)
         {
+            _timer.Stop();
             if (_isActive)
             {
                 lock (sync)
@@ -311,8 +312,7 @@ namespace DataService
                         Update();
                 }
             }
-            else
-                return;
+            _timer.Start();
         }
 
         protected virtual int Poll()

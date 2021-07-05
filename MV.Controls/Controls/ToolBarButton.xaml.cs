@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
+using System.Windows;
 
 namespace Mv.Controls.Controls
 {

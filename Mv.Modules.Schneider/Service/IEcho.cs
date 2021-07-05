@@ -1,22 +1,21 @@
-﻿using System;
+﻿using SimpleTCP;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
-using SimpleTCP;
 
 namespace Mv.Modules.Schneider.Service
 {
     public static class Folders
     {
-         static Folders()
+        static Folders()
         {
             Directory.CreateDirectory(TENSIONS);
             Directory.CreateDirectory(TENSIONSBACKUP);
         }
         public static readonly string TENSIONS = Path.Combine(@"D:\DATA", "TENSIONS");
-        public static readonly string TENSIONSBACKUP = Path.Combine(@"D:\DATA", "TENSIONS","BACKUP");
+        public static readonly string TENSIONSBACKUP = Path.Combine(@"D:\DATA", "TENSIONS", "BACKUP");
     }
 
     public static class TcpClientEx

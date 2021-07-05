@@ -12,13 +12,13 @@ using Unity;
 
 namespace Mv.Shell.ViewModels.Authentication
 {
-    public class SignUpViewModel:BindableBase, INotificable
+    public class SignUpViewModel : BindableBase, INotificable
     {
-        private SignUpArgs _signUpArgs=new SignUpArgs();
+        private SignUpArgs _signUpArgs = new SignUpArgs();
 
         public string Username
         {
-            get => _signUpArgs.Username??"";
+            get => _signUpArgs.Username ?? "";
             set
             {
                 var temp = _signUpArgs.Username;
@@ -53,7 +53,7 @@ namespace Mv.Shell.ViewModels.Authentication
         public ICommand SignUpCommand { get; }
 
         public ISnackbarMessageQueue GlobalMessageQueue { get; set; }
-        
+
 
         private bool SignUpCommandCanExecute(PasswordBox passwordBox) => new[]
         {
@@ -67,18 +67,18 @@ namespace Mv.Shell.ViewModels.Authentication
             var nonAuthApi = Container.Resolve<INonAuthenticationApi>();
 
             ConfigureSignUpArgs(configure: args => args.Password = passwordBox.Password);
-             var  m=await nonAuthApi.SignUpAsync(_signUpArgs);
-             if (m.Item1 == 1)
-             {
-                 passwordBox.Password = string.Empty;
-                 GlobalMessageQueue.Enqueue("Registered successfully!");
-                 EventAggregator.GetEvent<SignUpSuccessEvent>().Publish(_signUpArgs);
-             }
-             else
-             {
-                 GlobalMessageQueue.Enqueue(m.Item2);
-             }
-             EventAggregator.GetEvent<MainWindowLoadingEvent>().Publish(false);
+            var m = await nonAuthApi.SignUpAsync(_signUpArgs);
+            if (m.Item1 == 1)
+            {
+                passwordBox.Password = string.Empty;
+                GlobalMessageQueue.Enqueue("Registered successfully!");
+                EventAggregator.GetEvent<SignUpSuccessEvent>().Publish(_signUpArgs);
+            }
+            else
+            {
+                GlobalMessageQueue.Enqueue(m.Item2);
+            }
+            EventAggregator.GetEvent<MainWindowLoadingEvent>().Publish(false);
         }
 
         private void ConfigureSignUpArgs(Action<SignUpArgs> configure = null, bool force = false)

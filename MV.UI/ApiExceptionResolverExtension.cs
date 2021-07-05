@@ -1,9 +1,9 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 //using Newtonsoft.Json.Linq;
 using Prism.Ioc;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 //using Refit;
 
 namespace Mv.Ui.Core
@@ -51,10 +51,10 @@ namespace Mv.Ui.Core
 
         public static void SetUnityContainer(IContainerProvider container) => _container = container;
 
-        public static Task RunApi(this Task task, Action onSuccessCallback = null) => 
+        public static Task RunApi(this Task task, Action onSuccessCallback = null) =>
             _container.Resolve<ApiExceptionResolver>().RunApiInternal(task, onSuccessCallback);
 
-        public static Task<T> RunApi<T>(this Task<T> task) where T : new() => 
+        public static Task<T> RunApi<T>(this Task<T> task) where T : new() =>
             _container.Resolve<ApiExceptionResolver>().RunApiInternal(task);
     }
 

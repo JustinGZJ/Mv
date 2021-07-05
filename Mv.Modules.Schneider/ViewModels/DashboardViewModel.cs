@@ -1,7 +1,4 @@
 ﻿using Mv.Ui.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Unity;
 
 namespace Mv.Modules.Schneider.ViewModels

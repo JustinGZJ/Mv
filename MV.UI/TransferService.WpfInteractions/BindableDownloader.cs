@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Windows.Threading;
-using Prism.Mvvm;
-
-// ReSharper disable once CheckNamespace
+﻿// ReSharper disable once CheckNamespace
 namespace Mv.Ui.TransferService.WpfInteractions
 {
     //public class BindableDownloader : BindableBase

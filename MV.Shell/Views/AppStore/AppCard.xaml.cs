@@ -17,31 +17,31 @@ namespace Mv.Shell.Views.AppStore
 
         public string AppName
         {
-            get => (string) GetValue(AppNameProperty);
+            get => (string)GetValue(AppNameProperty);
             set => SetValue(AppNameProperty, value);
         }
 
         public ImageSource AppImageSource
         {
-            get => (ImageSource) GetValue(AppImageSourceProperty);
+            get => (ImageSource)GetValue(AppImageSourceProperty);
             set => SetValue(AppImageSourceProperty, value);
         }
 
         public string AppDescription
         {
-            get => (string) GetValue(AppDescriptionProperty);
+            get => (string)GetValue(AppDescriptionProperty);
             set => SetValue(AppDescriptionProperty, value);
         }
 
         public long AppDownloadCount
         {
-            get => (long) GetValue(AppDownloadCountProperty);
+            get => (long)GetValue(AppDownloadCountProperty);
             set => SetValue(AppDownloadCountProperty, value);
         }
 
         public string AppAuthors
         {
-            get => (string) GetValue(AppAuthorsProperty);
+            get => (string)GetValue(AppAuthorsProperty);
             set => SetValue(AppAuthorsProperty, value);
         }
 

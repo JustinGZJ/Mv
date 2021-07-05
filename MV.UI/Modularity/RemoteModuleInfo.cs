@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Prism.Modularity;
+﻿using Prism.Modularity;
+using System.Collections.Generic;
 
 namespace Mv.Ui.Core.Modularity
 {

@@ -237,7 +237,7 @@ namespace CommonDriver
             }
         }
 
-       // public event IOErrorEventHandler OnError;
+        // public event IOErrorEventHandler OnError;
         public event ShutdownRequestEventHandler OnClose;
         public event EventHandler<Exception> OnError;
 

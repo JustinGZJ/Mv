@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Mv.Core;
+﻿using Mv.Core;
 using Newtonsoft.Json;
 using Prism.Modularity;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Mv.Ui.Core.Modularity
 {

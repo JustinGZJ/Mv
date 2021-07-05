@@ -1,10 +1,10 @@
-﻿using System;
+﻿using MaterialDesignThemes.Wpf;
+using Mv.Core;
+using Mv.Ui.Core.I18n;
+using Prism.Ioc;
+using System;
 using System.Linq;
 using System.Windows;
-using Mv.Ui.Core.I18n;
-using MaterialDesignThemes.Wpf;
-using Prism.Ioc;
-using Mv.Core;
 
 namespace Mv.Ui.Mvvm
 {
@@ -96,10 +96,10 @@ namespace Mv.Ui.Mvvm
             {
                 viewModel.GlobalMessageQueue = container.Resolve<ISnackbarMessageQueue>();
             });
-            //.IfInheritsFrom<IAwareTabItemSelectionChanged>((view, viewModel) =>
-            //{
-            //    TabControlHelper.SetAwareSelectionChanged(view, true);
-            //});
+        //.IfInheritsFrom<IAwareTabItemSelectionChanged>((view, viewModel) =>
+        //{
+        //    TabControlHelper.SetAwareSelectionChanged(view, true);
+        //});
 
         public static IViewModelResolver IfInheritsFrom<TViewModel>(this IViewModelResolver @this, Action<FrameworkElement, TViewModel> configuration)
         {

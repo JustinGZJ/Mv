@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using  static  Mv.Core.SystemErrorCodes;
+using static Mv.Core.SystemErrorCodes;
 
 namespace Mv.Core
 {

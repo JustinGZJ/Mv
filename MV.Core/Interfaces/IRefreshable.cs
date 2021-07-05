@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Mv.Core.Interfaces
 {
@@ -13,11 +10,11 @@ namespace Mv.Core.Interfaces
 
         Task<bool> SignOutAsync();
 
-        Task<(int,string)> ChangePassword(string oldPassword,string newPassword);
+        Task<(int, string)> ChangePassword(string oldPassword, string newPassword);
 
         void Exit();
     }
-    
+
     public interface IRefreshable
     {
         /// <summary>

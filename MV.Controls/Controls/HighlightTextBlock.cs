@@ -96,7 +96,7 @@ namespace Mv.Controls
 
             if (start0 > 0) yield return (sourceText.Substring(0, start0), false);
             yield return (sourceText.Substring(start0, end0 - start0), true);
-              
+
             int previousEnd = end0;
             foreach ((int start, int end) in mergedIntervals.Skip(1))
             {

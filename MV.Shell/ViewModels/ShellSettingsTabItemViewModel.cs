@@ -2,10 +2,6 @@
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
 using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity;
 
 namespace Mv.Shell.ViewModels
@@ -37,7 +33,7 @@ namespace Mv.Shell.ViewModels
 
         void ExecuteSetAutoStart(bool? isAutoStart)
         {
-            ProcessController.RunWhenStart(isAutoStart.HasValue?isAutoStart.Value:false);
+            ProcessController.RunWhenStart(isAutoStart.HasValue ? isAutoStart.Value : false);
         }
     }
 }

@@ -1,11 +1,11 @@
-﻿using System.Collections.Specialized;
-using System.Diagnostics;
-using System.Linq;
-using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
 using Prism.Regions;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Linq;
+using System.Windows.Input;
 using Unity;
 
 namespace Mv.Shell.ViewModels

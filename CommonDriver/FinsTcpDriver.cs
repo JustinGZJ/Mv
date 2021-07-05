@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Xml.Xsl;
 
 namespace CommonDriver
 {
-   
+
 
 
     [Description("FINS TCP协议")]
@@ -38,7 +37,7 @@ namespace CommonDriver
             Name = name;
             Parent = server;
             _ip = serverName;
-       
+
         }
 
         public FinsTcpDriver() : base(null, 0, "fins", "127.0.0.1", 100, null)
@@ -69,7 +68,7 @@ namespace CommonDriver
         public bool Connect()
         {
             mc.Port = Port;
-            mc.IpAddress = ServerName??"127.0.0.1";
+            mc.IpAddress = ServerName ?? "127.0.0.1";
             mc.SA1 = 222;
             mc.DA1 = 1;
             var MR = mc.ConnectServer();
@@ -97,7 +96,7 @@ namespace CommonDriver
         public byte[] ReadBytes(DeviceAddress address, ushort size)
         {
             var addr = GetAddress(address);
-        //    addr = addr.Substring(0, addr.IndexOf('.'));
+            //    addr = addr.Substring(0, addr.IndexOf('.'));
             var r = mc.Read(addr, size);
             _IsClosed = !r.IsSuccess;
             return r.Content;
@@ -259,19 +258,19 @@ namespace CommonDriver
             else
             {
                 result = OmronFinsNetHelper.AnalysisAddress(address, false);
-            }          
-            if(result.IsSuccess)
+            }
+            if (result.IsSuccess)
             {
-                if(address.Contains('.'))
+                if (address.Contains('.'))
                 {
                     return new DeviceAddress
                     {
                         Area = 0,
-                        Start =int.Parse(address.Substring(1,address.IndexOf('.')-1)),
-                        DBNumber =result.Content1.WordCode,
+                        Start = int.Parse(address.Substring(1, address.IndexOf('.') - 1)),
+                        DBNumber = result.Content1.WordCode,
                         DataSize = 0,
                         CacheIndex = 0,
-                        Bit = (byte)(byte.Parse(address.Substring(address.IndexOf('.')+1)))
+                        Bit = (byte)(byte.Parse(address.Substring(address.IndexOf('.') + 1)))
                     };
                 }
                 else
@@ -294,7 +293,7 @@ namespace CommonDriver
 
         public string GetAddress(DeviceAddress address)
         {
-            if(address.DBNumber==OmronFinsDataType.CIO.WordCode)
+            if (address.DBNumber == OmronFinsDataType.CIO.WordCode)
             {
                 return $"C{address.Start}";
             }

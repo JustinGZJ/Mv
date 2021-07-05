@@ -1,7 +1,7 @@
-﻿using System;
-using System.Reactive.Linq;
-using LiveCharts;
+﻿using LiveCharts;
 using Prism.Mvvm;
+using System;
+using System.Reactive.Linq;
 
 namespace Mv.Modules.Schneider.ViewModels
 {
@@ -31,7 +31,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
 
             //the values property will store our values array
-            ChartValues = new ChartValues<MeasureModel>() ;
+            ChartValues = new ChartValues<MeasureModel>();
             //lets set how to display the X Labels
 
 
@@ -88,8 +88,8 @@ namespace Mv.Modules.Schneider.ViewModels
         private double tensionValue = 0;
         private double _axisMax;
         private double _axisMin;
-        private double _yaxisMax=2000;
-        private double _yaxisMin=0;
+        private double _yaxisMax = 2000;
+        private double _yaxisMin = 0;
         public double TensionValue
         {
             get { return tensionValue; }
@@ -105,8 +105,8 @@ namespace Mv.Modules.Schneider.ViewModels
             disposable = observable.ObserveOnDispatcher()
                 .Subscribe(x =>
                 {
-                      TensionValue =x;
-                    ChartValues.Add(new MeasureModel { DateTime = DateTime.Now, Value =TensionValue });
+                    TensionValue = x;
+                    ChartValues.Add(new MeasureModel { DateTime = DateTime.Now, Value = TensionValue });
                     if (ChartValues.Count > 150)
                         ChartValues.RemoveAt(0);
                     SetAxisLimits(DateTime.Now);

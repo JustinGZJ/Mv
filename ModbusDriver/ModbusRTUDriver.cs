@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DataService;
+using RJCP.IO.Ports;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Timers;
-using DataService;
-using RJCP.IO.Ports;
 
 namespace ModbusDriver
 {
@@ -155,7 +153,7 @@ namespace ModbusDriver
         {
             try
             {
-                _serialPort.PortName = string.IsNullOrEmpty(port)?"COM1":port;
+                _serialPort.PortName = string.IsNullOrEmpty(port) ? "COM1" : port;
                 _serialPort.ReadTimeout = _timeOut;
                 _serialPort.WriteTimeout = _timeOut;
                 _serialPort.BaudRate = baudRate;

@@ -126,7 +126,7 @@ namespace CommonDriver
             foreach (PDUArea area in _rangeList)
             {
 
-               //    DeviceAddress
+                //    DeviceAddress
                 byte[] rcvBytes = _plcReader.ReadBytes(area.Start, (ushort)area.Len);//从PLC读取数据  
                 if (rcvBytes == null)
                 {
@@ -204,11 +204,11 @@ namespace CommonDriver
                     }
                     k += len;
                 }
-             
+
             }
             return 1;
         }
-         
+
 
     }
 }

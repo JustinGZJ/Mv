@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Mv.Ui.Core;
+using Mv.Ui.Mvvm;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Mv.Ui.Core;
-using Mv.Ui.Mvvm;
 
 namespace Mv.Controls.Wizard
 {

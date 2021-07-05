@@ -1,19 +1,17 @@
-﻿using System;
-using System.Windows;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Authentication;
 using Mv.Core;
+using Mv.Core.Interfaces;
+using Mv.Shell.Views.Authentication;
 using Mv.Ui.Mvvm;
 using Prism.Ioc;
+using Prism.Logging;
 using Prism.Modularity;
 using Prism.Mvvm;
-using Mv.Shell.Views.Authentication;
-using Mv.Core.Interfaces;
 using Serilog;
+using System;
 using System.IO;
-
-
-using Prism.Logging;
+using System.Windows;
 
 namespace Mv.Shell
 {
@@ -26,13 +24,13 @@ namespace Mv.Shell
         protected override Window CreateShell()
         {
             this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件启动", Category.Debug, Priority.None);
-            return  IContainerProviderExtensions.Resolve<AuthenticationWindow>(Container);
+            return IContainerProviderExtensions.Resolve<AuthenticationWindow>(Container);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSerilog();
-            
+
             containerRegistry.RegisterSingleton<INonAuthenticationApi, NonAuthenticationApi>();
             containerRegistry.RegisterInstance<ISnackbarMessageQueue>(new SnackbarMessageQueue(TimeSpan.FromMilliseconds(2000)));
             containerRegistry.RegisterInstance(new ConfigureFile().Load());
@@ -44,10 +42,10 @@ namespace Mv.Shell
             ProcessController.CheckSingleton();
             Log.Logger = new LoggerConfiguration()
                      .MinimumLevel.Debug()
-                     .WriteTo.RollingFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Logs","log.txt"), retainedFileCountLimit: 7)
+                     .WriteTo.RollingFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs", "log.txt"), retainedFileCountLimit: 7)
                      .CreateLogger();
 
-            
+
 
             base.OnStartup(e);
         }
@@ -70,10 +68,10 @@ namespace Mv.Shell
 
         public override void Initialize()
         {
-            base.Initialize();    
+            base.Initialize();
             Settings.Default.PropertyChanged += (sender, eventArgs) => Settings.Default.Save();
         }
-        
+
         private void ConfigureApplicationEventHandlers()
         {
             var handler = Container.Resolve<ExceptionHandler>();
@@ -82,9 +80,11 @@ namespace Mv.Shell
         }
         protected override void OnExit(ExitEventArgs e)
         {
-            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件退出:{e.ApplicationExitCode}", Category.Debug, Priority.None); 
+            this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件退出:{e.ApplicationExitCode}", Category.Debug, Priority.None);
             Log.CloseAndFlush();
+   
             base.OnExit(e);
+            Environment.Exit(0);
         }
     }
 }

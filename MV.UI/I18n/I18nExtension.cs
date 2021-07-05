@@ -21,7 +21,7 @@ namespace Mv.Ui.Core.I18n
             //if (Binding != null) return ProvideValueFromBinding(serviceProvider, Binding);
             if (Key == null)
                 throw new NullReferenceException($"{nameof(Key)} cannot be null at the same time.");
-            
+
             return ProvideValueFromKey(serviceProvider, Key);
         }
 

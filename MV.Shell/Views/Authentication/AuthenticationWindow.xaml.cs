@@ -7,7 +7,7 @@
     {
         public AuthenticationWindow()
         {
-            
+
             InitializeComponent();
         }
     }

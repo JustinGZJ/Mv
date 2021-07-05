@@ -6,11 +6,11 @@ using Unity;
 
 namespace Mv.Shell.ViewModels.Dialogs
 {
-    public class SettingsDialogViewModel : ViewModelBase,IViewLoadedAndUnloadedAware<SettingsDialog>
+    public class SettingsDialogViewModel : ViewModelBase, IViewLoadedAndUnloadedAware<SettingsDialog>
     {
         private readonly IConfigureFile configure;
 
-        public SettingsDialogViewModel(IUnityContainer container, IRegionManager regionManager,IConfigureFile configure) : base(container)
+        public SettingsDialogViewModel(IUnityContainer container, IRegionManager regionManager, IConfigureFile configure) : base(container)
         {
             RegionManager = regionManager;
             this.configure = configure;
@@ -20,12 +20,12 @@ namespace Mv.Shell.ViewModels.Dialogs
 
         public void OnLoaded(SettingsDialog view)
         {
-         //   throw new System.NotImplementedException();
+            //   throw new System.NotImplementedException();
         }
 
         public void OnUnloaded(SettingsDialog view)
         {
-          
+
             //throw new System.NotImplementedException();
         }
     }

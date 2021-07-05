@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Prism.Modularity;
+using System;
 using System.IO;
 using System.Linq;
-using Prism.Modularity;
 // ReSharper disable InheritdocConsiderUsage
 
 namespace Mv.Ui.Core.Modularity
@@ -76,7 +76,7 @@ namespace Mv.Ui.Core.Modularity
                         missingRemoteRefs,
                         new Progress<(long bytesReceived, long totalBytesToReceive)>(report =>
                             RaiseModuleDownloadProgressChanged(moduleInfo, report.bytesReceived, report.totalBytesToReceive)));
-                    
+
 
                 }
 

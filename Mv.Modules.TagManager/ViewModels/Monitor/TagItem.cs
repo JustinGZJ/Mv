@@ -94,7 +94,7 @@ namespace Mv.Modules.TagManager.ViewModels
             }
             catch { }
         }
-       public ObservableCollection<TagItem> TagItems { get; set; } = new ObservableCollection<TagItem>();
+        public ObservableCollection<TagItem> TagItems { get; set; } = new ObservableCollection<TagItem>();
         public ITag Tag { get => _tag; set => _tag = value; }
 
         public void Dispose()
@@ -102,7 +102,7 @@ namespace Mv.Modules.TagManager.ViewModels
             if (Tag != null)
             {
                 // ReSharper disable once DelegateSubtraction
-               Tag.ValueChanged -= TagValueChanged;
+                Tag.ValueChanged -= TagValueChanged;
             }
         }
     }

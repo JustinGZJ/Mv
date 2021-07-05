@@ -1,15 +1,11 @@
 ﻿using DataService;
 using MaterialDesignThemes.Wpf;
 using Mv.Modules.TagManager.ViewModels.Monitor;
-using Mv.Modules.TagManager.Views;
 using Mv.Modules.TagManager.Views.Monitor;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace Mv.Modules.TagManager.ViewModels
 {
@@ -38,7 +34,7 @@ namespace Mv.Modules.TagManager.ViewModels
         void ExecuteSelectedChanged(IGroup group)
         {
             TagItems.Clear();
-            if (group==null||group.Items == null)
+            if (group == null || group.Items == null)
                 return;
             foreach (var item in group.Items)
             {
@@ -62,24 +58,24 @@ namespace Mv.Modules.TagManager.ViewModels
 
         private DelegateCommand execEditTag;
         public DelegateCommand EditTagCommand =>
-            execEditTag ?? (execEditTag = new DelegateCommand(async()=>await EditTagAsync()));
+            execEditTag ?? (execEditTag = new DelegateCommand(async () => await EditTagAsync()));
 
         async System.Threading.Tasks.Task EditTagAsync()
         {
             if (SelectedItem == null)
                 return;
             var vm = new TagWriterViewModel(SelectedItem.Tag);
-            var dlg = new TagWriter() { DataContext=vm};
+            var dlg = new TagWriter() { DataContext = vm };
 
             var result = await DialogHost.Show(dlg, "RootDialog");
             if (result.ToString() == "OK")
             {
-               // if (realWrite)
-                    SelectedItem.Write(vm.Value);
+                // if (realWrite)
+                SelectedItem.Write(vm.Value);
                 //else
                 //    SelectedItem.SimWrite(vm.Value);
             }
         }
-       
+
     }
 }

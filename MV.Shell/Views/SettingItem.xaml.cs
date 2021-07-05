@@ -1,6 +1,6 @@
-﻿using System.Windows;
+﻿using MaterialDesignThemes.Wpf;
+using System.Windows;
 using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
 
 namespace Mv.Shell.Views
 {

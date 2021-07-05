@@ -1,4 +1,9 @@
-﻿using System;
+﻿using MaterialDesignThemes.Wpf;
+using Mv.Core.Interfaces;
+using Prism.Events;
+using Prism.Logging;
+using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -6,12 +11,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Threading;
-using MaterialDesignThemes.Wpf;
-using Mv.Core.Interfaces;
-using Prism.Common;
-using Prism.Events;
-using Prism.Logging;
-using Prism.Mvvm;
 using Unity;
 
 namespace Mv.Ui.Mvvm
@@ -23,7 +22,7 @@ namespace Mv.Ui.Mvvm
         protected ViewModelBase(IUnityContainer container)
         {
             Container = container;
-   
+
             Logger = container.Resolve<ILoggerFacade>();
             EventAggregator = container.Resolve<IEventAggregator>();
             SnackbarMessageQueue = container.Resolve<ISnackbarMessageQueue>();
@@ -51,7 +50,7 @@ namespace Mv.Ui.Mvvm
             catch (Exception ex)
             {
                 ;
-        //        throw;
+                //        throw;
             }
         }
     }
@@ -95,7 +94,7 @@ namespace Mv.Ui.Mvvm
             return isChanged;
         }
 
-        protected void ValidateProperty(object value, [CallerMemberName]string propertyName = null)
+        protected void ValidateProperty(object value, [CallerMemberName] string propertyName = null)
         {
             var context = new ValidationContext(this) { MemberName = propertyName };
             var validationErrors = new List<ValidationResult>();

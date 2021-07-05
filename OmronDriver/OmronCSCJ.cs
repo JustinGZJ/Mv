@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace OmronDriver
+﻿namespace OmronDriver
 {
 
     /// <summary>

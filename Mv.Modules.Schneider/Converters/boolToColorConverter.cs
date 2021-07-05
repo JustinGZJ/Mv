@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -11,13 +9,13 @@ namespace Mv.Modules.Schneider.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value is bool b)
+            if (value is bool b)
             {
                 return b ? Brushes.LimeGreen : Brushes.Red;
             }
-            if(value is string s)
+            if (value is string s)
             {
-                if(s.ToUpper().Contains("PASS"))
+                if (s.ToUpper().Contains("PASS"))
                 {
                     return Brushes.LimeGreen;
                 }
@@ -27,7 +25,7 @@ namespace Mv.Modules.Schneider.Converters
                 }
             }
             return Brushes.Black;
-          //  throw new NotImplementedException();
+            //  throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -30,12 +30,12 @@ namespace Mv.Shell.ViewModels.Dialogs
         [StringLength(10, MinimumLength = 3, ErrorMessage = "password must have at least 3 characters")]
         public string NewPasswordConfirm
         {
-            get { return newPasswordConform ; }
+            get { return newPasswordConform; }
             set { SetProperty(ref newPasswordConform, value); }
         }
         private DelegateCommand changePassword;
         public DelegateCommand ChangePassword =>
-            changePassword ?? (changePassword = new DelegateCommand(async()=>await ExecuteCommandNameAsync(), CanExecuteCommandName));
+            changePassword ?? (changePassword = new DelegateCommand(async () => await ExecuteCommandNameAsync(), CanExecuteCommandName));
 
         async System.Threading.Tasks.Task ExecuteCommandNameAsync()
         {
@@ -49,7 +49,7 @@ namespace Mv.Shell.ViewModels.Dialogs
                 return false;
             if (OldPassword == NewPassword)
                 return false;
-            if(NewPassword != NewPasswordConfirm)
+            if (NewPassword != NewPasswordConfirm)
             {
                 return false;
             }
@@ -89,7 +89,7 @@ namespace Mv.Shell.ViewModels.Dialogs
 
         public void OnUnloaded(ProfileDialog view)
         {
-         //   throw new System.NotImplementedException();
+            //   throw new System.NotImplementedException();
         }
     }
 }

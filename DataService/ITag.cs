@@ -96,7 +96,7 @@ namespace DataService
             {
                 _value = newvalue;
                 NotityValueChanged(new ValueChangedEventArgs(_value));
-              //  ValueChanged?.Invoke(this, );
+                //  ValueChanged?.Invoke(this, );
             }
         }
 
@@ -142,7 +142,7 @@ namespace DataService
             return 0;
         }
 
-        public  ValueChangingEventHandler<Storage> ValueChanging;
+        public ValueChangingEventHandler<Storage> ValueChanging;
 
         public event ValueChangedEventHandler ValueChanged;
 
@@ -450,7 +450,7 @@ namespace DataService
                 {
                     _value = value;
                     NotityValueChanged(new ValueChangedEventArgs(value));
-              
+
                 }
                 return true;
             }

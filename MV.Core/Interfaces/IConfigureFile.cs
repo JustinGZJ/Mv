@@ -6,9 +6,9 @@ namespace Mv.Core.Interfaces
 
     public interface INonAuthenticationApi
     {
-        Task<(int,string)> SignUpAsync(SignUpArgs args);
-        Task<(int,string,MvRole)> LoginAsync(LoginArgs args);
-        
+        Task<(int, string)> SignUpAsync(SignUpArgs args);
+        Task<(int, string, MvRole)> LoginAsync(LoginArgs args);
+
     }
     public class MvUser
     {

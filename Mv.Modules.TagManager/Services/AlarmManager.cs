@@ -1,16 +1,9 @@
 ﻿using DataService;
-using Mv.Modules.TagManager.ViewModels.Messages;
+using MV.Core.Events;
 using Prism.Events;
 using Prism.Logging;
-using PropertyTools;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Reactive.Linq;
-using MV.Core.Events;
 
 namespace Mv.Modules.TagManager.Services
 {

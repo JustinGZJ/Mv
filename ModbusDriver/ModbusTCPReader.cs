@@ -1,13 +1,11 @@
-﻿using System;
+﻿using DataService;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
-using DataService;
 
 namespace ModbusDriver
 {
@@ -113,7 +111,8 @@ namespace ModbusDriver
                     tcpSynCl.SendTimeout = _timeout;
                     tcpSynCl.ReceiveTimeout = _timeout;
                     tcpSynCl.NoDelay = true;
-                    tcpSynCl.ConnectAsync(_ip, port).WithTimeout(TimeSpan.FromMilliseconds(_timeout)).Wait(); 
+                    tcpSynCl.Connect(_ip, port);
+     
                 }
                 return true;
             }
@@ -171,7 +170,7 @@ namespace ModbusDriver
             if (IsClosed)
             {
                 //if (!Connect())
-                    CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
+                CallException(id, write_data[7], Modbus.excExceptionConnectionLost);
             }
             else
             {

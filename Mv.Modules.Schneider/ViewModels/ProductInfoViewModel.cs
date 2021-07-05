@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using Prism.Mvvm;
-using System.Linq;
+﻿using Mv.Core.Interfaces;
 using Prism.Commands;
-using System.Windows.Input;
+using Prism.Mvvm;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.RegularExpressions;
-using Mv.Core.Interfaces;
+using System.Windows.Input;
 
 namespace Mv.Modules.Schneider.ViewModels
 {
@@ -134,7 +131,7 @@ namespace Mv.Modules.Schneider.ViewModels
                 }
                 else if (RegexCode.IsMatch(Input) && SelectedInfo != null)
                 {
-                    var match = RegexCode.Match(Input);        
+                    var match = RegexCode.Match(Input);
                     SelectedInfo.Code = Input;
                     SelectedInfo.Specs = match.Groups[1].Value;
                     SelectedInfo.Model = match.Groups[2].Value;

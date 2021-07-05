@@ -15,7 +15,7 @@ namespace CommonDriver
 
 
     [Description("Melsec-MC-3E协议")]
-    public class MelsecMcNetDriver :DriverInitBase, IPLCDriver, IMultiReadWrite
+    public class MelsecMcNetDriver : DriverInitBase, IPLCDriver, IMultiReadWrite
     {
 
         protected Dictionary<int, MelsecMcDataType> _dictionary = new Dictionary<int, MelsecMcDataType>()
@@ -27,9 +27,9 @@ namespace CommonDriver
             mc.ConnectClose();
             //  throw new System.NotImplementedException();
         }
-        public MelsecMcNetDriver() 
+        public MelsecMcNetDriver()
         {
-            
+
         }
         public MelsecMcNetDriver(IDataServer server, short id, string name, string serverName, int timeOut = 500, IDictionary<string, string> paras = null) : base(server, id, name, serverName, timeOut, paras)
         {
@@ -38,11 +38,11 @@ namespace CommonDriver
             Parent = server;
             _ip = serverName;
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Static;
-            var fields =typeof(MelsecMcDataType).GetFields(bindingFlags)
+            var fields = typeof(MelsecMcDataType).GetFields(bindingFlags)
                 .Where(x => x.FieldType == typeof(MelsecMcDataType))
-                .Where(m=>!m.Name.Contains("_"))
-                .Select(x=>(MelsecMcDataType)x.GetValue(null))
-                .ToDictionary(x=>(int)x.DataCode);
+                .Where(m => !m.Name.Contains("_"))
+                .Select(x => (MelsecMcDataType)x.GetValue(null))
+                .ToDictionary(x => (int)x.DataCode);
             if (fields != null)
                 _dictionary = fields;
 
@@ -264,7 +264,7 @@ namespace CommonDriver
                     return new DeviceAddress
                     {
                         Area = 0,
-                        Start =operateResult.Content.AddressStart,
+                        Start = operateResult.Content.AddressStart,
                         DBNumber = operateResult.Content.McDataType.DataCode,
                         DataSize = 0,
                         CacheIndex = 0,
@@ -289,7 +289,7 @@ namespace CommonDriver
                 if (m.DataType == 0)
                     return m.AsciiCode.Trim('*') + Convert.ToString(address.Start, m.FromBase);
                 else
-                    return $"{m.AsciiCode.Trim('*')}{Convert.ToString(address.Start * 16 + address.Bit , m.FromBase)}";
+                    return $"{m.AsciiCode.Trim('*')}{Convert.ToString(address.Start * 16 + address.Bit, m.FromBase)}";
             }
             else
             {

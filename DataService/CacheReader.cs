@@ -496,7 +496,7 @@ namespace DataService
             }
             else
             {
-                result = (IPAddress.HostToNetworkOrder(_cache[startIndex+1]) << 16) | ((ushort)IPAddress.HostToNetworkOrder(_cache[startIndex ]));
+                result = (IPAddress.HostToNetworkOrder(_cache[startIndex + 1]) << 16) | ((ushort)IPAddress.HostToNetworkOrder(_cache[startIndex]));
             }
             return new ItemData<int>(result, 0, QUALITIES.QUALITY_GOOD);
         }
@@ -539,7 +539,7 @@ namespace DataService
             }
             else
             {
-                result = (IPAddress.HostToNetworkOrder(_cache[startIndex+1]) << 16) | ((ushort)IPAddress.HostToNetworkOrder(_cache[startIndex ]));
+                result = (IPAddress.HostToNetworkOrder(_cache[startIndex + 1]) << 16) | ((ushort)IPAddress.HostToNetworkOrder(_cache[startIndex]));
             }
             return new ItemData<float>(*(((float*)&result)), 0, QUALITIES.QUALITY_GOOD);
         }

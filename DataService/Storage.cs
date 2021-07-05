@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace DataService
 {
@@ -18,7 +18,7 @@ namespace DataService
         [FieldOffset(0)]
         public float Single;
 
-        public static readonly Storage Empty ;
+        public static readonly Storage Empty;
 
         static Storage()
         {
@@ -62,7 +62,7 @@ namespace DataService
         public static bool operator !=(Storage x, Storage y)
         {
             return x.Int32 != y.Int32;
-        } 
+        }
     }
 
     public enum QUALITIES : short

@@ -1,14 +1,10 @@
 ﻿using BatchCoreService;
-using DataService;
 using MaterialDesignThemes.Wpf;
 using Mv.Modules.TagManager.Views.Dialogs;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Mv.Modules.TagManager.ViewModels.Dialogs
@@ -26,7 +22,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
             set { SetProperty(ref driver, value); }
         }
 
-        public ObservableCollection<Group> Groups=>driver!=null? new ObservableCollection<Group>(driver?.Groups):null ;
+        public ObservableCollection<Group> Groups => driver != null ? new ObservableCollection<Group>(driver?.Groups) : null;
 
 
         private DelegateCommand _addGroupCommand;
@@ -68,7 +64,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
             {
                 if (dv != null)
                 {
-                    Driver = dv;           
+                    Driver = dv;
                 }
             }
             this.RaisePropertyChanged(nameof(Groups));
@@ -77,7 +73,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
 
         public bool IsNavigationTarget(NavigationContext navigationContext)
         {
-  
+
             return true;
         }
 

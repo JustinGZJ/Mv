@@ -1,16 +1,13 @@
 ﻿using BatchCoreService;
 using DataService;
 using Mv.Core;
+using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using Mv.Ui.Mvvm;
-using Prism.Mvvm;
-using System.ComponentModel;
 
 namespace Mv.Modules.TagManager.ViewModels.Dialogs
 {
@@ -35,7 +32,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
             {
                 if (SetProperty(ref name, value))
                 {
-                    Driver.Name=value;
+                    Driver.Name = value;
                 }
             }
         }
@@ -57,7 +54,7 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
         public AddDriverDlgViewModel()
         {
             var drivers = Directory.GetFiles(MvFolders.Drivers, "*.dll")
-                  .Select(x =>GetAssembly(x))
+                  .Select(x => GetAssembly(x))
                   .SelectMany(m => m.GetTypes())
                   .Where(t => t.GetInterfaces().Contains(typeof(IDriver)))
                   .Where(t => !t.IsInterface)
@@ -71,10 +68,11 @@ namespace Mv.Modules.TagManager.ViewModels.Dialogs
             SelectedValue = DriverInfos.FirstOrDefault();
         }
 
-        private Assembly GetAssembly(string filename) {
+        private Assembly GetAssembly(string filename)
+        {
             try
             {
-               return Assembly.LoadFrom(filename);
+                return Assembly.LoadFrom(filename);
             }
             catch (Exception)
             {

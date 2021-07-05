@@ -1,9 +1,7 @@
 ﻿using BatchCoreService;
 using Mv.Core.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Mv.Modules.TagManager.Services
 {
@@ -31,13 +29,13 @@ namespace Mv.Modules.TagManager.Services
             {
                 m.Second.Id = (short)m.First;
             }
-            var gs = Enumerable.Range(0, drivers.SelectMany(x=>x.Groups).Count()).Zip(drivers.SelectMany(x => x.Groups));
+            var gs = Enumerable.Range(0, drivers.SelectMany(x => x.Groups).Count()).Zip(drivers.SelectMany(x => x.Groups));
             foreach (var g in gs)
             {
                 g.Second.Id = (short)g.First;
                 g.Second.TagMetas.ForEach(x => x.GroupID = g.Second.Id);
             }
-            var ts = Enumerable.Range(0, drivers.SelectMany(x => x.Groups).SelectMany(m=>m.TagMetas).Count()).Zip(drivers.SelectMany(x => x.Groups).SelectMany(m => m.TagMetas));
+            var ts = Enumerable.Range(0, drivers.SelectMany(x => x.Groups).SelectMany(m => m.TagMetas).Count()).Zip(drivers.SelectMany(x => x.Groups).SelectMany(m => m.TagMetas));
             foreach (var t in ts)
             {
                 t.Second.ID = (short)t.First;

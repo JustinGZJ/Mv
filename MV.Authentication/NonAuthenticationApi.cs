@@ -1,18 +1,18 @@
-﻿using System;
-using System.Threading.Tasks;
-using Mv.Core.Interfaces;
-using LiteDB;
-using System.IO;
+﻿using LiteDB;
 using Mv.Core;
+using Mv.Core.Interfaces;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using static Mv.Authentication.AuthenticationExtentions;
 
 namespace Mv.Authentication
 {
-    
+
 
     public static class AuthenticationExtentions
     {
-  
+
         public static string DbPath = Path.Combine(MvFolders.MainProgram, "authentication.db");
 
         public static TResult Using<TDisposable, TResult>(
@@ -65,7 +65,7 @@ namespace Mv.Authentication
             return Task.FromResult(true);
         }
 
-        public Task<(int,string)> ChangePassword(string oldpassword,string password)
+        public Task<(int, string)> ChangePassword(string oldpassword, string password)
         {
             return Task.Run(() => Db<(int, string)>((db) =>
               {
@@ -75,7 +75,7 @@ namespace Mv.Authentication
                   if (user.Password != oldpassword)
                       return (-2, "password is incorrect!");
                   user.Password = password;
-                 if(col.Update(user))
+                  if (col.Update(user))
                   {
                       return (0, "success!");
                   }
@@ -93,78 +93,78 @@ namespace Mv.Authentication
         public NonAuthenticationApi()
         {
             //add root user
-            Db<(int,string)>(db =>
-            {
-                var col = db.GetCollection<MvUser>(nameof(MvUser));
-                col.EnsureIndex(x => x.Name);
-               var root= col.FindOne(x => x.Name == "root");
-               if (root == null)
-               {
-                   col.Insert(new MvUser
-                   {
-                       Name = "root",
-                       Password = "tanac123",
-                       Role = MvRole.Root
-                   });
-               }
-               return (0,"user exits...");
-            });
-        }
-        Task<(int,string,MvRole)> INonAuthenticationApi.LoginAsync(LoginArgs args)
+            Db<(int, string)>(db =>
+             {
+                 var col = db.GetCollection<MvUser>(nameof(MvUser));
+                 col.EnsureIndex(x => x.Name);
+                 var root = col.FindOne(x => x.Name == "root");
+                 if (root == null)
                  {
-            return Task.Run(()=>Db<(int,string,MvRole)>((db) =>
-            {
-                var col = db.GetCollection<MvUser>(nameof(MvUser));
-                col.EnsureIndex(x => x.Name);
-                var user = col.FindOne(x => x.Name == args.UserName);
-                switch (user)
+                     col.Insert(new MvUser
+                     {
+                         Name = "root",
+                         Password = "tanac123",
+                         Role = MvRole.Root
+                     });
+                 }
+                 return (0, "user exits...");
+             });
+        }
+        Task<(int, string, MvRole)> INonAuthenticationApi.LoginAsync(LoginArgs args)
+        {
+            return Task.Run(() => Db<(int, string, MvRole)>((db) =>
                 {
-                    case null:
-                        return (0,"user not exists...",MvRole.User);
-                    default:
-                        return (user.Password == args.Password)?(1,"login success.",user.Role):(-1,"password is incorrect.",MvRole.User);
-                }
-            }));
+                    var col = db.GetCollection<MvUser>(nameof(MvUser));
+                    col.EnsureIndex(x => x.Name);
+                    var user = col.FindOne(x => x.Name == args.UserName);
+                    switch (user)
+                    {
+                        case null:
+                            return (0, "user not exists...", MvRole.User);
+                        default:
+                            return (user.Password == args.Password) ? (1, "login success.", user.Role) : (-1, "password is incorrect.", MvRole.User);
+                    }
+                }));
         }
 
-        Task<(int,string)> INonAuthenticationApi.SignUpAsync(SignUpArgs args)
+        Task<(int, string)> INonAuthenticationApi.SignUpAsync(SignUpArgs args)
         {
-            return Task.Run(()=>Db((db) =>
-            {
-                var col = db.GetCollection<MvUser>(nameof(MvUser));
-                col.EnsureIndex(x => x.Name);
-                var mvUser = new MvUser
-                {
-                    Name = args.Username,
-                    Password = args.Password,
-                    Role = MvRole.User
-                };
-                if (!string.IsNullOrEmpty(args.VerifyCode))
-                {
-                    var root= col.FindOne(x => x.Name == "root");
-                    if (root == null) return (-1,"root user not exit");
-                    if (args.VerifyCode == root.Password)
-                    {
-                        mvUser.Role = MvRole.Admin;
-                    }
-                    else
-                    {
-                        return (-2,"password is incorrect.");
-                    }
-                }
+            return Task.Run(() => Db((db) =>
+              {
+                  var col = db.GetCollection<MvUser>(nameof(MvUser));
+                  col.EnsureIndex(x => x.Name);
+                  var mvUser = new MvUser
+                  {
+                      Name = args.Username,
+                      Password = args.Password,
+                      Role = MvRole.User
+                  };
+                  if (!string.IsNullOrEmpty(args.VerifyCode))
+                  {
+                      var root = col.FindOne(x => x.Name == "root");
+                      if (root == null) return (-1, "root user not exit");
+                      if (args.VerifyCode == root.Password)
+                      {
+                          mvUser.Role = MvRole.Admin;
+                      }
+                      else
+                      {
+                          return (-2, "password is incorrect.");
+                      }
+                  }
 
-                 var user = col.FindOne(x => x.Name==args.Username); 
+                  var user = col.FindOne(x => x.Name == args.Username);
 
-                if (user == null)
-                {
-                    col.Insert(mvUser);
-                    return (1,"sign up success.");
-                }
-                else
-                {
-                    return (-1,"user has exits.");
-                }
-            }));
+                  if (user == null)
+                  {
+                      col.Insert(mvUser);
+                      return (1, "sign up success.");
+                  }
+                  else
+                  {
+                      return (-1, "user has exits.");
+                  }
+              }));
         }
     }
 }

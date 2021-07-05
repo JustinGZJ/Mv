@@ -1,7 +1,7 @@
-﻿using System.Windows.Controls;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Shell.Views.Authentication;
 using Mv.Ui.Mvvm;
+using System.Windows.Controls;
 using Unity;
 
 namespace Mv.Shell.ViewModels.Authentication

@@ -1,16 +1,11 @@
-﻿using BatchCoreService;
-using DataService;
+﻿using DataService;
 using Mv.Modules.TagManager.Views;
 using Prism.Commands;
 using Prism.Mvvm;
 using Prism.Regions;
-using PropertyTools;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
@@ -77,7 +72,7 @@ namespace Mv.Modules.TagManager.ViewModels
         {
             await Task.Run(() =>
              {
-                // DataServer.Run();
+                 // DataServer.Run();
              });
             RaisePropertyChanged(nameof(Drivers));
         }

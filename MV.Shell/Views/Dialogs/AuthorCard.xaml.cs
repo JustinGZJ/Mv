@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Mv.Ui.Core;
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using Mv.Ui.Core;
 
 namespace Mv.Shell.Views.Dialogs
 {

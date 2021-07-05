@@ -1,6 +1,6 @@
-﻿using System;
-using Mv.Core;
+﻿using Mv.Core;
 using Prism.Ioc;
+using System;
 
 namespace Mv.Ui.Mvvm
 {

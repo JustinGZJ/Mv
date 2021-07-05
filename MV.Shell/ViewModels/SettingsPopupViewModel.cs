@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Windows.Input;
-using MaterialDesignThemes.Wpf;
+﻿using MaterialDesignThemes.Wpf;
 using Mv.Core.Interfaces;
 using Mv.Shell.Constants;
 using Mv.Shell.Views;
 using Mv.Shell.Views.Dialogs;
 using Mv.Ui.Core;
 using Mv.Ui.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Windows.Input;
 using Unity;
 
 namespace Mv.Shell.ViewModels
@@ -33,7 +32,7 @@ namespace Mv.Shell.ViewModels
 
             OpenSettingsPanelCommand = new RelayCommand(OpenDialog<SettingsDialog>);
 
-            HelpCommand = new RelayCommand(()=>Thread.Sleep(0)) ;
+            HelpCommand = new RelayCommand(() => Thread.Sleep(0));
             OpenOfficialSiteCommand = new RelayCommand(() => Thread.Sleep(0));
             AboutCommand = new RelayCommand(OpenDialog<AboutDialog>);
 

@@ -7,9 +7,9 @@ namespace Mv.Modules.Schneider.ViewModels
 {
     public static class GlobalValues
     {
-        public const int AXISCNT= 4;
+        public const int AXISCNT = 4;
     }
-   
+
     public class ProductDataCollection
     {
 
@@ -20,9 +20,9 @@ namespace Mv.Modules.Schneider.ViewModels
             {
                 ProductDatas.Add(new ProductData(i));
             }
-            TensionResut = new int[8] ;
+            TensionResut = new int[8];
         }
-        public int[] TensionResut { get;  }
+        public int[] TensionResut { get; }
         public uint TensionOutput { get; set; }
         public List<ProductData> ProductDatas { get; set; }
     }
@@ -55,11 +55,11 @@ namespace Mv.Modules.Schneider.ViewModels
             TensionGroups = new List<TensionGroup>();
             for (int i = 0; i < 2; i++)
             {
-                TensionGroups.Add(new TensionGroup() { Name = $"tension{i*AXISCNT + 1+index}" });
+                TensionGroups.Add(new TensionGroup() { Name = $"tension{i * AXISCNT + 1 + index}" });
             }
         }
 
-        public string Code { get; set; } 
+        public string Code { get; set; }
         public int Status { get; set; }
         public double LoopTime { get; set; }
         public int Quantity { get; set; }
@@ -79,22 +79,27 @@ namespace Mv.Modules.Schneider.ViewModels
             public string Name { get; set; }
             public double UpperLimit { get; set; }
             public double LowerLimit { get; set; }
-            public bool Result => Values.Count==0||Values.All(z => z.Value <= UpperLimit && z.Value >= LowerLimit);
-            public int iResult { get {
+            public bool Result => Values.Count == 0 || Values.All(z => z.Value <= UpperLimit && z.Value >= LowerLimit);
+            public int iResult
+            {
+                get
+                {
                     if (Values.Count == 0)
                     {
                         return 0;
                     }
-                    else {
+                    else
+                    {
                         return Values.All(z => z.Value <= UpperLimit && z.Value >= LowerLimit) ? -1 : 1;
-                    }  
-                } }
+                    }
+                }
+            }
             public ICollection<Tension> Values { get; set; }
         }
         public class Tension
         {
             public DateTime Time { get; set; } = DateTime.Now;
-            public short Value { get; set; }
+            public ushort Value { get; set; }
         }
     }
 }

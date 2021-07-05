@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Prism.Logging;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using Prism.Logging;
 
 namespace Mv.Core
 {
