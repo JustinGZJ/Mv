@@ -248,6 +248,7 @@ namespace Mv.Modules.Schneider.ViewModels
                       Invoke(new Action(() =>
                       {
                           PushMsg("扫码枪完成");
+                          Buffers.Clear();
                           Buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
                           RaisePropertyChanged(nameof(Buffers));
                           Barcodes.ForEach(x => x.Value = "");
