@@ -80,7 +80,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public class Tension
         {
             public DateTime Time { get; set; } = DateTime.Now;
-            public short Value { get; set; }
+            public ushort Value { get; set; }
         }
     }
 }

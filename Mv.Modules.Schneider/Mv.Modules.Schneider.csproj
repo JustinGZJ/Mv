@@ -23,6 +23,9 @@
     <Exec Command="xcopy &quot;$(TargetDir)*$(TargetExt)&quot; &quot;$(SolutionDir)$(SolutionName).Shell\bin\Debug\netcoreapp3.1\Modules&quot; /Y /S" />
   </Target>
   <ItemGroup>
+    <Reference Include="Communication">
+      <HintPath>C:\Users\Administrator.LAPTOP-7D6B2GK7\Documents\GitHub\Mv\CommonDriver\Communication.dll</HintPath>
+    </Reference>
     <Reference Include="LiveCharts.Geared">
       <HintPath>LiveCharts.Geared.dll</HintPath>
       <Private>true</Private>
@@ -33,6 +36,11 @@
     <Reference Include="PropertyTools.Wpf">
       <HintPath>..\Mv.Modules.TagManager\Library\PropertyTools.Wpf.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Communication.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\ProductInfo.xaml">

@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.InteropServices;
@@ -37,13 +38,19 @@ namespace Mv.Modules.Schneider.ViewModels
         private readonly ILoggerFacade logger;
         private bool bgettensiongroup1;
         private bool bgettensiongroup2;
-        Dictionary<string, IObservable<short>> tensionobs = new Dictionary<string, IObservable<short>>();
+        Dictionary<string, IObservable<ushort>> tensionobs = new Dictionary<string, IObservable<ushort>>();
         UserMessageEvent userMessageEvent;
         ProductDataCollection dataCollection = null;
-        CompositeDisposable disposables1 = new CompositeDisposable();
-        CompositeDisposable disposables2 = new CompositeDisposable();
         CompositeDisposable disposables3 = new CompositeDisposable();
-        Queue<List<string>> buffers = new Queue<List<string>>() ;
+        Queue<List<string>> buffers = new Queue<List<string>>();
+
+        IObservable<bool[]> RemoteIO;
+        string rinputs = "";
+        public string Inputs { get { return rinputs; } set { SetProperty(ref rinputs, value); } }
+        string routputs = "";
+        public string Ontputs { get { return routputs; } set { SetProperty(ref routputs, value); } }
+
+        private List<TesionMonitor> monitors = new List<TesionMonitor>();
 
 
         IDevice scanner;
@@ -60,10 +67,27 @@ namespace Mv.Modules.Schneider.ViewModels
                              IDataServer dataServer,
                              IServerOperations operations,
                              IConfigureFile configureFile,
+                             IRemoteIOService remoteIO,
                              ILoggerFacade logger) : base(container)
         {
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
+
+            RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x);
+            monitors.Add(new TesionMonitor("192.168.1.201", 32));
+
+            Observable.Interval(TimeSpan.FromSeconds(0.5), ThreadPoolScheduler.Instance).Subscribe(x =>
+            {
+                if (Buffers.Count > 0)
+                {
+                    remoteIO.outputs[2] = true;
+                }
+                else
+                {
+                    remoteIO.outputs[2] = false;
+                }
+                remoteIO.outputs[3] = !remoteIO.outputs[3];
+            });
 
             //PLC 心跳
 
@@ -71,16 +95,22 @@ namespace Mv.Modules.Schneider.ViewModels
 
             (dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
-            Enumerable.Range(1, 1).Select(x => $"tension{x}").ForEach(m =>
-             {
-                 if (dataServer[m] != null)
-                     tensionobs[m] = Observable.Interval(TimeSpan.FromSeconds(0.5)).Select(x => dataServer[m].Value.Int16);
-             });
+            Enumerable.Range(1, 1).Select(x => (index: x - 1, name: $"tension{x}")).ForEach(m =>
+            {
+                tensionobs[m.name] = monitors[m.index].GetObservable();
+            });
+
+            RemoteIO.Subscribe(x =>
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Inputs = "输入：" + string.Join(' ', x.Take(8).Select(x => x ? 1 : 0));
+                    Ontputs = "输出：" + string.Join(' ', x.Skip(16).Take(8).Select(x => x ? 1 : 0));
+                }), null);
+            });
 
 
-
-
-            dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 1).Subscribe(x =>
+            RemoteIO.Select(x => x[3]).Rising().ObserveOn(NewThreadScheduler.Default).Subscribe(x =>
             {
                 PushMsg("开始绕线");
                 dataCollection = new ProductDataCollection();
@@ -113,24 +143,45 @@ namespace Mv.Modules.Schneider.ViewModels
                 RaisePropertyChanged(nameof(Buffers));
             });
 
-            dataServer["BUSY"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32).Where(x => x == 0).Subscribe(x =>
+            RemoteIO.Select(x => x[3]).Falling().ObserveOn(NewThreadScheduler.Default).Subscribe(x =>
+            {
+                PushMsg("上传数据");
+                disposables3.Dispose();
+                try
                 {
-                    disposables3.Dispose();
-                    try
+                    if (dataCollection != null)
                     {
-                        if (dataCollection != null)
-                        {
-                            operations.Upload(dataCollection);
+                        operations.Upload(dataCollection);
 
-                        }
                     }
-                    catch (Exception ex)
-                    {
-                        PushMsg(ex.GetExceptionMsg());
-                    }
-                });
+                }
+                catch (Exception ex)
+                {
+                    PushMsg(ex.GetExceptionMsg());
+                }
+            });
             #region 扫码
             //扫码
+
+            RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0))
+            .Where(v => v == 0).ObserveOn(NewThreadScheduler.Default).Subscribe(x =>
+            {
+                try
+                {
+                    if (remoteIO.outputs[0] || remoteIO.outputs[1])
+                    {
+                        PushMsg("G4清除");
+                        remoteIO.outputs[0] = false;
+                        remoteIO.outputs[1] = false;
+                    }
+                }
+                catch (Exception)
+                {
+
+                    //    throw;
+                }
+
+            });
 
             dataServer["IN_SCAN"]?.ToObservable().Select(x => x.Int32)
             .Where(v => v == 0).Subscribe(x =>
@@ -138,28 +189,32 @@ namespace Mv.Modules.Schneider.ViewModels
                 dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
             });
 
-            dataServer["IN_SCAN"]?.ToObservable().Select(x => x.Int32)
-            .Where(v => v == 5).Subscribe(x =>
-            {
-                PushMsg("扫码枪完成");
-                Buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
-                RaisePropertyChanged(nameof(Buffers));
-                Barcodes.ForEach(x => x.Value = "");
-                dataServer["OUT_SCAN_ERROR"]?.Write(5);
-                dataServer["CNT"].Write(Buffers.Count);
-            });
+            RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0))
+                .Buffer(2, 1)
+                .Where(x => x[0] != x[1]).Select(x => x[1])
+                .Where(v => v == 5).ObserveOn(NewThreadScheduler.Default)
+              .Subscribe(x =>
+              {
+                  PushMsg("扫码枪完成");
+                  Buffers.Enqueue(Barcodes.Select(x => x.Value).ToList());
+                  RaisePropertyChanged(nameof(Buffers));
+                  Barcodes.ForEach(x => x.Value = "");
+                  dataServer["OUT_SCAN_ERROR"]?.Write(5);
+                  dataServer["CNT"].Write(Buffers.Count);
+              });
             dataServer["CLR"]?.ToObservable().Select(X => X.Int32).Where(X => X == 1).Subscribe(X =>
             {
                 PushMsg("清除数据");
                 Buffers.Clear();
                 dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
             });
-         
-           
 
-            dataServer["IN_SCAN"]?.ToObservable().ObserveOnDispatcher().Select(x => x.Int32)
-             .Where(value => value >= 1 && value <= 4)
-             .Subscribe(m =>
+
+
+            RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0)).Buffer(2, 1).Where(x => x[0] != x[1])
+                .Select(x => x[1]).ObserveOn(NewThreadScheduler.Default)
+          .Where(value => value >= 1 && value <= 4)
+         .Subscribe(m =>
              {
                  try
                  {
@@ -212,9 +267,9 @@ namespace Mv.Modules.Schneider.ViewModels
 
             //记录第一组张力值
             #region 记录第一组张力
-            dataServer["TS1_IN"]?.ToObservable().Select(X => X.Int32)
-                .Where(v => v == 1).Subscribe(x =>
-                {
+            RemoteIO.Select(x => x[4]).Rising().ObserveOn(NewThreadScheduler.Default)
+           .Subscribe(x =>
+           {
                     PushMsg("开始记录第一组张力");
                     if (dataCollection
                         == null)
@@ -230,11 +285,9 @@ namespace Mv.Modules.Schneider.ViewModels
                     }
                     bgettensiongroup1 = true;
                 });
-            dataServer["TS1_IN"]?
-                .ToObservable()
-                .Select(X => X.Int32)
-            .Where(v => v == 0).Subscribe(x =>
-            {
+            RemoteIO.Select(x => x[4]).Falling().ObserveOn(NewThreadScheduler.Default)
+             .Subscribe(x =>
+             {
                 bgettensiongroup1 = false;
                 var standard1 = dataServer["TS1_STANDARD"].Value.Int32 * 1d;
                 var offset1 = standard1 * dataServer["TS1_OFFSET"].Value.Int32 / 1000.0d / 100d;
@@ -249,8 +302,6 @@ namespace Mv.Modules.Schneider.ViewModels
                         Index = m.First,
                         Name = m.Second.Name,
                         Values = m.Second.Values,
-                        //HighValues = m.Second.Values.Where(z => z.Value > standard1 + offset1).OrderByDescending(z => z.Value),
-                        //LowValues = m.Second.Values.Where(z => z.Value < standard1 - offset1).OrderBy(z => z.Value),
                         Result = m.Second.Values.All(z => z.Value < (standard1 + offset1) && z.Value > (standard1 - offset1))
                     });
                     ps.ForEach(x =>
@@ -280,10 +331,10 @@ namespace Mv.Modules.Schneider.ViewModels
                         }
                     });
                     dataServer["TS_OUTPUT"].Write(output);
-                    
+
                     PushMsg("输出：" + Convert.ToString(output, 2).PadLeft(4, '0'));
                 }
-        
+
             });
             #endregion
 
@@ -291,7 +342,6 @@ namespace Mv.Modules.Schneider.ViewModels
             this.configureFile = configureFile;
             this.logger = logger;
             gettensiongroup1();
-           // gettensiongroup2();
 
 
         }
@@ -299,7 +349,7 @@ namespace Mv.Modules.Schneider.ViewModels
         private void gettensiongroup1()
         {
             PushMsg("开始记录第一组张力数据");
-         
+
 
             var tensionNames = Enumerable.Range(1, 1).Select(x => $"tension{x}").ToList();
             for (int i = 0; i < 1; i++)
@@ -310,9 +360,9 @@ namespace Mv.Modules.Schneider.ViewModels
                     var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups);
                     if (bgettensiongroup1)
                     {
-                     //   PushMsg($"{m},value:{value}");
+                        //   PushMsg($"{m},value:{value}");
                         groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
-                    }                 
+                    }
                 });
             }
         }
@@ -348,6 +398,20 @@ namespace Mv.Modules.Schneider.ViewModels
         public void OnUnloaded(Dash view)
         {
             //   throw new NotImplementedException();
+        }
+    }
+
+    public static class IOExt
+    {
+
+        public static IObservable<bool> Rising(this IObservable<bool> observable)
+        {
+            return observable.Buffer(2, 1).Where(x => (x[1] == true) && (x[0] == false)).Select(x => x[1]);
+        }
+
+        public static IObservable<bool> Falling(this IObservable<bool> observable)
+        {
+            return observable.Buffer(2, 1).Where(x => (x[1] == false) && (x[0] == true)).Select(x => x[1]);
         }
     }
 }
