@@ -40,12 +40,21 @@ namespace Mv.Modules.Schneider.Service
 
         }
 
-        public void saveFile(string localdata, string fileName)
+        public bool saveFile(string localdata, string fileName)
         {
-            string contents = JsonConvert.SerializeObject(localdata);
-            OnMessage($"{fileName}--{contents}");
-            File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
-            File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+            try
+            {
+                string contents = JsonConvert.SerializeObject(localdata);
+                OnMessage($"{fileName}--{contents}");
+                File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
+                File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
         }
 
         public void OnMessage(string msg, Category level = Category.Debug)
@@ -166,11 +175,13 @@ namespace Mv.Modules.Schneider.Service
                     localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
                     localdata.Quantity = dataServer["R_QTY"].Value.Int32;
                     localdata.Turns = dataServer["R_ROWS"].Value.Int32;
-                    localdata.Program = dataServer["PROGRAM"].ToString();
+                    localdata.Program = dataServer["PROGRAM"].ToString();                 
                     string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
-                    string content = $"{Station}JS$,{localdata.Code}," + JsonConvert.SerializeObject(localdata) + "\n";
+                    string js = JsonConvert.SerializeObject(localdata);
+                    var result =  saveFile(js, fileName)?-1:1;
+                    string content = $"{Station}JS$,{localdata.Code},{result},{js}\n";                
                     Write(content);
-                    saveFile(content, fileName);
+  
                 }
                 catch (Exception ex)
                 {
