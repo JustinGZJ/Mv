@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using static Mv.Modules.Schneider.ViewModels.GlobalValues;
 
 namespace Mv.Modules.Schneider.ViewModels
 {
     public static class GlobalValues
     {
-        public const int AXISCNT= 1;
+        public const int AXISCNT = 1;
     }
-   
+
     public class ProductDataCollection
     {
 
@@ -19,7 +20,9 @@ namespace Mv.Modules.Schneider.ViewModels
             {
                 ProductDatas.Add(new ProductData(i));
             }
+            TensionResut = new int[1];
         }
+        public int[] TensionResut { get; }
         public uint TensionOutput { get; set; }
         public List<ProductData> ProductDatas { get; set; }
     }
@@ -39,6 +42,7 @@ namespace Mv.Modules.Schneider.ViewModels
         public string Program { get; set; } = "";
         public int HVC { get; set; }
         public uint TensionOutput { get; set; }
+        public int[] TensionResults { get; set; }
 
         public string[] MaterialCodes { get; set; }
 
@@ -51,11 +55,11 @@ namespace Mv.Modules.Schneider.ViewModels
             TensionGroups = new List<TensionGroup>();
             for (int i = 0; i < 1; i++)
             {
-                TensionGroups.Add(new TensionGroup() { Name = $"tension{i*AXISCNT + 1+index}" });
+                TensionGroups.Add(new TensionGroup() { Name = $"tension{i * AXISCNT + 1 + index}" });
             }
         }
 
-        public string Code { get; set; } 
+        public string Code { get; set; }
         public int Status { get; set; }
         public double LoopTime { get; set; }
         public int Quantity { get; set; }
@@ -75,6 +79,21 @@ namespace Mv.Modules.Schneider.ViewModels
             public string Name { get; set; }
             public double UpperLimit { get; set; }
             public double LowerLimit { get; set; }
+            public bool Result => Values.Count == 0 || Values.All(z => z.Value <= UpperLimit && z.Value >= LowerLimit);
+            public int iResult
+            {
+                get
+                {
+                    if (Values.Count == 0)
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        return Values.All(z => z.Value <= UpperLimit && z.Value >= LowerLimit) ? -1 : 1;
+                    }
+                }
+            }
             public ICollection<Tension> Values { get; set; }
         }
         public class Tension

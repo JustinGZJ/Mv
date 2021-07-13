@@ -27,7 +27,7 @@
             <TextBlock Text="{Binding Title}" Margin="5" Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
         </Border>
         <Border Grid.Row="1" BorderThickness="1" BorderBrush="LightGray" CornerRadius="10" Background="WhiteSmoke">
-            <lvc:CartesianChart Grid.Row="1" AnimationsSpeed="0:0:0.05" Hoverable="False" DataTooltip="{x:Null}">
+            <!--<lvc:CartesianChart Grid.Row="1" AnimationsSpeed="0:0:0.05" Hoverable="False" DataTooltip="{x:Null}">
                 <lvc:CartesianChart.Series>
                     <lvc:LineSeries Values="{Binding ChartValues}" 
                                 PointGeometry="{x:Null}" 
@@ -54,7 +54,7 @@
                         </lvc:Axis.Separator>
                     </lvc:Axis>
                 </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
+            </lvc:CartesianChart>-->
         </Border>
         <Grid Panel.ZIndex="1" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="30 40"  >
             <Grid Margin="10">
