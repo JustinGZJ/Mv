@@ -41,6 +41,7 @@ namespace Mv.Modules.Schneider
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            Container.RegisterType<IRemoteIOService, RemoteIOService>();
             Container.RegisterType<IServerOperations, ServerOperations>();
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(Dashboard));
             regionManager.RegisterViewWithRegion(RegionNames.MainTabRegion, typeof(ProductInfo));

@@ -40,12 +40,22 @@ namespace Mv.Modules.Schneider.Service
 
         }
 
-        public void saveFile(string localdata, string fileName)
+        public bool saveFile(string localdata, string fileName)
         {
-            string contents = JsonConvert.SerializeObject(localdata);
-            OnMessage($"{fileName}--{contents}");
-            File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
-            File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+            try
+            {
+                string contents = JsonConvert.SerializeObject(localdata);
+                OnMessage($"{fileName}--{contents}");
+                File.WriteAllText(Path.Combine(Folders.TENSIONS, fileName), contents);
+                File.WriteAllText(Path.Combine(Folders.TENSIONSBACKUP, fileName), contents);
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+
         }
 
         public void OnMessage(string msg, Category level = Category.Debug)
@@ -137,7 +147,7 @@ namespace Mv.Modules.Schneider.Service
                 OnMessage("服务器验证已关闭");
                 return 0;
             }
-
+          
             var uploadData = new ServerData()
             {
                 Status = dataServer["R_STATUS"].Value.Int32,
@@ -160,7 +170,7 @@ namespace Mv.Modules.Schneider.Service
                 {
                     foreach (var group in localdata.TensionGroups)
                     {
-                        group.Values = group.Values.ToList();
+                        group.Values = group.Values.Skip(10).SkipLast(10).ToList();
                     }
                     localdata.Status = dataServer["R_STATUS"].Value.Int32;
                     localdata.LoopTime = dataServer["R_CIRCLE"].Value.Int32 / 100f;
@@ -169,9 +179,10 @@ namespace Mv.Modules.Schneider.Service
                     localdata.Program = dataServer["PROGRAM"].ToString();
                     string fileName = $"{Station}_{localdata.Code ?? ("Empty" + DateTime.Now.ToString("yyyyMMddHHmmss"))}.json";
                     string js = JsonConvert.SerializeObject(localdata);
+                    var r = saveFile(js, fileName) ? -1 : 1;
                     string content = $"{Station}JS$,{localdata.Code},{js}\n";
                     Write(content);
-                    saveFile(content, fileName);
+
                 }
                 catch (Exception ex)
                 {

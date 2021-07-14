@@ -85,6 +85,7 @@ namespace Mv.Shell
             this.Container.Resolve<ILoggerFacade>().Log($"TANAC上位机软件退出:{e.ApplicationExitCode}", Category.Debug, Priority.None); 
             Log.CloseAndFlush();
             base.OnExit(e);
+            Environment.Exit(0);
         }
     }
 }

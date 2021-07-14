@@ -77,7 +77,7 @@ namespace Mv.Modules.Schneider.ViewModels
             scanner = new TcpDevice("192.168.1.101", 9004);
 
             RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x);
-            monitors.Add(new TesionMonitor("192.168.1.201", 32));
+            monitors.Add(new TesionMonitor("192.168.1.200", 32));
 
             Observable.Interval(TimeSpan.FromSeconds(0.5), ThreadPoolScheduler.Instance).Subscribe(x =>
             {
@@ -94,9 +94,9 @@ namespace Mv.Modules.Schneider.ViewModels
 
             //PLC 心跳
 
-            Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(x =>
+            //Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(x =>
 
-            (dataServer["PC_READY"])?.Write((x % 2).ToString()));
+            //(dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
             Enumerable.Range(1, 1).Select(x => (index: x - 1, name: $"tension{x}")).ForEach(m =>
             {
@@ -216,12 +216,12 @@ namespace Mv.Modules.Schneider.ViewModels
                   dataServer["OUT_SCAN_ERROR"]?.Write(5);
 
               });
-            dataServer["CLR"]?.ToObservable().Select(X => X.Int32).Where(X => X == 1).Subscribe(X =>
-            {
-                PushMsg("清除数据");
-                Buffers.Clear();
-                dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
-            });
+            //dataServer["CLR"]?.ToObservable().Select(X => X.Int32).Where(X => X == 1).Subscribe(X =>
+            //{
+            //    PushMsg("清除数据");
+            //    Buffers.Clear();
+            //    dataServer["OUT_SCAN_ERROR"]?.Write((int)ScanCode.STANDBY);
+            //});
 
 
 
@@ -358,7 +358,7 @@ namespace Mv.Modules.Schneider.ViewModels
                          {
                              Index = m.First,
                              Name = m.Second.Name,
-                             Values = m.Second.Values.SkipLast(3).ToList(),
+                             Values = m.Second.Values.Skip(10).SkipLast(10).ToList(),
                          });
                          ps.ForEach(x =>
                          {
@@ -425,13 +425,15 @@ namespace Mv.Modules.Schneider.ViewModels
             for (int i = 0; i < 1; i++)
             {
                 var m = tensionNames[i];
-                tensionobs[m]?.Subscribe(value =>
+                tensionobs[m]?.ObserveOn(NewThreadScheduler.Default).Subscribe(value =>
                 {
-                    var groups = dataCollection?.ProductDatas.SelectMany(x => x.TensionGroups);
                     if (bgettensiongroup1)
                     {
-                        //   PushMsg($"{m},value:{value}");
-                        groups.FirstOrDefault(x => x.Name == m).Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
+                        dataCollection?
+                        .ProductDatas
+                        .SelectMany(x => x.TensionGroups)
+                        .FirstOrDefault(x => x.Name == m)
+                        .Values.Add(new ProductData.Tension() { Time = DateTime.Now, Value = value });
                     }
                 });
             }

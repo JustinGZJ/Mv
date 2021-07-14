@@ -17,8 +17,8 @@ namespace Mv.Modules.Schneider.Service
     public class RemoteIOService : IRemoteIOService, IDisposable
     {
         CancellationTokenSource tokenSource;
-        public bool[] outputs { get; } = new bool[] { false, false, false, false, false, false, false, false };
-        bool[] _outputs { get; } = new bool[] { false, false, false, false, false, false, false, false };
+        public bool[] outputs { get; } = new bool[] { false, false, false, false };
+        bool[] _outputs { get; } = new bool[] { false, false, false, false};
         UserMessageEvent userMessageEvent;
         public event Action<bool[]> OnRecieve;
         private int lastTick;
@@ -45,7 +45,7 @@ namespace Mv.Modules.Schneider.Service
                     if (outputs.Zip(_outputs).Any(X => X.First != X.Second))
                     {
                         Array.Copy(outputs, _outputs, _outputs.Length);
-                        modbus.Write("16", outputs);
+                        modbus.Write("20", outputs);
                         Thread.Sleep(10);
                     }
 
