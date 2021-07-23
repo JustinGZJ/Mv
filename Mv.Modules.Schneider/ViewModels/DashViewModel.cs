@@ -100,9 +100,6 @@ namespace Mv.Modules.Schneider.ViewModels
              });
             //PLC 心跳
 
-            Observable.Interval(TimeSpan.FromSeconds(1)).Subscribe(x =>
-
-            (dataServer["PC_READY"])?.Write((x % 2).ToString()));
 
 
             Enumerable.Range(1, 8).Select(x => (index:x-1,name: $"tension{x}")).ForEach(m =>
@@ -267,7 +264,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             void 扫码(IDataServer dataServer, IServerOperations operations, IConfigureFile configureFile)
             {
-                RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0)).Buffer(2, 1).Where(x => x[0] != x[1])
+                RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0)).Buffer(2, 1).Where(x => x[0] != x[1]&&x[0]==0)
                     .Select(x => x[1]).ObserveOn(NewThreadScheduler.Default)
               .Where(value => value >= 1 && value <= 4)
                  .Subscribe(m =>
