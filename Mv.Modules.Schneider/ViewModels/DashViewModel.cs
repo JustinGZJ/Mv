@@ -74,7 +74,7 @@ namespace Mv.Modules.Schneider.ViewModels
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
 
-            RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x);
+            RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x).Where(x=>x!=null);
             monitors.Add(new TesionMonitor("192.168.1.201", 32));
             monitors.Add(new TesionMonitor("192.168.1.201", 33));
             monitors.Add(new TesionMonitor("192.168.1.201", 34));
@@ -195,8 +195,8 @@ namespace Mv.Modules.Schneider.ViewModels
                         {
                             foreach (var data in uploaddata.ProductDatas)
                             {
-                                data.TensionGroups.First().Values = data.TensionGroups.First().Values.ToList().SkipLast(3).ToList();
-                                data.TensionGroups.Last().Values = data.TensionGroups.Last().Values.ToList().SkipLast(3).ToList();
+                                data.TensionGroups.First().Values = data.TensionGroups.First().Values.ToList().Median(3).SkipLast(3).ToList();
+                                data.TensionGroups.Last().Values = data.TensionGroups.Last().Values.ToList().Median(3).SkipLast(3).ToList();
                             }
                             operations.Upload(uploaddata);
                         }
@@ -402,7 +402,7 @@ namespace Mv.Modules.Schneider.ViewModels
                              {
                                  Index = m.First,
                                  Name = m.Second.Name,
-                                 Values = m.Second.Values.SkipLast(3).ToList(),
+                                 Values = m.Second.Values.SkipLast(3).Median(3).ToList(),
                              });
                              ps.ForEach(x =>
                              {
@@ -492,7 +492,7 @@ namespace Mv.Modules.Schneider.ViewModels
                        {
                            Index = m.First,
                            Name = m.Second.Name,
-                           Values = m.Second.Values.SkipLast(3).ToList(),
+                           Values = m.Second.Values.SkipLast(3).Median(3).ToList(),
                        });
                        ps.ForEach(x =>
                        {
@@ -623,6 +623,14 @@ namespace Mv.Modules.Schneider.ViewModels
         public static IObservable<bool> Falling(this IObservable<bool> observable)
         {
             return observable.Buffer(2, 1).Where(x => (x[1] == false) && (x[0] == true)).Select(x => x[1]);
+        }
+
+   
+    }
+    public static class LinqExt
+    {
+        public static IEnumerable<ProductData.Tension> Median(this IEnumerable<ProductData.Tension> ts,int count) {
+          return ts.ToObservable().Buffer(count, 1).Select(x => x.OrderBy(x =>x.Value).Skip(x.Count / 2).First()).ToEnumerable().ToList();
         }
     }
 }
