@@ -195,8 +195,8 @@ namespace Mv.Modules.Schneider.ViewModels
                         {
                             foreach (var data in uploaddata.ProductDatas)
                             {
-                                data.TensionGroups.First().Values = data.TensionGroups.First().Values.ToList().Median(3).SkipLast(3).ToList();
-                                data.TensionGroups.Last().Values = data.TensionGroups.Last().Values.ToList().Median(3).SkipLast(3).ToList();
+                                data.TensionGroups.First().Values = data.TensionGroups.First().Values.ToList().Median(3).SkipLast(10).ToList();
+                                data.TensionGroups.Last().Values = data.TensionGroups.Last().Values.ToList().Median(3).SkipLast(10).ToList();
                             }
                             operations.Upload(uploaddata);
                         }
@@ -402,7 +402,7 @@ namespace Mv.Modules.Schneider.ViewModels
                              {
                                  Index = m.First,
                                  Name = m.Second.Name,
-                                 Values = m.Second.Values.SkipLast(3).Median(3).ToList(),
+                                 Values = m.Second.Values.SkipLast(10).Median(3).ToList(),
                              });
                              ps.ForEach(x =>
                              {
@@ -492,7 +492,7 @@ namespace Mv.Modules.Schneider.ViewModels
                        {
                            Index = m.First,
                            Name = m.Second.Name,
-                           Values = m.Second.Values.SkipLast(3).Median(3).ToList(),
+                           Values = m.Second.Values.SkipLast(10).Median(3).ToList(),
                        });
                        ps.ForEach(x =>
                        {
