@@ -21,6 +21,11 @@ namespace Mv.Modules.Schneider.ViewModels
         [DisplayName("上传禁用")]
         public bool ServerDisable { get; set; }
 
+        [Category("配置")]
+        [DisplayName("张力采集频率（ms）")]
+        public int TensionFreq { get; set; }
+
+
         public string[] MaterialCodes { get; set; } = Enumerable.Repeat("", 8).ToArray();
 
     }

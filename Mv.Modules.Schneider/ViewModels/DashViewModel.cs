@@ -75,16 +75,15 @@ namespace Mv.Modules.Schneider.ViewModels
             scanner = new TcpDevice("192.168.1.101", 9004);
 
             RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x).Where(x=>x!=null);
-            monitors.Add(new TesionMonitor("192.168.1.201", 32));
-            monitors.Add(new TesionMonitor("192.168.1.201", 33));
-            monitors.Add(new TesionMonitor("192.168.1.201", 34));
-            monitors.Add(new TesionMonitor("192.168.1.201", 35));
-            monitors.Add(new TesionMonitor("192.168.1.200", 36));
-            monitors.Add(new TesionMonitor("192.168.1.200", 37));
-            monitors.Add(new TesionMonitor("192.168.1.200", 38));
-            monitors.Add(new TesionMonitor("192.168.1.200", 39));
-
-
+           var  Config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
+            monitors.Add(new TesionMonitor("192.168.1.201", 32,Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.201", 33, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.201", 34, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.201", 35, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.200", 36, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.200", 37, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.200", 38, Config.TensionFreq));
+            monitors.Add(new TesionMonitor("192.168.1.200", 39, Config.TensionFreq));
 
             Observable.Interval(TimeSpan.FromSeconds(0.5), ThreadPoolScheduler.Instance).Subscribe(x =>
              {
@@ -96,6 +95,7 @@ namespace Mv.Modules.Schneider.ViewModels
                  {
                      remoteIO.outputs[2] = false;
                  }
+
                  remoteIO.outputs[3] = !remoteIO.outputs[3];
              });
             //PLC 心跳
