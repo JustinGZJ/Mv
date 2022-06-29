@@ -286,7 +286,7 @@ namespace Mv.Modules.Hmi.ViewModels
                         data.Position1Result = dataServer[GetTagName(TagNames.R_POS1)].Value.Int16 == 0;
                         data.Position2Result = dataServer[GetTagName(TagNames.R_POS2)].Value.Int16 == 0;
                         data.ResistanceResult = dataServer[GetTagName(TagNames.R_RES)].Value.Int16 == 0;
-                        data.Product = dataServer[GetTagName(TagNames.PD_NUM)].Value.Int16 == 1 ? "B1" : "W2";
+                        data.Product = dataServer[GetTagName(TagNames.PD_NUM)].Value.Int16 == 1 ? "B1" :dataServer[GetTagName(TagNames.PD_NUM)].Value.Int16 == 2?"W2":"G3";
                         data.Result = dataServer[GetTagName(TagNames.R_PD)].Value.Int16 == 0 ? "PASS" : "FAIL";
                         Invoke(() =>
                         {
