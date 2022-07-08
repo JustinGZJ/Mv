@@ -25,7 +25,7 @@ namespace Mv.Modules.Schneider.Service
 
         bool serverDisable => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerDisable;
         public string Ip => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerIP;
-        public int Port { get; set; } = 502;
+        public int Port => (configure.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig()).ServerPort;
         public ServerOperations(IEventAggregator aggregator, IDataServer dataServer, IConfigureFile configure, ILoggerFacade logger)
         {
             messageEvent = aggregator.GetEvent<UserMessageEvent>();
@@ -61,27 +61,25 @@ namespace Mv.Modules.Schneider.Service
         {
             try
             {
-                using (SimpleTcpClient client = new SimpleTcpClient())
+                using SimpleTcpClient client = new SimpleTcpClient();
+                client.TimeOut = TimeSpan.FromSeconds(3);
+                client.Connect(Ip, Port);
+                if (!client.TcpClient.IsOnline())
                 {
-                    client.TimeOut = TimeSpan.FromSeconds(3);
-                    client.Connect(Ip, Port);
-                    if (!client.TcpClient.IsOnline())
-                    {
-                        OnMessage("没连接上.");
-                        return -1;//连接失败
-                    }
-                    var msg = client.WriteAndGetReply(cmd);
-                    OnMessage("发送数据:" + cmd);
-                    if (msg != null && func != null)
-                    {
-                        OnMessage("收到反馈:" + msg.MessageString);
-                        return func.Invoke(msg.MessageString);
-                    }
-                    else
-                    {
-                        OnMessage("没有收到返回数据");
-                        return -2;//没有收到返回数据
-                    }
+                    OnMessage("没连接上.");
+                    return -1;//连接失败
+                }
+                var msg = client.WriteAndGetReply(cmd);
+                OnMessage("发送数据:" + cmd);
+                if (msg != null && func != null)
+                {
+                    OnMessage("收到反馈:" + msg.MessageString);
+                    return func.Invoke(msg.MessageString);
+                }
+                else
+                {
+                    OnMessage("没有收到返回数据");
+                    return -2;//没有收到返回数据
                 }
             }
             catch (Exception ex)
@@ -96,19 +94,17 @@ namespace Mv.Modules.Schneider.Service
         {
             try
             {
-                using (SimpleTcpClient client = new SimpleTcpClient())
+                using SimpleTcpClient client = new SimpleTcpClient();
+                client.TimeOut = TimeSpan.FromSeconds(3);
+                client.Connect(Ip, Port);
+                if (!client.TcpClient.IsOnline())
                 {
-                    client.TimeOut = TimeSpan.FromSeconds(3);
-                    client.Connect(Ip, Port);
-                    if (!client.TcpClient.IsOnline())
-                    {
-                        OnMessage("没连接上.");
-                        return -1;//连接失败
-                    }
-                    client.Write(cmd);
-                    OnMessage("发送数据:" + cmd);
-                    return 0;
+                    OnMessage("没连接上.");
+                    return -1;//连接失败
                 }
+                client.Write(cmd);
+                OnMessage("发送数据:" + cmd);
+                return 0;
             }
             catch (Exception ex)
             {

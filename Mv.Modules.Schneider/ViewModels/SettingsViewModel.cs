@@ -13,6 +13,10 @@ namespace Mv.Modules.Schneider.ViewModels
         [Category("配置")]
         [DisplayName("服务器IP")]
         public string ServerIP { get; set; } = "192.168.0.201";
+        
+        [Category("配置")]
+        [DisplayName("服务器端口")]
+        public int ServerPort { get; set; } = 6000;
         [Category("配置")]
         [DisplayName("站号")]
         public string Station { get; set; } = "ST030";
