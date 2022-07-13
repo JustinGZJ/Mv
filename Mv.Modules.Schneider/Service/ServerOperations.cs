@@ -92,6 +92,11 @@ namespace Mv.Modules.Schneider.Service
 
         private int Write(string cmd)
         {
+            if (serverDisable)
+            {
+                OnMessage("服务器验证已关闭");
+                return 0;
+            }
             try
             {
                 using SimpleTcpClient client = new SimpleTcpClient();
@@ -135,7 +140,6 @@ namespace Mv.Modules.Schneider.Service
             if (serverDisable)
             {
                 OnMessage("服务器验证已关闭");
-                return 0;
             }
 
             var uploadData = new ServerData()
