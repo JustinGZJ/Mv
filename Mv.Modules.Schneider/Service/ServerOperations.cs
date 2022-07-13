@@ -95,21 +95,25 @@ namespace Mv.Modules.Schneider.Service
 
         private int Write(string cmd)
         {
+
+            if (serverDisable)
+            {    
+                OnMessage("服务器上传已经关闭");
+                return 0;
+            }
             try
             {
-                using (SimpleTcpClient client = new SimpleTcpClient())
+                using SimpleTcpClient client = new SimpleTcpClient();
+                client.TimeOut = TimeSpan.FromSeconds(3);
+                client.Connect(Ip, Port);
+                if (!client.TcpClient.IsOnline())
                 {
-                    client.TimeOut = TimeSpan.FromSeconds(3);
-                    client.Connect(Ip, Port);
-                    if (!client.TcpClient.IsOnline())
-                    {
-                        OnMessage("没连接上.");
-                        return -1;//连接失败
-                    }
-                    client.Write(cmd);
-                    OnMessage("发送数据:" + cmd);
-                    return 0;
+                    OnMessage("没连接上.");
+                    return -1;//连接失败
                 }
+                client.Write(cmd);
+                OnMessage("发送数据:" + cmd);
+                return 0;
             }
             catch (Exception ex)
             {
@@ -140,7 +144,7 @@ namespace Mv.Modules.Schneider.Service
             if (serverDisable)
             {
                 OnMessage("服务器验证已关闭");
-                return 0;
+            //    return 0;
             }
           
             var uploadData = new ServerData()
