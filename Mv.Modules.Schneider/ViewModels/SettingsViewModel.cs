@@ -25,7 +25,11 @@ namespace Mv.Modules.Schneider.ViewModels
         [Category("配置")]
         [DisplayName("上传禁用")]
         public bool ServerDisable { get; set; }
-   
+
+        [Category("配置")]
+        [DisplayName("采集频率")]
+        public int Freq { get; set; } = 400;
+
         public string[] MaterialCodes { get; set; } = Enumerable.Repeat("", 8).ToArray();
 
     }

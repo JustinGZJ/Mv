@@ -9,11 +9,11 @@ namespace Mv.Modules.Schneider.Service
     {
         ModbusTcpNet modbus;
         public event Action<ushort> OnRecieve;
-        public TesionMonitor(string address, int node)
+        public TesionMonitor(string address, int node, int interval = 400)
         {
             modbus = new ModbusTcpNet(address);
 
-            Observable.Interval(TimeSpan.FromMilliseconds(400), NewThreadScheduler.Default).Subscribe(x =>
+            Observable.Interval(TimeSpan.FromMilliseconds(interval), NewThreadScheduler.Default).Subscribe(x =>
                 {
                     var result = modbus.ReadUInt16($"s:{node};162");
                     if (result.IsSuccess)
@@ -24,7 +24,7 @@ namespace Mv.Modules.Schneider.Service
         }
         public IObservable<ushort> GetObservable()
         {
-          return  Observable.FromEvent<ushort>(x => OnRecieve += x, x => OnRecieve -= x);
+            return Observable.FromEvent<ushort>(x => OnRecieve += x, x => OnRecieve -= x);
         }
     }
 }

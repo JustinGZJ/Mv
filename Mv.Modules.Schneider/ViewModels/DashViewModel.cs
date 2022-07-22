@@ -75,10 +75,10 @@ namespace Mv.Modules.Schneider.ViewModels
         {
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
-
+            var config =configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig)) ?? new ScheiderConfig();
             RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x);
-            monitors.Add(new TesionMonitor("192.168.1.200", 32));
-
+            monitors.Add(new TesionMonitor("192.168.1.200", 32,config.Freq));
+        
             Observable.Interval(TimeSpan.FromSeconds(0.5), ThreadPoolScheduler.Instance).Subscribe(x =>
             {
                 if (Buffers.Count > 0)
@@ -410,6 +410,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             this.operations = operations;
             this.configureFile = configureFile;
+           //var scheduler =this.configureFile.GetValue<>(nameof(Scheduler));
             this.logger = logger;
             gettensiongroup1();
 

@@ -38,6 +38,7 @@ namespace Mv.Modules.Schneider
             base.OnInitialized(containerProvider);
       
         }
+        
 
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
