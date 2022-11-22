@@ -187,5 +187,20 @@ namespace Mv.Modules.Schneider.Service
             }
             return 0;
         }
+
+        public int CheckHVC(string hvc)
+        {
+            if (serverDisable)
+            {
+                OnMessage("HVC验证已关闭");
+            }
+          return  Read($"HVC${hvc},{Station}\n", (s) =>
+            {
+                if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
+                    return 0;
+                else
+                    return -1;
+            });
+        }
     }
 }

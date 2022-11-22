@@ -10,6 +10,7 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -74,9 +75,9 @@ namespace Mv.Modules.Schneider.ViewModels
             userMessageEvent = EventAggregator.GetEvent<UserMessageEvent>();
             scanner = new TcpDevice("192.168.1.101", 9004);
 
-            RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x).Where(x=>x!=null);
-           var  Config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
-            monitors.Add(new TesionMonitor("192.168.1.201", 32,Config.TensionFreq));
+            RemoteIO = Observable.FromEvent<bool[]>(x => remoteIO.OnRecieve += x, x => remoteIO.OnRecieve -= x).Where(x => x != null);
+            var Config = configureFile.GetValue<ScheiderConfig>(nameof(ScheiderConfig));
+            monitors.Add(new TesionMonitor("192.168.1.201", 32, Config.TensionFreq));
             monitors.Add(new TesionMonitor("192.168.1.201", 33, Config.TensionFreq));
             monitors.Add(new TesionMonitor("192.168.1.201", 34, Config.TensionFreq));
             monitors.Add(new TesionMonitor("192.168.1.201", 35, Config.TensionFreq));
@@ -85,7 +86,7 @@ namespace Mv.Modules.Schneider.ViewModels
             monitors.Add(new TesionMonitor("192.168.1.200", 38, Config.TensionFreq));
             monitors.Add(new TesionMonitor("192.168.1.200", 39, Config.TensionFreq));
 
-            Observable.Interval(TimeSpan.FromSeconds(0.5), ThreadPoolScheduler.Instance).Subscribe(x =>
+            Observable.Interval(TimeSpan.FromSeconds(1), ThreadPoolScheduler.Instance).Subscribe(x =>
              {
                  if (Buffers.Count > 0)
                  {
@@ -99,19 +100,40 @@ namespace Mv.Modules.Schneider.ViewModels
                  remoteIO.outputs[3] = !remoteIO.outputs[3];
              });
             //PLC 心跳
-
-
-
-            Enumerable.Range(1, 8).Select(x => (index:x-1,name: $"tension{x}")).ForEach(m =>
+            Observable.Interval(TimeSpan.FromSeconds(1.5), ThreadPoolScheduler.Instance).Subscribe(x =>
             {
-                    tensionobs[m.name] = monitors[m.index].GetObservable();
+                if (dataServer["IN_SCAN"].Value.Int32 != 0)  //G4 HVC使能
+                {
+               //     string.Join(",", Process.GetProcesses().Select(x => x.ProcessName).ToList());
+
+                    if (!Process.GetProcesses().Any(x => x.ProcessName.ToUpper().Contains("MCU"))) //检查HVC程序是否运行
+                    {
+                        PushMsg("HVC未打开");
+                        remoteIO.outputs[4] = false;  //HVC 输出给G4
+                    }
+                    if (operations.CheckHVC(dataServer["PROGRAM"].ToString()) == 0)
+                    {
+                        remoteIO.outputs[4] = true;  //HVC 输出
+                    }
+                    else
+                    {
+                        remoteIO.outputs[4] = false; //HVC 输出
+                    }
+                }
             });
+
+
+            Enumerable.Range(1, 8).Select(x => (index: x - 1, name: $"tension{x}")).ForEach(m =>
+                {
+                    tensionobs[m.name] = monitors[m.index].GetObservable();
+                });
             RemoteIO.Subscribe(x =>
             {
-                Dispatcher.BeginInvoke(new Action(() => {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
                     Inputs = "输入：" + string.Join(' ', x.Take(8).Select(x => x ? 1 : 0));
                     Ontputs = "输出：" + string.Join(' ', x.Skip(16).Take(8).Select(x => x ? 1 : 0));
-                }),null);
+                }), null);
             });
 
             开始绕线信号(dataServer);
@@ -178,8 +200,8 @@ namespace Mv.Modules.Schneider.ViewModels
             catch (Exception)
             {
 
-                    //    throw;
-                }
+                //    throw;
+            }
         });
 
             }
@@ -264,7 +286,7 @@ namespace Mv.Modules.Schneider.ViewModels
 
             void 扫码(IDataServer dataServer, IServerOperations operations, IConfigureFile configureFile)
             {
-                RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0)).Buffer(2, 1).Where(x => x[0] != x[1]&&x[0]==0)
+                RemoteIO.Select(x => (x[0] ? 1 : 0) + (x[1] ? 2 : 0) + (x[2] ? 4 : 0)).Buffer(2, 1).Where(x => x[0] != x[1] && x[0] == 0)
                     .Select(x => x[1]).ObserveOn(NewThreadScheduler.Default)
               .Where(value => value >= 1 && value <= 4)
                  .Subscribe(m =>
@@ -286,11 +308,11 @@ namespace Mv.Modules.Schneider.ViewModels
                              else
                              {
                                  barcode = result.Trim('\r');
-                                  Invoke(new Action(() =>
-                                 {
-                                     Barcodes[m - 1] = barcode;
-                                 }));
-                          
+                                 Invoke(new Action(() =>
+                                {
+                                    Barcodes[m - 1] = barcode;
+                                }));
+
                                  // barcod
                                  if (!barcode.Contains("GDE888888") && !barcode.Contains("GDE999999") && !barcode.Contains(dataServer["PROGRAM"].ToString().Trim('\0')))
                                  {
@@ -361,7 +383,7 @@ namespace Mv.Modules.Schneider.ViewModels
                                         }
                                     }
                                 }));
-         
+
                             }
                             bgettensiongroup1 = true;
                         }
@@ -625,12 +647,13 @@ namespace Mv.Modules.Schneider.ViewModels
             return observable.Buffer(2, 1).Where(x => (x[1] == false) && (x[0] == true)).Select(x => x[1]);
         }
 
-   
+
     }
     public static class LinqExt
     {
-        public static IEnumerable<ProductData.Tension> Median(this IEnumerable<ProductData.Tension> ts,int count) {
-          return ts.ToObservable().Buffer(count, 1).Select(x => x.OrderBy(x =>x.Value).Skip(x.Count / 2).First()).ToEnumerable().ToList();
+        public static IEnumerable<ProductData.Tension> Median(this IEnumerable<ProductData.Tension> ts, int count)
+        {
+            return ts.ToObservable().Buffer(count, 1).Select(x => x.OrderBy(x => x.Value).Skip(x.Count / 2).First()).ToEnumerable().ToList();
         }
     }
 }
