@@ -110,6 +110,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     {
                         PushMsg("HVC未打开");
                         remoteIO.outputs[4] = false;  //HVC 输出给G4
+                        return;
                     }
                     if (operations.CheckHVC(dataServer["PROGRAM"].ToString()) == 0)
                     {
@@ -118,6 +119,7 @@ namespace Mv.Modules.Schneider.ViewModels
                     else
                     {
                         remoteIO.outputs[4] = false; //HVC 输出
+                        PushMsg("HVC服务器验证失败");
                     }
                 }
             });

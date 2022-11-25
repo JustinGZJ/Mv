@@ -66,10 +66,12 @@ namespace Mv.Modules.Schneider.Service
                 client.Connect(Ip, Port);
                 if (!client.TcpClient.IsOnline())
                 {
-                    OnMessage("没连接上.");
+                   
+                    OnMessage(cmd+"没连接上.");
                     return -1;//连接失败
                 }
                 var msg = client.WriteAndGetReply(cmd);
+    
                 OnMessage("发送数据:" + cmd);
                 if (msg != null && func != null)
                 {
@@ -78,7 +80,43 @@ namespace Mv.Modules.Schneider.Service
                 }
                 else
                 {
-                    OnMessage("没有收到返回数据");
+                    OnMessage(cmd+"没有收到返回数据");
+                    return -2;//没有收到返回数据
+                }
+            }
+            catch (Exception ex)
+            {
+                OnMessage(ex.Message + "\n" + ex.StackTrace, Category.Warn);
+                return -3;
+                //  throw;
+            }
+        }
+
+
+        private int HVCRead(string cmd, Func<string, int> func)
+        {
+            try
+            {
+                using SimpleTcpClient client = new SimpleTcpClient();
+                client.TimeOut = TimeSpan.FromSeconds(3);
+                client.Connect(Ip, Port);
+                if (!client.TcpClient.IsOnline())
+                {
+
+                    OnMessage(cmd + "没连接上.");
+                    return -1;//连接失败
+                }
+                var msg = client.WriteAndGetReply(cmd);
+
+            //    OnMessage("发送数据:" + cmd);
+                if (msg != null && func != null)
+                {
+             //       OnMessage("收到反馈:" + msg.MessageString);
+                    return func.Invoke(msg.MessageString);
+                }
+                else
+                {
+                    OnMessage(cmd + "没有收到返回数据");
                     return -2;//没有收到返回数据
                 }
             }
@@ -94,7 +132,7 @@ namespace Mv.Modules.Schneider.Service
         {
             if (serverDisable)
             {
-                OnMessage("服务器验证已关闭");
+                OnMessage(cmd+"服务器验证已关闭");
                 return 0;
             }
             try
@@ -194,7 +232,7 @@ namespace Mv.Modules.Schneider.Service
             {
                 OnMessage("HVC验证已关闭");
             }
-          return  Read($"HVC${hvc},{Station}\n", (s) =>
+          return  HVCRead($"{Station}HVC${hvc}\n", (s) =>
             {
                 if (!string.IsNullOrEmpty(s) && s.ToUpper().Contains("OK"))
                     return 0;
