@@ -29,7 +29,9 @@ namespace Mv.Modules.Schneider.ViewModels
         [DisplayName("张力采集频率（ms）")]
         public int TensionFreq { get; set; }
 
-
+        [Category("配置")]
+        [DisplayName("HVC确认频率（s）")]
+        public int HVCFreq { get; set; } = 5;
         public string[] MaterialCodes { get; set; } = Enumerable.Repeat("", 8).ToArray();
 
     }

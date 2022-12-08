@@ -100,7 +100,7 @@ namespace Mv.Modules.Schneider.ViewModels
                  remoteIO.outputs[3] = !remoteIO.outputs[3];
              });
             //PLC 心跳
-            Observable.Interval(TimeSpan.FromSeconds(1.5), ThreadPoolScheduler.Instance).Subscribe(x =>
+            Observable.Interval(TimeSpan.FromSeconds(Config.HVCFreq), ThreadPoolScheduler.Instance).Subscribe(x =>
             {
                 if (dataServer["IN_SCAN"].Value.Int32 != 0)  //G4 HVC使能
                 {
